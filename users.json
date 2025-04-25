@@ -55,5 +55,17 @@
     "collegeName": "IIT Delhi",
     "trade": "Fitter",
     "photo": "https://raw.github.com/Horsamod/itidata/main/images/CYCCYCV_20250425182640.jpg"
+  },
+  {
+    "submittedAt": "2025-04-25T18:29:15.024Z",
+    "name": "TC5F",
+    "fatherName": "7FF6F6G",
+    "motherName": "UC66V6V",
+    "mobile": "5828258288",
+    "dob": "25-Apr-2025",
+    "passingYear": 2025,
+    "collegeName": "NIT Trichy",
+    "trade": "Electrician",
+    "photo": "https://raw.github.com/Horsamod/itidata/main/images/TC5F_20250425182913.jpg"
   }
 ]
