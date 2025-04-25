@@ -1,5 +1,4 @@
 [
- 
   {
     "name": "PO[KOPK",
     "fatherName": "HYYYUOI",
@@ -10,5 +9,17 @@
     "collegeName": "IIT Delhi",
     "trade": "Fitter",
     "photo": "https://raw.githubusercontent.com/Horsamod/itidata/main/images/PO[KOPK_20250425162411.jpg"
+  },
+  {
+    "submittedAt": "2025-04-25T16:54:23.243Z",
+    "name": "JFJF",
+    "fatherName": "FJFJFT",
+    "motherName": "FTJURFTJUF",
+    "mobile": "3655636565",
+    "dob": "6-May-56",
+    "passingYear": 2025,
+    "collegeName": "IIT Delhi",
+    "trade": "Electrician",
+    "photo": "https://raw.githubusercontent.com/Horsamod/itidata/main/images/JFJF_20250425165420.jpg"
   }
 ]
