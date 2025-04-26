@@ -56,7 +56,8 @@
     "passingYear": 2025,
     "collegeName": "IIT Delhi",
     "trade": "Fitter",
-    "photo": "https://raw.github.com/Horsamod/itidata/main/images/CYCCYCV_20250425182640.jpg"
+    "photo": "https://raw.github.com/Horsamod/itidata/main/images/CYCCYCV_20250425182640.jpg",
+    "status": "Processing"
   },
   {
     "submittedAt": "2025-04-25T18:29:15.024Z",
