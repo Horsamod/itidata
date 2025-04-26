@@ -21,7 +21,8 @@
     "passingYear": 2025,
     "collegeName": "IIT Delhi",
     "trade": "Electrician",
-    "photo": "https://raw.githubusercontent.com/Horsamod/itidata/main/images/JFJF_20250425165420.jpg"
+    "photo": "https://raw.githubusercontent.com/Horsamod/itidata/main/images/JFJF_20250425165420.jpg",
+    "status": "Processing"
   },
   {
     "submittedAt": "2025-04-25T17:37:46.731Z",
