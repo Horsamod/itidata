@@ -45,7 +45,8 @@
     "passingYear": 2025,
     "collegeName": "IIT Delhi",
     "trade": "Fitter",
-    "photo": "https://raw.githubusercontent.com/Horsamod/itidata/main/images/AMDADUL_20250425180619.jpg"
+    "photo": "https://raw.githubusercontent.com/Horsamod/itidata/main/images/AMDADUL_20250425180619.jpg",
+    "status": "Rejected"
   },
   {
     "name": "CYCCYCV",
