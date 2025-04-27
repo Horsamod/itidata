@@ -71,5 +71,18 @@
     "trade": "Electrician",
     "photo": "https://raw.github.com/Horsamod/itidata/main/images/TC5F_20250425182913.jpg",
     "status": "Processing"
+  },
+  {
+    "submittedAt": "2025-04-27T00:32:58.374Z",
+    "name": "T7YY",
+    "fatherName": "YIUUUI",
+    "motherName": "UIUUI",
+    "mobile": "5556555533",
+    "dob": "27-Apr-2025",
+    "passingYear": 2025,
+    "collegeName": "Custom",
+    "trade": "Fitter",
+    "photo": "https://raw.githubusercontent.com/Horsamod/itidata/main/images/T7YY_20250427003256.jpg",
+    "status": "Processing"
   }
 ]
