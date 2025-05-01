@@ -86,5 +86,18 @@
     "trade": "Fitter",
     "photo": "https://raw.githubusercontent.com/Horsamod/itidata/main/images/T7YY_20250427003256.jpg",
     "status": "Rejected"
+  },
+  {
+    "submittedAt": "2025-05-01T02:11:47.313Z",
+    "name": "MAHARAM ANSARY",
+    "fatherName": "UMERALI ANSARY",
+    "motherName": "SALEHA BIBI",
+    "mobile": "6297099756",
+    "dob": "1-Nov-2001",
+    "passingYear": 2017,
+    "collegeName": "PR19000119 Bkm Private Iti",
+    "trade": "Electrician",
+    "photo": "https://raw.githubusercontent.com/Horsamod/itidata/main/images/MAHARAM_ANSARY_20250501021138.jpg",
+    "status": "Processing"
   }
 ]
