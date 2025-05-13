@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Neon Vortex with Advanced Controls</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #1a1a1a;
+            overflow: hidden;
+            perspective: 1000px;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .control-panel {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 30, 30, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            display: none;
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-title {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            color: #7DF9FF;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .slider-label {
+            width: 80px;
+            text-align: right;
+            color: #7DF9FF;
+            font-size: 12px;
+        }
+
+        .slider-value {
+            width: 40px;
+            text-align: center;
+            color: #FF10F0;
+            font-size: 12px;
+        }
+
+        input[type="range"] {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: linear-gradient(to right, #1a1a1a, #333);
+            border-radius: 3px;
+            outline: none;
+            border: 1px solid #444;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #ff00ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 5px #ff00ff;
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #00ffff;
+        }
+
+        .tilt-container {
+            transform-style: preserve-3d;
+            transition: transform 0.2s ease-out;
+        }
+
+        .container {
+            position: relative;
+            width: 310px;
+            height: 310px;
+            border-radius: 100%;
+            transform-style: preserve-3d;
+            box-shadow: 
+                0 0 50px rgba(255, 0, 255, 0.3),
+                0 0 100px rgba(0, 255, 255, 0.2);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                conic-gradient(from 0deg at 0% 0%, 
+                rgba(0, 0, 255, 0.9), 
+                rgba(255, 167, 0, 0.9), 
+                rgba(255, 0, 255, 0.9), 
+                rgba(255, 243, 0, 0.9) 180deg),
+                radial-gradient(circle at center, 
+                rgba(98,98,98,0.5) 0%, 
+                rgba(0,0,0,0.7) 100%);
+            border-radius: 100%;
+            box-shadow: 0 10 30px rgba(255,0,255,0.6),
+                inset 0 10px 30px rgba(255,255,255,0.1),
+                inset 0 -10px 30px rgba(0,0,0,0.5);
+            filter: brightness(1.4) blur(2px);
+            animation: glow 1s ease-in-out infinite;
+        }
+
+        /*@keyframes glow {*/
+        /*    0%, 100% { filter: brightness(1.2) contrast(1.2); }*/
+        /*    50% { filter: brightness(1.5) contrast(1.5); }*/
+        /*}*/
+
+        .ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            filter: brightness(0.85) contrast(1.2);
+            background: radial-gradient(circle at 30% 30%, #888 10%, #333 90%);
+            border: 1px solid #222;
+            box-shadow: 
+                inset 3px 3px 5px rgba(0,0,0,0.5),
+                0 0 15px var(--ball-color),
+                0 0 30px var(--ball-color);
+            transform-style: preserve-3d;
+            transition: transform 0.3s;
+        }
+
+        .ball::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.7;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                var(--ball-color) 5%, 
+                rgba(0,0,0,0.8) 70%);
+            filter: blur(1px);
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .center {
+            top: 3px;
+            left: 3px;
+            position: absolute;
+            width: 290px;
+            height: 290px;
+            background: radial-gradient(circle, 
+                rgba(26,26,26,0.9) 10%, 
+                rgba(27,27,27,0.9) 80%);
+            border-radius: 50%;
+            
+            box-shadow: 0 0 10px rgba(0,0,0,0.5),
+            inset 0 0 1px 2px rgba(0, 0, 0, 1),
+                inset 0 0px 8px rgba(0,0,0,0.8),
+                inset 0 0px 15px rgba(0,0,0,0.4);
+            border: 1px solid rgba(43, 43, 43, 0.22);
+        }
+
+        .action-buttons {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 101;
+        }
+
+        .action-button {
+            padding: 12px;
+            font-size: 16px;
+            background: rgba(255, 0, 255, 0.3);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+
+        .action-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+            background: rgba(0, 255, 255, 0.3);
+        }
+
+        .action-button.active {
+            background: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+        }
+
+        .flower-bg {
+            top: 3.5px;
+            left: 3.5px;
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, #2d2d2d 65%, #1a1a1a);
+            overflow: hidden;
+            border: 2px solid #F8F8F830;
+        }
+
+        .petal {
+            position: absolute;
+            width: 24px;
+            height: 110px;
+            background: linear-gradient(0deg, #1a1a1a, #333);
+            border-radius: 15px;
+            box-shadow: 0px -5px 0px rgba(6,6,6,0.6);
+            top: calc(50% - 55px);
+            left: calc(50% - 12px);
+            transform-origin: center center;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 99;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="action-buttons">
+        <button id="settingsButton" class="action-button" title="3D Controls">
+            <i class="fas fa-sliders-h"></i>
+        </button>
+        <button id="motionButton" class="action-button" title="Slow Motion">
+            <i class="fas fa-tachometer-alt"></i>
+        </button>
+    </div>
+
+    <div class="control-panel" id="controlPanel">
+        <div class="control-group">
+            <div class="control-title">3D Rotation Controls</div>
+            <div class="slider-container">
+                <span class="slider-label">X-Axis:</span>
+                <input type="range" id="xRotation" min="-45" max="45" value="0" step="1">
+                <span class="slider-value" id="xValue">0°</span>
+            </div>
+            <div class="slider-container">
+                <span class="slider-label">Y-Axis:</span>
+                <input type="range" id="yRotation" min="-45" max="45" value="0" step="1">
+                <span class="slider-value" id="yValue">0°</span>
+            </div>
+            <div class="slider-container">
+                <span class="slider-label">Z-Axis:</span>
+                <input type="range" id="zRotation" min="-45" max="45" value="0" step="1">
+                <span class="slider-value" id="zValue">0°</span>
+            </div>
+            <div class="slider-container">
+                <span class="slider-label">Depth:</span>
+                <input type="range" id="depth" min="0" max="100" value="50" step="1">
+                <span class="slider-value" id="depthValue">50</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="tilt-container" id="tiltContainer">
+        <div class="container">
+            <div class="flower-bg" id="flower">
+                <div class="center"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tiltContainer = document.getElementById('tiltContainer');
+        const container = document.querySelector('.container');
+        const motionButton = document.querySelector('#motionButton');
+        const settingsButton = document.querySelector('#settingsButton');
+        const controlPanel = document.getElementById('controlPanel');
+        const overlay = document.getElementById('overlay');
+        const xRotationSlider = document.getElementById('xRotation');
+        const yRotationSlider = document.getElementById('yRotation');
+        const zRotationSlider = document.getElementById('zRotation');
+        const depthSlider = document.getElementById('depth');
+        const xValue = document.getElementById('xValue');
+        const yValue = document.getElementById('yValue');
+        const zValue = document.getElementById('zValue');
+        const depthValue = document.getElementById('depthValue');
+        
+        const numBalls = 24;
+        const radius = 120;
+        const normalOmega = 3;
+        const slowOmega = 1;
+        let omega = normalOmega;
+        let isSlowMotion = false;
+        const balls = [];
+
+        // Neon color palette with 0.6 opacity
+        const colors = [
+            'rgba(255, 16, 240, 0.6)', 
+            'rgba(57, 255, 20, 0.6)',
+            'rgba(125, 249, 255, 0.6)',
+            'rgba(255, 7, 58, 0.6)',
+            'rgba(255, 221, 0, 0.6)',
+            'rgba(204, 255, 0, 0.6)',
+            'rgba(255, 110, 199, 0.6)',
+            'rgba(0, 254, 254, 0.6)',
+            'rgba(255, 144, 0, 0.6)',
+            'rgba(190, 10, 255, 0.6)',
+            'rgba(10, 255, 255, 0.6)',
+            'rgba(255, 0, 124, 0.6)'
+        ];
+
+        // Create flower petals
+        const flower = document.getElementById("flower");
+        const totalPetals = 24;
+        for (let i = 0; i < totalPetals; i++) {
+            const petal = document.createElement("div");
+            petal.className = "petal";
+            petal.style.transform = `rotate(${(360 / totalPetals) * i}deg) translateY(-80px)`;
+            flower.appendChild(petal);
+        }
+
+        // Create balls with colors
+        for (let i = 0; i < numBalls; i++) {
+            const ball = document.createElement('div');
+            ball.classList.add('ball');
+            const color = colors[i % colors.length];
+            ball.style.setProperty('--ball-color', color);
+            container.appendChild(ball);
+            balls.push(ball);
+        }
+
+        // Toggle control panel visibility
+        function toggleControlPanel() {
+            const isVisible = controlPanel.style.display === 'block';
+            controlPanel.style.display = isVisible ? 'none' : 'block';
+            overlay.style.display = isVisible ? 'none' : 'block';
+            settingsButton.classList.toggle('active', !isVisible);
+        }
+
+        settingsButton.addEventListener('click', toggleControlPanel);
+
+        // Close panel when clicking outside
+        overlay.addEventListener('click', toggleControlPanel);
+
+        // Update tilt based on slider values
+        function updateTilt() {
+            const xRot = xRotationSlider.value;
+            const yRot = yRotationSlider.value;
+            const zRot = zRotationSlider.value;
+            const depth = depthSlider.value;
+            
+            // Update displayed values
+            xValue.textContent = `${xRot}°`;
+            yValue.textContent = `${yRot}°`;
+            zValue.textContent = `${zRot}°`;
+            depthValue.textContent = depth;
+            
+            tiltContainer.style.transform = `
+                rotateX(${xRot}deg) 
+                rotateY(${yRot}deg)
+                rotateZ(${zRot}deg)
+                translateZ(${depth}px)
+            `;
+        }
+
+        // Set up event listeners for all sliders
+        xRotationSlider.addEventListener('input', updateTilt);
+        yRotationSlider.addEventListener('input', updateTilt);
+        zRotationSlider.addEventListener('input', updateTilt);
+        depthSlider.addEventListener('input', updateTilt);
+
+        // Toggle motion speed
+        function toggleMotionSpeed() {
+            isSlowMotion = !isSlowMotion;
+            omega = isSlowMotion ? slowOmega : normalOmega;
+            motionButton.classList.toggle('active', isSlowMotion);
+            motionButton.title = isSlowMotion ? "Normal Speed" : "Slow Motion";
+            motionButton.innerHTML = isSlowMotion ? '<i class="fas fa-running"></i>' : '<i class="fas fa-tachometer-alt"></i>';
+        }
+
+        motionButton.addEventListener('click', toggleMotionSpeed);
+
+        // Animation loop
+        let time = 0;
+        function animate() {
+            balls.forEach((ball, index) => {
+                const baseAngle = (2 * Math.PI / numBalls) * index;
+                const phase = (2 * Math.PI / numBalls) * index;
+                const displacement = radius * Math.sin(omega * time + phase);
+                const zOffset = Math.sin(omega * time + index) * 20;
+                
+                const x = displacement * Math.cos(baseAngle);
+                const y = displacement * Math.sin(baseAngle);
+                
+                ball.style.left = `calc(50% + ${x}px - 10px)`;
+                ball.style.top = `calc(50% + ${y}px - 10px)`;
+                ball.style.transform = `translateZ(${zOffset}px)`;
+            });
+
+            time += 0.016;
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize
+        updateTilt();
+        animate();
+    </script>
+</body>
+</html>
