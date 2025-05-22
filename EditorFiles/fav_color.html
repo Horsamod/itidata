@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Color Palette UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .view-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn.active {
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .color-count {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        /* Grid View */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .color-grid.compact {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .color-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .color-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .color-preview {
+            height: 50px;
+            position: relative;
+            cursor: pointer;
+            transition: height 0.3s ease;
+        }
+
+        .color-preview:hover {
+            height: 60px;
+        }
+
+        .color-info {
+            padding: 15px;
+        }
+
+        .color-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .color-description {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+
+        .color-codes-compact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .code-chip {
+            background: #f0f2f5;
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .code-chip:hover {
+            background: #e3e6ea;
+            transform: scale(1.05);
+        }
+
+        /* List View */
+        .color-list {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .color-list.active {
+            display: flex;
+        }
+
+        .color-list-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            gap: 15px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .color-list-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .color-preview-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .color-preview-small:hover {
+            transform: scale(1.1);
+        }
+
+        .color-details {
+            flex: 1;
+        }
+
+        .color-codes-list {
+            display: flex;
+            gap: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: fixed;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 8px 0;
+            z-index: 1000;
+            display: none;
+            min-width: 150px;
+        }
+
+        .context-menu-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .context-menu-item:hover {
+            background: #f0f2f5;
+        }
+
+        .context-menu-item:active {
+            background: #e3e6ea;
+        }
+
+        /* Favorites */
+        .favorite-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .favorite-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: scale(1.1);
+        }
+
+        .favorite-btn.active {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Export Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1002;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .export-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .export-btn:hover {
+            background: #0056b3;
+        }
+
+        .ral-code {
+            background: #e9ecef;
+            color: #495057;
+            font-size: 0.75rem;
+            padding: 3px 6px;
+            border-radius: 3px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .view-controls {
+                justify-content: center;
+            }
+            
+            .color-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .color-codes-list {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advanced Color Palette</h1>
+            <div class="controls">
+                <div class="view-controls">
+                    <button class="btn active" id="gridBtn">Grid View</button>
+                    <button class="btn" id="listBtn">List View</button>
+                    <button class="btn" id="favoritesBtn">Favorites</button>
+                    <button class="btn" id="exportBtn">Export</button>
+                </div>
+                
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search colors...">
+                </div>
+                
+                <div class="color-count" id="colorCount">20 colors</div>
+            </div>
+        </div>
+
+        <div class="color-grid" id="colorGrid">
+            <!-- Colors will be populated by JavaScript -->
+        </div>
+
+        <div class="color-list" id="colorList">
+            <!-- List view will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" data-action="copy-hex">📋 Copy HEX</div>
+        <div class="context-menu-item" data-action="copy-rgb">📋 Copy RGB</div>
+        <div class="context-menu-item" data-action="copy-hsl">📋 Copy HSL</div>
+        <div class="context-menu-item" data-action="copy-all">📋 Copy All</div>
+        <div class="context-menu-item" data-action="favorite">⭐ Add to Favorites</div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Export Colors</h3>
+                <button class="close-btn" id="closeModal">×</button>
+            </div>
+            <div class="export-options">
+                <button class="export-btn" onclick="exportColors('json')">Export as JSON</button>
+                <button class="export-btn" onclick="exportColors('css')">Export as CSS Variables</button>
+                <button class="export-btn" onclick="exportColors('scss')">Export as SCSS</button>
+                <button class="export-btn" onclick="exportColors('tailwind')">Export as Tailwind Config</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const colors = [
+            {
+                name: "Malibu",
+                description: "Cyan Blue",
+                rgb: [64, 203, 220],
+                hsl: [185, 64, 62],
+                hex: "#40CBDC",
+                ral: "RAL 6027 Light green"
+            },
+            {
+                name: "Classic Rose",
+                description: "White → Pink-Red",
+                rgb: [251, 198, 216],
+                hsl: [340, 87, 88],
+                hex: "#FBC6D8",
+                ral: null
+            },
+            {
+                name: "Corn Silk",
+                description: "White → Yellow-Orange",
+                rgb: [254, 248, 219],
+                hsl: [50, 95, 93],
+                hex: "#FEF8DB",
+                ral: null
+            },
+            {
+                name: "Chardonnay",
+                description: "Light Orange-Yellow",
+                rgb: [251, 193, 108],
+                hsl: [36, 95, 70],
+                hex: "#FBC16C",
+                ral: "RAL 1004 Golden yellow"
+            },
+            {
+                name: "Roman",
+                description: "Red",
+                rgb: [218, 95, 108],
+                hsl: [354, 62, 61],
+                hex: "#DA5F6C",
+                ral: "RAL 3014 Antique pink"
+            },
+            {
+                name: "Wewak",
+                description: "Light Red",
+                rgb: [248, 147, 151],
+                hsl: [358, 89, 77],
+                hex: "#F89397",
+                ral: "RAL 3015 Light pink"
+            },
+            {
+                name: "Cosmos",
+                description: "White → Red-Orange",
+                rgb: [247, 215, 209],
+                hsl: [9, 70, 89],
+                hex: "#F7D7D1",
+                ral: null
+            },
+            {
+                name: "Azalea",
+                description: "Light Red-Orange",
+                rgb: [246, 197, 192],
+                hsl: [6, 75, 86],
+                hex: "#F6C5C0",
+                ral: null
+            },
+            {
+                name: "Grey 90%",
+                description: "White",
+                rgb: [253, 242, 236],
+                hsl: [21, 81, 96],
+                hex: "#FDF2EC",
+                ral: "RAL 9003 Signal white"
+            },
+            {
+                name: "Conch",
+                description: "Grey → Green-Cyan",
+                rgb: [155, 182, 181],
+                hsl: [178, 16, 66],
+                hex: "#9BB6B5",
+                ral: "RAL 6034 Pastel turquoise"
+            },
+            {
+                name: "Midnight Express",
+                description: "Black → Blue",
+                rgb: [16, 34, 58],
+                hsl: [214, 57, 15],
+                hex: "#10223A",
+                ral: "RAL 5010 Gentian blue"
+            },
+            {
+                name: "Hot Pink",
+                description: "Light Pink-Red",
+                rgb: [255, 119, 160],
+                hsl: [336, 100, 73],
+                hex: "#FF77A0",
+                ral: "RAL 3015 Light pink"
+            },
+            {
+                name: "Sulu",
+                description: "Green-Yellow",
+                rgb: [198, 223, 119],
+                hsl: [74, 62, 67],
+                hex: "#C6DF77",
+                ral: "RAL 6018 Yellow green"
+            },
+            {
+                name: "Cranberry",
+                description: "Pink-Red",
+                rgb: [221, 68, 112],
+                hsl: [343, 69, 57],
+                hex: "#DD4470",
+                ral: "RAL 4003 Heather violet"
+            },
+            {
+                name: "Moccasin",
+                description: "Light Orange-Yellow",
+                rgb: [255, 227, 179],
+                hsl: [38, 100, 85],
+                hex: "#FFE3B3",
+                ral: "RAL 1015 Light ivory"
+            },
+            {
+                name: "Heliotrope",
+                description: "Light Violet",
+                rgb: [205, 122, 255],
+                hsl: [277, 100, 74],
+                hex: "#CD7AFF",
+                ral: null
+            },
+            {
+                name: "Royal Blue",
+                description: "Blue-Violet",
+                rgb: [91, 96, 238],
+                hsl: [238, 81, 65],
+                hex: "#5B60EE",
+                ral: null
+            },
+            {
+                name: "Medium Orchid",
+                description: "Violet",
+                rgb: [186, 85, 211],
+                hsl: [275, 82, 62],
+                hex: "#BA55D3",
+                ral: null
+            },
+            {
+                name: "Camelot",
+                description: "Dark Pink-Red",
+                rgb: [118, 56, 76],
+                hsl: [341, 36, 34],
+                hex: "#76384C",
+                ral: "RAL 3005 Wine red"
+            },
+            {
+                name: "Mountain Meadow",
+                description: "Green",
+                rgb: [10, 204, 120],
+                hsl: [154, 91, 42],
+                hex: "#0ACC78",
+                ral: "RAL 6016 Turquoise green"
+            }
+        ];
+
+        let filteredColors = [...colors];
+        let favorites = JSON.parse(localStorage.getItem('colorFavorites') || '[]');
+        let currentView = 'grid';
+        let currentContextColor = null;
+
+        // Utility functions
+        function rgbToString(rgb) {
+            return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+        }
+
+        function hslToString(hsl) {
+            return `hsl(${hsl[0]}°, ${hsl[1]}%, ${hsl[2]}%)`;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`Copied: ${text}`);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                showToast('Failed to copy to clipboard');
+            });
+        }
+
+        function toggleFavorite(colorName) {
+            if (favorites.includes(colorName)) {
+                favorites = favorites.filter(name => name !== colorName);
+                showToast(`${colorName} removed from favorites`);
+            } else {
+                favorites.push(colorName);
+                showToast(`${colorName} added to favorites`);
+            }
+            localStorage.setItem('colorFavorites', JSON.stringify(favorites));
+            renderCurrentView();
+        }
+
+        function isFavorite(colorName) {
+            return favorites.includes(colorName);
+        }
+
+        // Create color card for grid view
+        function createColorCard(color) {
+            const rgbString = rgbToString(color.rgb);
+            const hslString = hslToString(color.hsl);
+            const favoriteClass = isFavorite(color.name) ? 'active' : '';
+            
+            return `
+                <div class="color-card" data-color='${JSON.stringify(color)}'>
+                    <div class="color-preview" style="background-color: ${color.hex};" oncontextmenu="showContextMenu(event, '${color.name}')">
+                        <button class="favorite-btn ${favoriteClass}" onclick="toggleFavorite('${color.name}')">
+                            ${isFavorite(color.name) ? '❤️' : '🤍'}
+                        </button>
+                    </div>
+                    <div class="color-info">
+                        <div class="color-name">${color.name}</div>
+                        <div class="color-description">${color.description}</div>
+                        
+                        <div class="color-codes-compact">
+                            <div class="code-chip" onclick="copyToClipboard('${color.hex}')">${color.hex}</div>
+                            <div class="code-chip" onclick="copyToClipboard('${rgbString}')">${rgbString}</div>
+                            <div class="code-chip" onclick="copyToClipboard('${hslString}')">${hslString}</div>
+                        </div>
+                        
+                        ${color.ral ? `<div class="ral-code">${color.ral}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create color list item for list view
+        function createColorListItem(color) {
+            const rgbString = rgbToString(color.rgb);
+            const hslString = hslToString(color.hsl);
+            const favoriteClass = isFavorite(color.name) ? 'active' : '';
+            
+            return `
+                <div class="color-list-item" data-color='${JSON.stringify(color)}'>
+                    <div class="color-preview-small" style="background-color: ${color.hex};" oncontextmenu="showContextMenu(event, '${color.name}')">
+                    </div>
+                    <div class="color-details">
+                        <div class="color-name">${color.name}</div>
+                        <div class="color-description">${color.description}</div>
+                        <div class="color-codes-list">
+                            <span onclick="copyToClipboard('${color.hex}')" style="cursor: pointer;">${color.hex}</span>
+                            <span onclick="copyToClipboard('${rgbString}')" style="cursor: pointer;">${rgbString}</span>
+                            <span onclick="copyToClipboard('${hslString}')" style="cursor: pointer;">${hslString}</span>
+                        </div>
+                        ${color.ral ? `<div class="ral-code">${color.ral}</div>` : ''}
+                    </div>
+                    <button class="favorite-btn ${favoriteClass}" onclick="toggleFavorite('${color.name}')">
+                        ${isFavorite(color.name) ? '❤️' : '🤍'}
+                    </button>
+                </div>
+            `;
+        }
+
+        // Render functions
+        function renderGridView() {
+            const colorGrid = document.getElementById('colorGrid');
+            colorGrid.innerHTML = filteredColors.map(color => createColorCard(color)).join('');
+        }
+
+        function renderListView() {
+            const colorList = document.getElementById('colorList');
+            colorList.innerHTML = filteredColors.map(color => createColorListItem(color)).join('');
+        }
+
+        function renderCurrentView() {
+            if (currentView === 'grid') {
+                renderGridView();
+            } else {
+                renderListView();
+            }
+            updateColorCount();
+        }
+
+        function updateColorCount() {
+            const colorCount = document.getElementById('colorCount');
+            colorCount.textContent = `${filteredColors.length} colors`;
+        }
+
+        // View switching
+        function switchView(view) {
+            const gridBtn = document.getElementById('gridBtn');
+            const listBtn = document.getElementById('listBtn');
+            const favoritesBtn = document.getElementById('favoritesBtn');
+            const colorGrid = document.getElementById('colorGrid');
+            const colorList = document.getElementById('colorList');
+
+            // Remove active class from all buttons
+            [gridBtn, listBtn, favoritesBtn].forEach(btn => btn.classList.remove('active'));
+
+            if (view === 'grid') {
+                gridBtn.classList.add('active');
+                colorGrid.style.display = 'grid';
+                colorList.classList.remove('active');
+                currentView = 'grid';
+                filteredColors = colors.filter(color => 
+                    color.name.toLowerCase().includes(document.getElementById('searchInput').value.toLowerCase())
+                );
+            } else if (view === 'list') {
+                listBtn.classList.add('active');
+                colorGrid.style.display = 'none';
+                colorList.classList.add('active');
+                currentView = 'list';
+                filteredColors = colors.filter(color => 
+                    color.name.toLowerCase().includes(document.getElementById('searchInput').value.toLowerCase())
+                );
+            } else if (view === 'favorites') {
+                favoritesBtn.classList.add('active');
+                colorGrid.style.display = 'grid';
+                colorList.classList.remove('active');
+                currentView = 'grid';
+                filteredColors = colors.filter(color => favorites.includes(color.name));
+            }
+
+            renderCurrentView();
+        }
+
+        // Context menu
+        function showContextMenu(event, colorName) {
+            event.preventDefault();
+            const contextMenu = document.getElementById('contextMenu');
+            currentContextColor = colors.find(color => color.name === colorName);
+            
+            // Update the favorite menu item text
+            const favoriteItem = contextMenu.querySelector('[data-action="favorite"]');
+            favoriteItem.textContent = isFavorite(colorName) ? '⭐ Remove from Favorites' : '⭐ Add to Favorites';
+
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = event.pageX + 'px';
+            contextMenu.style.top = event.pageY + 'px';
+        }
+
+        function hideContextMenu() {
+            document.getElementById('contextMenu').style.display = 'none';
+        }
+
+        // Search functionality
+        function searchColors(query) {
+            if (currentView === 'favorites') {
+                filteredColors = colors.filter(color => 
+                    favorites.includes(color.name) && 
+                    (color.name.toLowerCase().includes(query.toLowerCase()) ||
+                    color.description.toLowerCase().includes(query.toLowerCase()) ||
+                    color.hex.toLowerCase().includes(query.toLowerCase()))
+                );
+            } else {
+                filteredColors = colors.filter(color => 
+                    color.name.toLowerCase().includes(query.toLowerCase()) ||
+                    color.description.toLowerCase().includes(query.toLowerCase()) ||
+                    color.hex.toLowerCase().includes(query.toLowerCase())
+                );
+            }
+            renderCurrentView();
+        }
+
+        // Export functions
+        function exportColors(format) {
+            let output = '';
+            const colorsToExport = filteredColors;
+
+            switch(format) {
+                case 'json':
+                    output = JSON.stringify(colorsToExport, null, 2);
+                    break;
+                case 'css':
+                    output = ':root {\n';
+                    colorsToExport.forEach(color => {
+                        output += `  --color-${color.name.toLowerCase().replace(/\s+/g, '-')}: ${color.hex};\n`;
+                    });
+                    output += '}';
+                    break;
+                case 'scss':
+                    colorsToExport.forEach(color => {
+                        output += `$color-${color.name.toLowerCase().replace(/\s+/g, '-')}: ${color.hex};\n`;
+                    });
+                    break;
+                case 'tailwind':
+                    output = 'module.exports = {\n  theme: {\n    extend: {\n      colors: {\n';
+                    colorsToExport.forEach(color => {
+                        output += `        '${color.name.toLowerCase().replace(/\s+/g, '-')}': '${color.hex}',\n`;
+                    });
+                    output += '      }\n    }\n  }\n}';
+                    break;
+            }
+
+            const blob = new Blob([output], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `colors.${format === 'json' ? 'json' : format === 'tailwind' ? 'js' : format}`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            document.getElementById('exportModal').style.display = 'none';
+            showToast(`Exported as ${format.toUpperCase()}`);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial render
+            renderCurrentView();
+
+            // View controls
+            document.getElementById('gridBtn').addEventListener('click', () => switchView('grid'));
+            document.getElementById('listBtn').addEventListener('click', () => switchView('list'));
+            document.getElementById('favoritesBtn').addEventListener('click', () => switchView('favorites'));
+            
+            // Search
+            document.getElementById('searchInput').addEventListener('input', (e) => searchColors(e.target.value));
+            
+            // Context menu
+            document.addEventListener('contextmenu', (e) => {
+                if (!e.target.closest('.color-preview, .color-preview-small')) {
+                    hideContextMenu();
+                }
+            });
+            
+            document.addEventListener('click', hideContextMenu);
+            
+            document.getElementById('contextMenu').addEventListener('click', (e) => {
+                const action = e.target.dataset.action;
+                if (action && currentContextColor) {
+                    const rgbString = rgbToString(currentContextColor.rgb);
+                    const hslString = hslToString(currentContextColor.hsl);
+                    switch(action) {
+                        case 'copy-hex':
+                            copyToClipboard(currentContextColor.hex);
+                            break;
+                        case 'copy-rgb':
+                            copyToClipboard(rgbString);
+                            break;
+                        case 'copy-hsl':
+                            copyToClipboard(hslString);
+                            break;
+                        case 'copy-all':
+                            const allCodes = `HEX: ${currentContextColor.hex}\nRGB: ${rgbString}\nHSL: ${hslString}`;
+                            copyToClipboard(allCodes);
+                            break;
+                        case 'favorite':
+                            toggleFavorite(currentContextColor.name);
+                            break;
+                    }
+                    hideContextMenu();
+                }
+            });
+
+            // Export modal
+            document.getElementById('exportBtn').addEventListener('click', () => {
+                document.getElementById('exportModal').style.display = 'flex';
+            });
+
+            document.getElementById('closeModal').addEventListener('click', () => {
+                document.getElementById('exportModal').style.display = 'none';
+            });
+
+            document.getElementById('exportModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('exportModal')) {
+                    document.getElementById('exportModal').style.display = 'none';
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + F: Focus search
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+
+                // Ctrl/Cmd + E: Open export modal
+                if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+                    e.preventDefault();
+                    document.getElementById('exportModal').style.display = 'flex';
+                }
+
+                // Ctrl/Cmd + 1/2/3: Switch views
+                if ((e.ctrlKey || e.metaKey) && e.key === '1') {
+                    e.preventDefault();
+                    switchView('grid');
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key === '2') {
+                    e.preventDefault();
+                    switchView('list');
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key === '3') {
+                    e.preventDefault();
+                    switchView('favorites');
+                }
+
+                // Escape: Close modals/context menus
+                if (e.key === 'Escape') {
+                    document.getElementById('exportModal').style.display = 'none';
+                    hideContextMenu();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
