@@ -3,131 +3,366 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Editor Loader</title>
+    <title>Advanced Code Editor Loader</title>
     <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --editor-bg: #252526;
+            --tab-bg: #2d2d2d;
+            --tab-active-bg: #1e1e1e;
+            --accent-color: #007acc;
+            --text-color: #d4d4d4;
+            --text-dimmed: #858585;
+            --line-number-color: #858585;
+            --terminal-bg: #1e1e1e;
+            --file-tree-bg: #252526;
+            --file-tree-width: 200px;
+            --status-bar-bg: #007acc;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #1e1e1e;
-            font-family: 'Consolas', 'Courier New', monospace;
+            background-color: var(--bg-color);
+            font-family: 'Fira Code', 'Consolas', monospace;
+            overflow: hidden;
         }
+
         .code-editor-loader {
-            width: 80%;
-            max-width: 800px;
-            background-color: #252526;
+            width: 90%;
+            max-width: 1200px;
+            height: 80vh;
+            background-color: var(--editor-bg);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
         }
+
         .loader-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 8px 15px;
-            background-color: #2d2d2d;
-            border-bottom: 1px solid #1e1e1e;
+            background-color: var(--tab-bg);
+            border-bottom: 1px solid var(--bg-color);
         }
+
         .loader-tabs {
             display: flex;
             gap: 5px;
+            overflow-x: auto;
+            scrollbar-width: none;
         }
+
+        .loader-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
         .loader-tab {
-            padding: 6px 12px;
-            background-color: #2d2d2d;
-            color: #858585;
-            font-size: 12px;
+            padding: 6px 15px;
+            background-color: var(--tab-bg);
+            color: var(--text-dimmed);
+            font-size: 13px;
             border-radius: 4px 4px 0 0;
             cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            position: relative;
         }
+
         .loader-tab.active {
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            border-top: 1px solid #007acc;
+            background-color: var(--tab-active-bg);
+            color: var(--text-color);
+            border-top: 2px solid var(--accent-color);
         }
+
+        .loader-tab .close-icon {
+            display: inline-block;
+            margin-left: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .loader-tab:hover .close-icon {
+            opacity: 0.6;
+        }
+
+        .loader-tab:hover .close-icon:hover {
+            opacity: 1;
+            color: #ff5555;
+        }
+
         .loader-controls {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
+
         .control {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
+
+        .control:hover {
+            transform: scale(1.1);
+        }
+
         .control.minimize {
             background-color: #f1fa8c;
         }
+
         .control.maximize {
             background-color: #50fa7b;
         }
+
         .control.close {
             background-color: #ff5555;
         }
+
+        .editor-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .file-tree {
+            width: var(--file-tree-width);
+            background-color: var(--file-tree-bg);
+            border-right: 1px solid var(--bg-color);
+            padding: 10px 0;
+            overflow-y: auto;
+        }
+
+        .file-tree-item {
+            padding: 6px 15px 6px 30px;
+            color: var(--text-dimmed);
+            font-size: 13px;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-tree-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .file-tree-item.active {
+            color: var(--text-color);
+            background-color: rgba(0, 122, 204, 0.2);
+        }
+
+        .file-tree-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .file-tree-item.folder::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23858585'%3E%3Cpath d='M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z'/%3E%3C/svg%3E");
+        }
+
+        .file-tree-item.file::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23858585'%3E%3Cpath d='M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6z'/%3E%3C/svg%3E");
+        }
+
+        .file-tree-item.active::before {
+            filter: brightness(1.5);
+        }
+
+        .editor-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
         .loader-content {
             display: flex;
-            min-height: 200px;
+            flex: 1;
+            overflow: hidden;
         }
+
         .line-numbers {
             padding: 10px;
-            background-color: #2d2d2d;
-            color: #858585;
+            background-color: var(--tab-bg);
+            color: var(--line-number-color);
             text-align: right;
             font-size: 14px;
             user-select: none;
+            min-width: 40px;
         }
+
         .line-numbers span {
             display: block;
             line-height: 1.8;
         }
+
         .code-lines {
             flex: 1;
             padding: 10px;
+            overflow-y: auto;
         }
+
         .code-line {
-            height: 16px;
+            height: 18px;
+            margin-bottom: 6px;
+            border-radius: 2px;
+            animation: pulse 1.5s infinite ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .code-line.type-1 { width: 70%; background-color: #3e3e3e; }
+        .code-line.type-2 { width: 40%; margin-left: 20px; background-color: #264f78; }
+        .code-line.type-3 { width: 60%; margin-left: 40px; background-color: #4d4d4d; }
+        .code-line.type-4 { width: 50%; background-color: #3e3e3e; }
+        .code-line.type-5 { width: 30%; margin-left: 20px; background-color: #264f78; }
+        .code-line.type-6 { width: 80%; background-color: #4d4d4d; }
+        .code-line.type-7 { width: 45%; margin-left: 60px; background-color: #3e3e3e; }
+        .code-line.type-8 { width: 65%; background-color: #264f78; }
+
+        .terminal {
+            height: 150px;
+            background-color: var(--terminal-bg);
+            border-top: 1px solid var(--bg-color);
+            padding: 10px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: var(--text-dimmed);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 8px;
+            color: var(--text-color);
+            font-size: 12px;
+        }
+
+        .terminal-content {
+            height: calc(100% - 25px);
+            overflow-y: auto;
+        }
+
+        .terminal-line {
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        .terminal-prompt {
+            color: #50fa7b;
+            margin-right: 8px;
+        }
+
+        .terminal-command {
+            flex: 1;
+            height: 14px;
             background-color: #3e3e3e;
             border-radius: 2px;
             animation: pulse 1.5s infinite ease-in-out;
         }
-        .code-line.type-1 { width: 70%; }
-        .code-line.type-2 { width: 40%; margin-left: 20px; }
-        .code-line.type-3 { width: 60%; margin-left: 40px; }
-        .code-line.type-4 { width: 50%; }
-        .code-line.type-5 { width: 30%; margin-left: 20px; }
+
+        .terminal-output {
+            height: 12px;
+            background-color: #3e3e3e;
+            border-radius: 2px;
+            margin: 4px 0 4px 20px;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
         .loader-status-bar {
             display: flex;
             justify-content: space-between;
-            padding: 6px 15px;
-            background-color: #007acc;
-            color: #ffffff;
+            padding: 8px 15px;
+            background-color: var(--status-bar-bg);
+            color: var(--text-color);
             font-size: 12px;
         }
-        .status-item { opacity: 0.8; }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-icon {
+            width: 14px;
+            height: 14px;
+        }
+
         .progress-container {
             height: 3px;
-            background-color: #1e1e1e;
+            background-color: var(--bg-color);
         }
+
         .progress-bar {
             height: 100%;
             width: 0;
-            background-color: #007acc;
-            animation: progress 2s ease-in-out infinite;
+            background: linear-gradient(90deg, var(--accent-color), #50fa7b);
+            animation: progress 2.5s ease-in-out infinite;
         }
+
         @keyframes pulse {
             0%, 100% { opacity: 0.6; }
             50% { opacity: 1; }
         }
+
         @keyframes progress {
-            0% { width: 0; }
+            0% { width: 0; left: 0; }
             50% { width: 70%; }
-            100% { width: 100%; }
+            100% { width: 100%; left: 100%; }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .cursor {
+            position: absolute;
+            width: 2px;
+            height: 18px;
+            background-color: var(--accent-color);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
     </style>
 </head>
@@ -135,9 +370,10 @@
     <div class="code-editor-loader">
         <div class="loader-header">
             <div class="loader-tabs">
-                <div class="loader-tab active">index.html</div>
-                <div class="loader-tab">styles.css</div>
-                <div class="loader-tab">app.js</div>
+                <div class="loader-tab active">index.html<span class="close-icon">×</span></div>
+                <div class="loader-tab">styles.css<span class="close-icon">×</span></div>
+                <div class="loader-tab">app.js<span class="close-icon">×</span></div>
+                <div class="loader-tab">config.json<span class="close-icon">×</span></div>
             </div>
             <div class="loader-controls">
                 <div class="control minimize"></div>
@@ -145,31 +381,108 @@
                 <div class="control close"></div>
             </div>
         </div>
-        <div class="loader-content">
-            <div class="line-numbers">
-                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-                <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+
+        <div class="editor-container">
+            <div class="file-tree">
+                <div class="file-tree-item folder">src</div>
+                <div class="file-tree-item folder active">public</div>
+                <div class="file-tree-item file">index.html</div>
+                <div class="file-tree-item file">favicon.ico</div>
+                <div class="file-tree-item folder">styles</div>
+                <div class="file-tree-item folder">scripts</div>
+                <div class="file-tree-item file">package.json</div>
+                <div class="file-tree-item file">README.md</div>
+                <div class="file-tree-item folder">node_modules</div>
             </div>
-            <div class="code-lines">
-                <div class="code-line type-1"></div>
-                <div class="code-line type-2"></div>
-                <div class="code-line type-3"></div>
-                <div class="code-line type-4"></div>
-                <div class="code-line type-1"></div>
-                <div class="code-line type-5"></div>
-                <div class="code-line type-2"></div>
-                <div class="code-line type-3"></div>
-                <div class="code-line type-1"></div>
-                <div class="code-line type-4"></div>
+
+            <div class="editor-content">
+                <div class="loader-content">
+                    <div class="line-numbers">
+                        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                        <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+                    </div>
+                    <div class="code-lines">
+                        <div class="code-line type-1"></div>
+                        <div class="code-line type-2"></div>
+                        <div class="code-line type-3"></div>
+                        <div class="code-line type-4"></div>
+                        <div class="code-line type-1"></div>
+                        <div class="code-line type-5"></div>
+                        <div class="code-line type-2"></div>
+                        <div class="code-line type-6"></div>
+                        <div class="code-line type-7"></div>
+                        <div class="code-line type-8"></div>
+                        <div class="code-line type-3"></div>
+                        <div class="code-line type-1"></div>
+                        <div class="code-line type-4"></div>
+                        <div class="code-line type-2"></div>
+                        <div class="code-line type-5"></div>
+                        <div class="cursor" style="left: 120px; top: 162px;"></div>
+                    </div>
+                </div>
+
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div>TERMINAL</div>
+                        <div>Problems | Output | Debug Console | Terminal</div>
+                    </div>
+                    <div class="terminal-content">
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">$</span>
+                            <div class="terminal-command" style="width: 120px;"></div>
+                        </div>
+                        <div class="terminal-output" style="width: 80%;"></div>
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">$</span>
+                            <div class="terminal-command" style="width: 150px;"></div>
+                        </div>
+                        <div class="terminal-output" style="width: 60%;"></div>
+                        <div class="terminal-output" style="width: 90%;"></div>
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">$</span>
+                            <div class="terminal-command" style="width: 100px;"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="loader-status-bar">
-            <div class="status-item">UTF-8</div>
-            <div class="status-item">JavaScript</div>
-            <div class="status-item">Ln 10, Col 15</div>
-        </div>
+
         <div class="progress-container">
             <div class="progress-bar"></div>
+        </div>
+
+        <div class="loader-status-bar">
+            <div class="status-item">
+                <svg class="status-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"></path>
+                </svg>
+                <span>UTF-8</span>
+            </div>
+            <div class="status-item">
+                <svg class="status-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14.6 16.6l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4m-5.2 0L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4z"></path>
+                </svg>
+                <span>JavaScript</span>
+            </div>
+            <div class="status-item">
+                <svg class="status-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M11 9h2V7h-2m1 13c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m0-18A10 10 0 002 12a10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2m-1 15h2v-6h-2v6z"></path>
+                </svg>
+                <span>Ln 10, Col 15</span>
+            </div>
+            <div class="status-item">
+                <svg class="status-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2a10 10 0 0110 10 10 10 0 01-10 10A10 10 0 012 12 10 10 0 0112 2m0 2a8 8 0 00-8 8 8 8 0 008 8 8 8 0 008-8 8 8 0 00-8-8m-1 3h2v6h-2V7m0 8h2v2h-2v-2z"></path>
+                </svg>
+                <span>0 Errors</span>
+            </div>
+            <div class="status-item">
+                <svg class="status-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 8a4 4 0 014 4 4 4 0 01-4 4 4 4 0 01-4-4 4 4 0 014-4m0 2a2 2 0 00-2 2 2 2 0 002 2 2 2 0 002-2 2 2 0 00-2-2m-2 12c0-.5.4-1 1-1h2c.6 0 1 .5 1 1v1h-4v-1m-8-1v1h3v-1c0-.5-.4-1-1-1H5c-.6 0-1 .5-1 1m14-1h-1c-.6 0-1 .5-1 1v1h3v-1c0-.5-.4-1-1-1m2-3v3H4v-3c0-1.1.9-2 2-2h1c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2h1c1.1 0 2 .9 2 2z"></path>
+                </svg>
+                <span>User</span>
+            </div>
         </div>
     </div>
 
@@ -179,16 +492,47 @@
             setTimeout(function() {
                 console.log('Loading complete!');
                 // In a real app: hide loader and show editor
-            }, 3000);
+            }, 5000);
             
-            // Cycle through tabs for demo
+            // Cycle through tabs
             const tabs = document.querySelectorAll('.loader-tab');
             let currentTab = 0;
+            
             setInterval(function() {
                 tabs.forEach(tab => tab.classList.remove('active'));
                 currentTab = (currentTab + 1) % tabs.length;
                 tabs[currentTab].classList.add('active');
+                
+                // Randomly move cursor
+                const cursor = document.querySelector('.cursor');
+                const randomLine = Math.floor(Math.random() * 15) + 1;
+                const randomCol = Math.floor(Math.random() * 200) + 50;
+                cursor.style.top = `${(randomLine * 24) - 6}px`;
+                cursor.style.left = `${randomCol}px`;
+            }, 2000);
+            
+            // Animate terminal commands
+            const terminalCommands = document.querySelectorAll('.terminal-command');
+            const terminalOutputs = document.querySelectorAll('.terminal-output');
+            
+            setInterval(function() {
+                terminalCommands.forEach(cmd => {
+                    cmd.style.width = `${Math.floor(Math.random() * 150) + 50}px`;
+                });
+                
+                terminalOutputs.forEach(output => {
+                    output.style.width = `${Math.floor(Math.random() * 80) + 20}%`;
+                });
             }, 1500);
+            
+            // File tree interaction
+            const fileItems = document.querySelectorAll('.file-tree-item');
+            fileItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    fileItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
         });
     </script>
 </body>
