@@ -1,0 +1,49 @@
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading completion
+            setTimeout(function() {
+                console.log('Loading complete!');
+                // In a real app: hide loader and show editor
+            }, 5000);
+            
+            // Cycle through tabs
+            const tabs = document.querySelectorAll('.loader-tab');
+            let currentTab = 0;
+            
+            setInterval(function() {
+                tabs.forEach(tab => tab.classList.remove('active'));
+                currentTab = (currentTab + 1) % tabs.length;
+                tabs[currentTab].classList.add('active');
+                
+                // Randomly move cursor
+                const cursor = document.querySelector('.cursor');
+                const randomLine = Math.floor(Math.random() * 15) + 1;
+                const randomCol = Math.floor(Math.random() * 200) + 50;
+                cursor.style.top = `${(randomLine * 24) - 6}px`;
+                cursor.style.left = `${randomCol}px`;
+            }, 2000);
+            
+            // Animate terminal commands
+            const terminalCommands = document.querySelectorAll('.terminal-command');
+            const terminalOutputs = document.querySelectorAll('.terminal-output');
+            
+            setInterval(function() {
+                terminalCommands.forEach(cmd => {
+                    cmd.style.width = `${Math.floor(Math.random() * 150) + 50}px`;
+                });
+                
+                terminalOutputs.forEach(output => {
+                    output.style.width = `${Math.floor(Math.random() * 80) + 20}%`;
+                });
+            }, 1500);
+            
+            // File tree interaction
+            const fileItems = document.querySelectorAll('.file-tree-item');
+            fileItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    fileItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    
