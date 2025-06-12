@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Neon Monaco Editor</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: black;
+    }
+    #editor {
+      width: 100%;
+      height: 100vh;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+</head>
+<body>
+  <div id="editor"></div>
+
+  <script>
+    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+    require(['vs/editor/editor.main'], function () {
+
+      // Neon Theme (from earlier)
+      monaco.editor.defineTheme('neon-complete-theme', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [
+          { token: 'tag', foreground: '39FF14' },
+          { token: 'tag.id.html', foreground: '00FFFF' },
+          { token: 'tag.class.html', foreground: 'FF69B4' },
+          { token: 'attribute.name.html', foreground: 'FF6EC7' },
+          { token: 'attribute.value.html', foreground: 'FFD700' },
+          { token: 'string.html', foreground: '00FFEF' },
+          { token: 'comment.html', foreground: '888888', fontStyle: 'italic' },
+          { token: 'metatag.html', foreground: '00BFFF', fontStyle: 'bold' },
+          { token: 'delimiter.html', foreground: '00FFFF' },
+
+          { token: 'keyword.css', foreground: 'FF00FF' },
+          { token: 'attribute.name.css', foreground: 'FFA500' },
+          { token: 'attribute.value.css', foreground: '7FFF00' },
+          { token: 'string.css', foreground: '00FF00' },
+          { token: 'number.css', foreground: '00FFFF' },
+          { token: 'unit.css', foreground: 'FF4500' },
+          { token: 'comment.css', foreground: '888888', fontStyle: 'italic' },
+          { token: 'selector.css', foreground: 'FF69B4' },
+          { token: 'delimiter.bracket.css', foreground: 'FF00FF' },
+
+          { token: 'keyword.js', foreground: 'FF1493' },
+          { token: 'identifier.js', foreground: '7FFF00' },
+          { token: 'string.js', foreground: '00FFEF' },
+          { token: 'number.js', foreground: 'FFFF00' },
+          { token: 'delimiter.bracket.js', foreground: 'FF00FF' },
+          { token: 'variable.language', foreground: '00FFFF' },
+          { token: 'comment.js', foreground: '888888', fontStyle: 'italic' },
+          { token: 'type.identifier.js', foreground: 'FF8C00' },
+          { token: 'function.js', foreground: '00FF00' },
+          { token: 'operator.js', foreground: 'FFFFFF' },
+
+          { token: 'comment', foreground: '888888', fontStyle: 'italic' },
+          { token: 'string', foreground: '39FF14' },
+          { token: 'keyword', foreground: 'FF00FF' },
+          { token: 'number', foreground: '00FFFF' },
+          { token: 'regexp', foreground: 'FFA07A' },
+          { token: 'operator', foreground: 'FFFFFF' },
+          { token: 'namespace', foreground: 'FF00FF' },
+          { token: 'type', foreground: '87CEFA' },
+          { token: 'class', foreground: 'FF4500' },
+          { token: 'interface', foreground: '00CED1' },
+          { token: 'constant', foreground: '00FFFF' },
+          { token: 'variable', foreground: '00FF7F' },
+          { token: 'function', foreground: '00FF00' },
+          { token: 'parameter', foreground: 'ADFF2F' },
+          { token: 'boolean', foreground: 'FFD700' },
+          { token: 'delimiter', foreground: 'B0E0E6' },
+        ],
+        colors: {
+          'editor.background': '#000000',
+          'editor.foreground': '#F8F8F2',
+          'editorCursor.foreground': '#39FF14',
+          'editorLineNumber.foreground': '#5A5A5A',
+          'editorLineNumber.activeForeground': '#00FFFF',
+          'editor.selectionBackground': '#FF00FF33',
+          'editor.inactiveSelectionBackground': '#FF00FF11',
+          'editorIndentGuide.background': '#303030',
+          'editorWhitespace.foreground': '#444444',
+          'editorLineHighlightBackground': '#111111',
+          'editorSuggestWidget.background': '#1a1a1a',
+          'editorSuggestWidget.foreground': '#00FFEF',
+        }
+      });
+
+      // Create the editor
+      monaco.editor.create(document.getElementById('editor'), {
+        value: `<!-- HTML Example -->
+<div class="box" id="neon">
+  <h1>Hello Neon!</h1>
+  <script>
+    const msg = "Hello from JavaScript!";
+    console.log(msg);
+  </script>
+  <style>
+    .box {
+      color: #39FF14;
+      animation: glow 2s infinite;
+    }
+  </style>
+</div>`,
+        language: 'html',
+        theme: 'neon-complete-theme',
+        fontSize: 16,
+        fontFamily: 'monospace',
+        automaticLayout: true,
+      });
+    });
+  </script>
+</body>
+</html>
