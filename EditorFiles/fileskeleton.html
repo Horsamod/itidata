@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dark Skeleton File Loader</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #1e1e1e;
+      padding: 20px;
+      color: #ddd;
+    }
+
+    .file-list {
+      max-width: 400px;
+      margin: auto;
+    }
+
+    .file-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px;
+      margin-bottom: 6px;
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #3a3a3a 25%, #4a4a4a 50%, #3a3a3a 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
+    }
+
+    .file-name {
+      width: 70%;
+      height: 16px;
+    }
+
+    .icon {
+      width: 24px;
+      height: 16px;
+      margin-left: 10px;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    .real-icon {
+      font-size: 18px;
+      background: #FF3939D3;
+      cursor: pointer;
+    }
+
+    .highlight {
+      background: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="file-list" id="fileList">
+    <!-- Skeleton rows -->
+    <div class="file-row skeleton-row">
+      <div class="skeleton file-name"></div>
+      <div class="skeleton icon"></div>
+      <div class="skeleton icon"></div>
+    </div>
+    <div class="file-row skeleton-row">
+      <div class="skeleton file-name"></div>
+      <div class="skeleton icon"></div>
+      <div class="skeleton icon"></div>
+    </div>
+    <div class="file-row skeleton-row">
+      <div class="skeleton file-name"></div>
+      <div class="skeleton icon"></div>
+      <div class="skeleton icon real-icon"></div>
+    </div>
+  </div>
+
+</body>
+</html>
