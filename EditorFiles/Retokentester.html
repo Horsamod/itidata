@@ -1,1 +1,422 @@
-hrty
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monaco Editor - Monokai Pro Filter Octagon Theme</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        #editor { 
+            height: 600px; 
+            border: 1px solid #374151;
+        }
+        .theme-preview {
+            background: #1e1f2b;
+            color: #fcfcfa;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                Monaco Editor
+            </h1>
+            <h2 class="text-2xl text-gray-300 mb-2">Monokai Pro Filter Octagon Theme</h2>
+            <p class="text-gray-400">A beautiful dark theme inspired by Monokai Pro's Filter Octagon variant</p>
+        </div>
+
+        <div class="mb-6">
+            <div class="flex flex-wrap gap-2 mb-4">
+                <button id="htmlBtn" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded transition-colors">HTML</button>
+                <button id="cssBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded transition-colors">CSS</button>
+                <button id="jsBtn" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded transition-colors">JavaScript</button>
+                <button id="jsonBtn" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded transition-colors">JSON</button>
+            </div>
+        </div>
+
+        <div class="bg-gray-800 rounded-lg overflow-hidden shadow-2xl">
+            <div id="editor"></div>
+        </div>
+
+        <div class="mt-8 theme-preview p-6 rounded-lg">
+            <h3 class="text-xl font-bold mb-4">Theme Color Palette</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #ff6188;"></div>
+                    <span>Keywords: <code class="text-xs">#ff6188</code></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #a9dc76;"></div>
+                    <span>Strings: <code class="text-xs">#a9dc76</code></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #78dce8;"></div>
+                    <span>Functions: <code class="text-xs">#78dce8</code></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #ffd866;"></div>
+                    <span>Numbers: <code class="text-xs">#ffd866</code></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #fc9867;"></div>
+                    <span>Operators: <code class="text-xs">#fc9867</code></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #c0caf5;"></div>
+                    <span>Types: <code class="text-xs">#c0caf5</code></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #727072;"></div>
+                    <span>Comments: <code class="text-xs">#727072</code></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded" style="background-color: #1e1f2b;"></div>
+                    <span>Background: <code class="text-xs">#1e1f2b</code></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+    <script>
+        require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
+        
+        require(['vs/editor/editor.main'], function () {
+            // Define Monokai Pro Filter Octagon Theme
+            monaco.editor.defineTheme('monokai-pro-octagon', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                    // HTML
+                    { token: 'tag', foreground: 'ff6188' }, // pink/red
+                    { token: 'delimiter.html', foreground: 'fc9867' }, // orange
+                    { token: 'attribute.name.html', foreground: '78dce8' }, // cyan
+                    { token: 'attribute.value.html', foreground: 'a9dc76' }, // green
+                    { token: 'comment.html', foreground: '727072', fontStyle: 'italic' }, // gray
+                    { token: 'metatag.html', foreground: 'fc9867' }, // orange
+                    
+                    // CSS
+                    { token: 'comment.css', foreground: '727072', fontStyle: 'italic' }, // gray
+                    { token: 'variable.css', foreground: 'c0caf5' }, // light blue
+                    { token: 'function.css', foreground: '78dce8' }, // cyan
+                    { token: 'keyword.css', foreground: 'ff6188' }, // pink/red
+                    { token: 'number.css', foreground: 'ffd866' }, // yellow
+                    { token: 'number.hex.css', foreground: 'ffd866' }, // yellow
+                    { token: 'string.css', foreground: 'a9dc76' }, // green
+                    { token: 'attribute.name.css', foreground: '78dce8' }, // cyan
+                    { token: 'attribute.value.css', foreground: 'a9dc76' }, // green
+                    { token: 'tag.css', foreground: 'ff6188' }, // pink/red
+                    { token: 'tag.id.css', foreground: 'ffd866' }, // yellow
+                    { token: 'tag.class.css', foreground: 'c0caf5' }, // light blue
+                    { token: 'operator.css', foreground: 'fc9867' }, // orange
+                    { token: 'delimiter.css', foreground: 'fc9867' }, // orange
+                    
+                    // JavaScript
+                    { token: 'keyword.js', foreground: 'ff6188' }, // pink/red
+                    { token: 'identifier.js', foreground: 'fcfcfa' }, // white
+                    { token: 'string.js', foreground: 'a9dc76' }, // green
+                    { token: 'number.js', foreground: 'ffd866' }, // yellow
+                    { token: 'comment.js', foreground: '727072', fontStyle: 'italic' }, // gray
+                    { token: 'function.js', foreground: '78dce8' }, // cyan
+                    { token: 'type.identifier.js', foreground: 'c0caf5' }, // light blue
+                    { token: 'operator.js', foreground: 'fc9867' }, // orange
+                    
+                    // JSON
+                    { token: 'string.key.json', foreground: '78dce8' }, // cyan
+                    { token: 'string.value.json', foreground: 'a9dc76' }, // green
+                    { token: 'number.json', foreground: 'ffd866' }, // yellow
+                    { token: 'keyword.json', foreground: 'ff6188' }, // pink/red
+                    
+                    // Common tokens
+                    { token: 'constant', foreground: 'ffd866' }, // yellow
+                    { token: 'variable', foreground: 'fcfcfa' }, // white
+                    { token: 'class', foreground: 'c0caf5' }, // light blue
+                    { token: 'regexp', foreground: 'ff6188' }, // pink/red
+                    { token: 'string', foreground: 'a9dc76' }, // green
+                    { token: 'number', foreground: 'ffd866' }, // yellow
+                    { token: 'keyword', foreground: 'ff6188' }, // pink/red
+                    { token: 'operator', foreground: 'fc9867' }, // orange
+                    { token: 'comment', foreground: '727072', fontStyle: 'italic' }, // gray
+                ],
+                colors: {
+                    'editor.background': '#1e1f2b', // Monokai Pro Filter Octagon background
+                    'editor.foreground': '#fcfcfa', // off-white
+                    'editorCursor.foreground': '#fc9867', // orange
+                    'editor.lineHighlightBackground': '#2a2d3a', // slightly lighter background
+                    'editorLineNumber.foreground': '#727072', // gray
+                    'editorLineNumber.activeForeground': '#fcfcfa', // white for active line
+                    'editor.selectionBackground': '#44475a', // selection background
+                    'editor.inactiveSelectionBackground': '#3a3d4a', // inactive selection
+                    'editorIndentGuide.background': '#44475a', // indent guides
+                    'editorIndentGuide.activeBackground': '#6272a4', // active indent guide
+                    'editorWhitespace.foreground': '#44475a', // whitespace characters
+                    'editorSuggestWidget.background': '#282a36', // autocomplete background
+                    'editorSuggestWidget.border': '#44475a', // autocomplete border
+                    'editorSuggestWidget.foreground': '#fcfcfa', // autocomplete text
+                    'editorSuggestWidget.selectedBackground': '#44475a', // selected item in autocomplete
+                    'editorWidget.background': '#282a36', // widget background
+                    'editorWidget.border': '#44475a', // widget border
+                    'editorHoverWidget.background': '#282a36', // hover widget background
+                    'editorHoverWidget.border': '#44475a', // hover widget border
+                }
+            });
+
+            // Set the theme
+            monaco.editor.setTheme('monokai-pro-octagon');
+
+            // Sample code snippets
+            const samples = {
+                html: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monokai Pro Theme</title>
+</head>
+<body>
+    <!-- This is a comment -->
+    <div class="container" id="main">
+        <h1 class="title">Hello World!</h1>
+        <p data-info="sample">Welcome to the Monokai Pro Filter Octagon theme.</p>
+        <button onclick="showAlert()">Click me</button>
+    </div>
+</body>
+</html>`,
+                css: `/* Monokai Pro Filter Octagon CSS */
+:root {
+    --primary-color: #ff6188;
+    --secondary-color: #78dce8;
+    --accent-color: #a9dc76;
+    --background: #1e1f2b;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: var(--background);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.title {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.button {
+    background: linear-gradient(45deg, #ff6188, #78dce8);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+}`,
+                javascript: `/**
+ * Monokai Pro Filter Octagon JavaScript Example
+ * Demonstrating various syntax highlighting features
+ */
+
+// Constants and variables
+const API_URL = 'https://api.example.com';
+let userData = null;
+var isLoggedIn = false;
+
+// Class definition
+class UserManager {
+    constructor(apiUrl) {
+        this.apiUrl = apiUrl;
+        this.users = new Map();
+        this.callbacks = [];
+    }
+
+    // Async method with error handling
+    async fetchUser(userId) {
+        try {
+            const response = await fetch(\`\${this.apiUrl}/users/\${userId}\`);
+            if (!response.ok) {
+                throw new Error(\`HTTP error! status: \${response.status}\`);
+            }
+            const user = await response.json();
+            this.users.set(userId, user);
+            return user;
+        } catch (error) {
+            console.error('Failed to fetch user:', error.message);
+            return null;
+        }
+    }
+
+    // Method with array operations
+    getActiveUsers() {
+        return Array.from(this.users.values())
+            .filter(user => user.isActive)
+            .sort((a, b) => new Date(b.lastLogin) - new Date(a.lastLogin));
+    }
+
+    // Event handling
+    onUserUpdate(callback) {
+        this.callbacks.push(callback);
+    }
+
+    // Private method (modern syntax)
+    #notifyCallbacks(user) {
+        this.callbacks.forEach(callback => callback(user));
+    }
+}
+
+// Function declarations and expressions
+function showAlert(message = 'Hello World!') {
+    alert(message);
+}
+
+const calculateAge = (birthDate) => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    const age = today.getFullYear() - birth.getFullYear();
+    return age;
+};
+
+// Regular expressions
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const phoneRegex = /^\+?1?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/;
+
+// Template literals and destructuring
+const user = { name: 'John Doe', age: 30, email: 'john@example.com' };
+const { name, age } = user;
+const greeting = \`Hello \${name}, you are \${age} years old!\`;
+
+// Modern JavaScript features
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map(n => n * 2);
+const sum = numbers.reduce((acc, n) => acc + n, 0);
+
+// Export (ES6 modules)
+export { UserManager, showAlert, calculateAge };`,
+                json: `{
+  "name": "monokai-pro-theme",
+  "version": "1.0.0",
+  "description": "A Monaco Editor theme based on Monokai Pro Filter Octagon",
+  "main": "index.js",
+  "keywords": [
+    "monaco",
+    "editor",
+    "theme",
+    "monokai",
+    "syntax-highlighting"
+  ],
+  "author": {
+    "name": "Developer",
+    "email": "dev@example.com",
+    "url": "https://github.com/developer"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "monaco-editor": "^0.45.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0",
+    "css-loader": "^6.8.0",
+    "style-loader": "^3.3.0"
+  },
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack serve --mode development",
+    "test": "jest",
+    "lint": "eslint src/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/monokai-pro-theme.git"
+  },
+  "bugs": {
+    "url": "https://github.com/example/monokai-pro-theme/issues"
+  },
+  "homepage": "https://github.com/example/monokai-pro-theme#readme",
+  "config": {
+    "theme": {
+      "background": "#1e1f2b",
+      "foreground": "#fcfcfa",
+      "colors": {
+        "red": "#ff6188",
+        "green": "#a9dc76",
+        "yellow": "#ffd866",
+        "blue": "#78dce8",
+        "purple": "#c0caf5",
+        "orange": "#fc9867",
+        "gray": "#727072"
+      }
+    }
+  }
+}`
+            };
+
+            // Create Monaco Editor instance
+            const editor = monaco.editor.create(document.getElementById('editor'), {
+                value: samples.html,
+                language: 'html',
+                theme: 'monokai-pro-octagon',
+                fontSize: 14,
+                fontFamily: 'Consolas, "Courier New", monospace',
+                lineNumbers: 'on',
+                roundedSelection: false,
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                minimap: { enabled: true },
+                wordWrap: 'on',
+                lineHeight: 22,
+                letterSpacing: 0.5,
+                renderWhitespace: 'selection',
+                showUnused: true,
+                folding: true,
+                foldingHighlight: true,
+                showFoldingControls: 'always',
+                smoothScrolling: true,
+                cursorSmoothCaretAnimation: true
+            });
+
+            // Button event handlers
+            document.getElementById('htmlBtn').addEventListener('click', () => {
+                monaco.editor.setModelLanguage(editor.getModel(), 'html');
+                editor.setValue(samples.html);
+            });
+
+            document.getElementById('cssBtn').addEventListener('click', () => {
+                monaco.editor.setModelLanguage(editor.getModel(), 'css');
+                editor.setValue(samples.css);
+            });
+
+            document.getElementById('jsBtn').addEventListener('click', () => {
+                monaco.editor.setModelLanguage(editor.getModel(), 'javascript');
+                editor.setValue(samples.javascript);
+            });
+
+            document.getElementById('jsonBtn').addEventListener('click', () => {
+                monaco.editor.setModelLanguage(editor.getModel(), 'json');
+                editor.setValue(samples.json);
+            });
+
+            // Auto-resize editor
+            window.addEventListener('resize', () => {
+                editor.layout();
+            });
+        });
+    </script>
+</body>
+</html>
