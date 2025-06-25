@@ -534,7 +534,7 @@ monaco.languages.setMonarchTokensProvider('javascript', {
       [/\b\d+(_+\d+)*(\.\d+)?([eE][\-+]?\d+)?\b/, 'number.js'],
 
       // Operators & Symbols
-      [/[{}()]/, '@brackets'],
+      [/[{}()\[]]/, '@brackets'],
       [/[<>](?!@symbols)/, 'operator.js'],
       [/[=+\-*/%&|^!~?:]/, 'operator.js'],
       [/[;,\.]/, 'delimiter.js'],
