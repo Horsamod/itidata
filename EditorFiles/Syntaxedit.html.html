@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -254,14 +253,14 @@
             .main-content {
                 flex-direction: column;
             }
-
+            
             .preview-panel {
                 width: 100%;
                 height: 200px;
                 border-left: none;
                 border-top: 1px solid var(--border-color);
             }
-
+            
             .toolbar-controls {
                 flex-direction: column;
                 gap: 8px;
@@ -269,7 +268,6 @@
         }
     </style>
 </head>
-
 <body>
     <div class="editor-container">
         <div class="toolbar">
@@ -300,9 +298,9 @@
                 </div>
                 <div id="monaco-editor"></div>
             </div>
-
+            
             <div class="resizer"></div>
-
+            
             <div class="preview-panel">
                 <div class="preview-header">Live Preview</div>
                 <div class="preview-content">
@@ -322,14 +320,14 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
-    <script>
-        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
-        
-        let editor;
-        let currentLanguage = 'css';
-        
-        const defaultCSS = `/* Monaco CSS Editor with Enhanced Tokenization */
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+<script>
+    require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+    
+    let editor;
+    let currentLanguage = 'css';
+    
+    const defaultCSS = `/* Monaco CSS Editor with Enhanced Tokenization */
 
 :root {
     --primary-color: #007acc;
@@ -390,7 +388,7 @@
     margin: calc(1rem + 2vh) auto;
 }`;
 
-        const defaultHTML = `<!DOCTYPE html>
+    const defaultHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -417,392 +415,860 @@
 </body>
 </html>`;
 
-        require(['vs/editor/editor.main'], function () {
-            // Enhanced CSS tokenizer with better selector handling
-            monaco.languages.setMonarchTokensProvider('css', {
-                tokenizer: {
-                    root: [
-                        // Comments
-                        [/\/\*/, 'comment', '@comment'],
-                        [/\/\/.*$/, 'comment'],
-                        
-                        // Strings
-                        [/"([^"]|\\.)*$/, 'string.invalid'],
-                        [/'([^']|\\.)*$/, 'string.invalid'],
-                        [/"/, 'string', '@string."'],
-                        [/'/, 'string', '@string.\''],
-                        
-                        // CSS Variables (definitions) - must come before general property matching
-                        [/--[\w-]+/, 'variable.css'],
-                        
-                        // CSS Variables (usage)
-                        [/\s*\(\s*--[\w-]+\s*(?:,\s*[^)]+)?\s*\)/, 'variable.css'],
-                        
-                        // Functions (calc, rgb, etc.)
-                        [/(calc|rgb|rgba|hsl|hsla|url|attr|counter|counters)\s*\(/, 'function.css'],
-                        
-                        // At-rules
-                        [/@[\w-]+/, 'keyword.css'],
-                        
-                        // Pseudo-elements (::)
-                        [/::[\w-]+/, 'tag.css'],
-                        
-                        // Pseudo-classes (:) - including those with parameters
-                        [/:[\w-]+(\([^)]*\))?/, 'attribute.value.css'],
-                        
-                        // Property names (before colon)
-                        [/[\w-]+(?=\s*:)/, 'attribute.name.css'],
-                        
-                        // Numbers with units
-                        [/\d*\.\d+([a-zA-Z%]+|[eE][\-+]?\d+)?/, 'number.css'],
-                        [/\d+([a-zA-Z%]+|[eE][\-+]?\d+)?/, 'number.css'],
-                        
-                        // Hex colors
-                        [/#[0-9a-fA-F]{3,8}/, 'number.hex.css'],
-                        
-                        // Important
-                        [/!important|var|reapeat/, 'keyword.css'],
-                        
-                        // Selectors - IDs
-                        [/#[\w-]+/, 'tag.id.css'],
-                        
-                        // Selectors - Classes
-                        [/\.[\w-]+/, 'tag.class.css'],
-                        
-                        // Selectors - Elements
-                        [/[a-zA-Z][\w-]*/, 'tag.css'],
-                        
-                        // Operators and punctuation
-                        [/[{}()\[\]]/, '@brackets'],
-                        [/[;,.]/, 'delimiter.css'],
-                        [/[>+~*]/, 'operator.css'],
-                        
-                        // Whitespace
-                        [/\s+/, 'white']
-                    ],
-                    
-                    comment: [
-                        [/[^\/*]+/, 'comment'],
-                        [/\/\*/, 'comment', '@push'],
-                        [/\*\//, 'comment', '@pop'],
-                        [/\/*/, 'comment']
-                    ],
-                    
-                    string: [
-                        [/[^\\"']+/, 'string'],
-                        [/\\./, 'string.escape'],
-                        [/["']/, {
-                            cases: {
-                                '$#==$S2': { token: 'string', next: '@pop' },
-                                '@default': 'string'
-                            }
-                        }]
-                    ]
-                }
-            });
-
-            monaco.languages.setMonarchTokensProvider('javascript', {
-    tokenizer: {
-        root: [
-            // Single-line comments
-            [/\/\/.*$/, 'comment'],
-            // Multi-line comments
-            [/\/\*/, 'comment', '@comment'],
+    require(['vs/editor/editor.main'], function () {
+        // Comprehensive CSS tokenizer with extensive token coverage
+        monaco.languages.setMonarchTokensProvider('css', {
+            defaultToken: 'invalid',
+            tokenPostfix: '.css',
             
-            // Strings
-            [/"([^"]|\\.)*$/, 'string.invalid'],
-            [/'([^']|\\.)*$/, 'string.invalid'],
-            [/"/, 'string', '@string."'],
-            [/'/, 'string', '@string.\''],
-            
-            // Template literals
-            [/`/, 'string.template.js', '@templateString'],
-            
-            // Keywords
-            [/\b(break|case|catch|class|const|continue|debugger|default|delete|do|else|export|extends|finally|for|function|if|import|in|instanceof|let|new|return|super|switch|this|throw|try|typeof|var|void|while|with|yield|async|await|static|public|private|protected|implements|interface|package|abstract|enum)\b/, 'keyword.js'],
-            
-            // Built-in objects and functions
-            [/\b(Array|Date|Math|Object|Promise|console|document|window|setTimeout|setInterval|fetch|JSON|Map|Set|WeakMap|WeakSet)\b/, 'support.function.js'],
-            
-            // Variables
-            [/[a-zA-Z_]\w*(?=\s*[:=])/, 'variable.js'],
-            
-            // Functions and Arrow Functions
-            [/[a-zA-Z_]\w*(?=\s*\()/, 'function.js'],
-            [/=>/, 'operator.arrow.js'],
-            
-            // Numbers
-            [/\d*\.\d+([eE][\-+]?\d+)?/, 'number.js'],
-            [/\d+/, 'number.js'],
-            
-            // Regular expressions
-            [/\/(?=.*\/[gimuy]*)/, { token: 'regexp.delim.js', bracket: '@open', next: '@regexp' }],
-            
-            // Operators
-            [/[+\-*\/%=<>&|~^]+/, 'operator.js'],
-            
-            // Punctuation
-            [/[{}()\[\];,.]/, 'delimiter.js'],
-            
-            // Destructuring and Object Literals
-            [/{[^}]*}/, 'object.literal.js'],
-            [/\[.*\]/, 'array.literal.js'],
-            
-            // Class Definitions
-            [/\bclass\b\s+[a-zA-Z_]\w*/, 'class.name.js'],
-            
-            // Decorators
-            [/@[a-zA-Z_]\w*(?:\s*\([^)]*\))?\s*(?=\n|;)/, 'decorator.js'],
-            
-            // Whitespace
-            [/\s+/, 'white']
-        ],
-        
-        comment: [
-            [/[^\/*]+/, 'comment'],
-            [/\/\*/, 'comment', '@push'],
-            [/\*\//, 'comment', '@pop'],
-            [/\/*/, 'comment']
-        ],
-        
-        string: [
-            [/[^\\"']+/, 'string'],
-            [/\\./, 'string.escape'],
-            [/["']/, {
-                cases: {
-                    '$#==$S2': { token: 'string', next: '@pop' },
-                    '@default': 'string'
-                }
-            }]
-        ],
-        
-        templateString: [
-            [/[^`\\]+/, 'string.template.js'],
-            [/\\./, 'string.escape.template.js'],
-            [/`/, { token: 'string.template.js', next: '@pop' }],
-            [/\${/, { token: 'string.template.js', next: '@interpolation' }]
-        ],
-                interpolation: [
-                [/[^{}]+/, 'variable.js'],
-                [/{/, '@brackets', '@push'],
-                [/}/, '@brackets', '@pop'],
-                [/\}/, { token: 'string.template.js', next: '@pop' }]
+            keywords: [
+                'auto', 'inherit', 'initial', 'unset', 'revert', 'revert-layer',
+                'transparent', 'currentColor', 'none', 'normal', 'bold', 'bolder', 'lighter',
+                'italic', 'oblique', 'small-caps', 'all-small-caps', 'all-petite-caps',
+                'unicase', 'titling-caps', 'underline', 'overline', 'line-through',
+                'absolute', 'relative', 'fixed', 'sticky', 'static',
+                'block', 'inline', 'inline-block', 'flex', 'inline-flex', 'grid', 'inline-grid',
+                'table', 'table-cell', 'table-row', 'list-item', 'run-in',
+                'left', 'right', 'center', 'justify', 'start', 'end',
+                'top', 'bottom', 'middle', 'baseline', 'sub', 'super',
+                'hidden', 'visible', 'collapse', 'scroll', 'auto',
+                'border-box', 'content-box', 'padding-box',
+                'ease', 'ease-in', 'ease-out', 'ease-in-out', 'linear', 'step-start', 'step-end',
+                'forwards', 'backwards', 'both', 'infinite', 'alternate', 'alternate-reverse',
+                'running', 'paused', 'reverse',
+                'row', 'column', 'row-reverse', 'column-reverse', 'wrap', 'nowrap', 'wrap-reverse',
+                'flex-start', 'flex-end', 'space-between', 'space-around', 'space-evenly', 'stretch',
+                'solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset',
+                'serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui',
+                'crosshair', 'default', 'pointer', 'move', 'text', 'wait', 'help', 'progress',
+                'not-allowed', 'context-menu', 'cell', 'vertical-text', 'alias', 'copy',
+                'no-drop', 'grab', 'grabbing', 'all-scroll', 'zoom-in', 'zoom-out'
             ],
-
-        regexp: [
-            { include: '@whitespace' },
-            [/[^\\/]+/, 'regexp.content.js'],
-            [/\//, { token: 'regexp.delim.js', bracket: '@close', next: '@pop' }],
-            [/\\./, 'regexp.escape.js']
-        ]
-    }
-});
-            // Custom theme for better syntax highlighting
-            monaco.editor.defineTheme('enhanced-dark', {
-                base: 'vs-dark',
-                inherit: true,
-                rules: [
-                    { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
-                    { token: 'variable.css', foreground: '9CDCFE', fontStyle: 'bold' },
-                    { token: 'function.css', foreground: 'DCDCAA' },
-                    { token: 'keyword.css', foreground: 'C586C0' },
-                    { token: 'number.css', foreground: 'B5CEA8' },
-                    { token: 'number.hex.css', foreground: 'B5CEA8', fontStyle: 'bold' },
-                    { token: 'string', foreground: 'CE9178' },
-                    { token: 'attribute.name.css', foreground: '4969f4' },
-                    { token: 'attribute.value.css', foreground: 'D7BA7D' },
-                    { token: 'tag.css', foreground: '4EC9B0' },
-                    { token: 'tag.id.css', foreground: 'F44747', fontStyle: 'bold' },
-                    { token: 'tag.class.css', foreground: 'FFD700', fontStyle: 'bold' },
-                    { token: 'operator.css', foreground: 'D4D4D4' },
-                    { token: 'delimiter.css', foreground: 'D4D4D4' },
-
-                    // { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
-        { token: 'keyword.js', foreground: 'C586C0' },
-        { token: 'support.function.js', foreground: 'DCDCAA' },
-        { token: 'variable.js', foreground: '9CDCFE', fontStyle: 'bold' },
-        { token: 'function.js', foreground: 'DCDCAA' },
-        { token: 'operator.arrow.js', foreground: 'C586C0' },
-        { token: 'number.js', foreground: 'B5CEA8' },
-        { token: 'string', foreground: 'CE9178' },
-        { token: 'string.template.js', foreground: 'CE9178', fontStyle: 'italic' },
-        { token: 'string.escape.template.js', foreground: 'CE9178', fontStyle: 'bold' },
-        { token: 'regexp.delim.js', foreground: 'DE6B74' },
-        { token: 'regexp.content.js', foreground: 'DE6B74' },
-        { token: 'regexp.escape.js', foreground: 'DE6B74', fontStyle: 'bold' },
-        { token: 'operator.js', foreground: 'D4D4D4' },
-        { token: 'delimiter.js', foreground: 'D4D4D4' },
-        { token: 'object.literal.js', foreground: 'D7BA7D' },
-        { token: 'array.literal.js', foreground: 'D7BA7D' },
-        { token: 'class.name.js', foreground: '4EC9B0', fontStyle: 'bold' },
-        { token: 'decorator.js', foreground: 'F44747' }
-                ],
-                colors: {
-                    'editor.background': '#1e1e1e'
-                }
-            });
-
-            // Create the editor
-            editor = monaco.editor.create(document.getElementById('monaco-editor'), {
-                value: defaultCSS,
-                language: 'css',
-                theme: 'enhanced-dark',
-                fontSize: 14,
-                minimap: { enabled: true },
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-                formatOnPaste: true,
-                formatOnType: true,
-                tabSize: 2,
-                // insertSpaces: true,
-                wordWrap: 'on',
-                lineNumbers: 'on',
-                // renderWhitespace: 'boundary',
-                bracketPairColorization: { enabled: true },
-                guides: {
-                    bracketPairs: true,
-                    indentation: true
-                }
-            });
-
-            // Language switching
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const language = tab.dataset.language;
-                    
-                    // Update active tab
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    // Switch editor language and content
-                    currentLanguage = language;
-                    monaco.editor.setModelLanguage(editor.getModel(), language);
-                    
-                    if (language === 'css') {
-                        editor.setValue(defaultCSS);
-                    } else if (language === 'html') {
-                        editor.setValue(defaultHTML);
-                    }
-                    
-                    updateStatus('Switched to ' + language.toUpperCase());
-                });
-            });
-
-            // Font size control
-            const fontSizeSlider = document.getElementById('fontSizeSlider');
-            const fontSizeDisplay = document.getElementById('fontSizeDisplay');
             
-            fontSizeSlider.addEventListener('input', (e) => {
-                const fontSize = parseInt(e.target.value);
-                fontSizeDisplay.textContent = fontSize + 'px';
-                editor.updateOptions({ fontSize: fontSize });
-            });
+            units: [
+                'px', 'em', 'rem', 'ex', 'ch', 'vw', 'vh', 'vmin', 'vmax', 'cm', 'mm', 'in',
+                'pt', 'pc', 'deg', 'rad', 'grad', 'turn', 's', 'ms', 'Hz', 'kHz', 'dpi',
+                'dpcm', 'dppx', 'fr', '%', 'Q', 'lh', 'rlh', 'vi', 'vb', 'svw', 'svh',
+                'lvw', 'lvh', 'dvw', 'dvh', 'cqw', 'cqh', 'cqi', 'cqb', 'cqmin', 'cqmax'
+            ],
+            
+            functions: [
+                'calc', 'min', 'max', 'clamp', 'abs', 'sign', 'mod', 'rem', 'sin', 'cos', 'tan',
+                'asin', 'acos', 'atan', 'atan2', 'pow', 'sqrt', 'hypot', 'log', 'exp',
+                'rgb', 'rgba', 'hsl', 'hsla', 'hwb', 'lab', 'lch', 'oklab', 'oklch', 'color',
+                'color-mix', 'color-contrast', 'device-cmyk',
+                'url', 'src', 'local', 'format', 'tech',
+                'linear-gradient', 'radial-gradient', 'conic-gradient', 'repeating-linear-gradient',
+                'repeating-radial-gradient', 'repeating-conic-gradient',
+                'attr', 'counter', 'counters', 'env', 'var',
+                'blur', 'brightness', 'contrast', 'drop-shadow', 'grayscale', 'hue-rotate',
+                'invert', 'opacity', 'saturate', 'sepia',
+                'matrix', 'matrix3d', 'translate', 'translate3d', 'translateX', 'translateY',
+                'translateZ', 'scale', 'scale3d', 'scaleX', 'scaleY', 'scaleZ', 'rotate',
+                'rotate3d', 'rotateX', 'rotateY', 'rotateZ', 'skew', 'skewX', 'skewY',
+                'perspective', 'path', 'polygon', 'circle', 'ellipse', 'inset',
+                'cubic-bezier', 'steps', 'frames',
+                'repeat', 'minmax', 'fit-content', 'symbols', 'cross-fade'
+            ],
+            
+            atRules: [
+                '@charset', '@import', '@namespace', '@media', '@supports', '@document',
+                '@page', '@font-face', '@keyframes', '@viewport', '@counter-style',
+                '@font-feature-values', '@property', '@layer', '@container', '@scope',
+                '@starting-style', '@position-try', '@view-transition'
+            ],
+            
+            pseudoClasses: [
+                'hover', 'active', 'focus', 'focus-visible', 'focus-within', 'visited', 'link',
+                'target', 'target-within', 'current', 'past', 'future', 'playing', 'paused',
+                'seeking', 'buffering', 'stalled', 'muted', 'volume-locked',
+                'first-child', 'last-child', 'only-child', 'first-of-type', 'last-of-type',
+                'only-of-type', 'nth-child', 'nth-last-child', 'nth-of-type', 'nth-last-of-type',
+                'empty', 'root', 'scope', 'host', 'host-context',
+                'defined', 'state', 'enabled', 'disabled', 'read-only', 'read-write',
+                'placeholder-shown', 'default', 'checked', 'indeterminate', 'blank',
+                'valid', 'invalid', 'in-range', 'out-of-range', 'required', 'optional',
+                'user-valid', 'user-invalid',
+                'dir', 'lang', 'not', 'is', 'where', 'has',
+                'fullscreen', 'modal', 'picture-in-picture', 'autofill', 'webkit-autofill',
+                'popover-open'
+            ],
+            
+            pseudoElements: [
+                'before', 'after', 'first-line', 'first-letter', 'selection', 'backdrop',
+                'placeholder', 'marker', 'spelling-error', 'grammar-error',
+                'file-selector-button', 'webkit-slider-thumb', 'webkit-slider-runnable-track',
+                'webkit-progress-bar', 'webkit-progress-value', 'webkit-meter-bar',
+                'webkit-meter-optimum-value', 'webkit-meter-suboptimum-value',
+                'webkit-meter-even-less-good-value', 'webkit-inner-spin-button',
+                'webkit-outer-spin-button', 'webkit-search-cancel-button',
+                'webkit-search-decoration', 'webkit-search-results-button',
+                'webkit-search-results-decoration', 'webkit-details-marker',
+                'webkit-calendar-picker-indicator', 'webkit-clear-button',
+                'webkit-color-swatch', 'webkit-color-swatch-wrapper',
+                'moz-progress-bar', 'moz-range-track', 'moz-range-thumb',
+                'moz-meter-bar', 'moz-placeholder', 'ms-clear', 'ms-reveal',
+                'ms-expand', 'ms-fill', 'ms-fill-lower', 'ms-fill-upper',
+                'ms-thumb', 'ms-track', 'ms-tooltip', 'view-transition',
+                'view-transition-group', 'view-transition-image-pair',
+                'view-transition-old', 'view-transition-new'
+            ],
+            
+            properties: [
+                // Layout
+                'display', 'position', 'top', 'right', 'bottom', 'left', 'z-index',
+                'float', 'clear', 'visibility', 'overflow', 'overflow-x', 'overflow-y',
+                'overflow-anchor', 'overflow-clip-margin', 'overflow-wrap', 'clip', 'clip-path',
+                
+                // Box Model
+                'width', 'height', 'min-width', 'min-height', 'max-width', 'max-height',
+                'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+                'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+                'border', 'border-width', 'border-style', 'border-color',
+                'border-top', 'border-right', 'border-bottom', 'border-left',
+                'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
+                'border-top-style', 'border-right-style', 'border-bottom-style', 'border-left-style',
+                'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
+                'border-radius', 'border-top-left-radius', 'border-top-right-radius',
+                'border-bottom-right-radius', 'border-bottom-left-radius',
+                'border-image', 'border-image-source', 'border-image-slice', 'border-image-width',
+                'border-image-outset', 'border-image-repeat', 'box-sizing', 'box-shadow',
+                'outline', 'outline-width', 'outline-style', 'outline-color', 'outline-offset',
+                
+                // Typography
+                'font', 'font-family', 'font-size', 'font-weight', 'font-style', 'font-variant',
+                'font-stretch', 'font-display', 'font-feature-settings', 'font-variation-settings',
+                'font-optical-sizing', 'font-kerning', 'font-language-override', 'font-synthesis',
+                'font-synthesis-weight', 'font-synthesis-style', 'font-synthesis-small-caps',
+                'font-size-adjust', 'font-palette', 'line-height', 'letter-spacing', 'word-spacing',
+                'text-align', 'text-align-last', 'text-indent', 'text-transform', 'text-decoration',
+                'text-decoration-line', 'text-decoration-color', 'text-decoration-style',
+                'text-decoration-thickness', 'text-decoration-skip', 'text-decoration-skip-ink',
+                'text-underline-offset', 'text-underline-position', 'text-emphasis',
+                'text-emphasis-style', 'text-emphasis-color', 'text-emphasis-position',
+                'text-shadow', 'text-wrap', 'text-orientation', 'text-combine-upright',
+                'writing-mode', 'direction', 'unicode-bidi', 'white-space', 'tab-size',
+                'word-break', 'word-wrap', 'hyphens', 'quotes', 'content',
+                
+                // Color and Background
+                'color', 'background', 'background-color', 'background-image', 'background-repeat',
+                'background-attachment', 'background-position', 'background-position-x',
+                'background-position-y', 'background-size', 'background-origin', 'background-clip',
+                'background-blend-mode', 'opacity', 'mix-blend-mode', 'isolation',
+                
+                // Flexbox
+                'flex', 'flex-direction', 'flex-wrap', 'flex-flow', 'justify-content',
+                'align-items', 'align-content', 'align-self', 'flex-grow', 'flex-shrink',
+                'flex-basis', 'order', 'gap', 'row-gap', 'column-gap',
+                
+                // Grid
+                'grid', 'grid-template', 'grid-template-rows', 'grid-template-columns',
+                'grid-template-areas', 'grid-auto-rows', 'grid-auto-columns', 'grid-auto-flow',
+                'grid-row', 'grid-column', 'grid-row-start', 'grid-row-end',
+                'grid-column-start', 'grid-column-end', 'grid-area', 'place-items',
+                'place-content', 'place-self', 'justify-items', 'justify-self',
+                
+                // Transforms and Animation
+                'transform', 'transform-origin', 'transform-style', 'perspective',
+                'perspective-origin', 'backface-visibility', 'transition',
+                'transition-property', 'transition-duration', 'transition-timing-function',
+                'transition-delay', 'animation', 'animation-name', 'animation-duration',
+                'animation-timing-function', 'animation-delay', 'animation-iteration-count',
+                'animation-direction', 'animation-fill-mode', 'animation-play-state',
+                'animation-timeline', 'animation-range', 'animation-range-start',
+                'animation-range-end',
+                
+                // Filters and Effects
+                'filter', 'backdrop-filter', 'mask', 'mask-image', 'mask-mode', 'mask-repeat',
+                'mask-position', 'mask-clip', 'mask-origin', 'mask-size', 'mask-composite',
+                'mask-border', 'mask-border-mode', 'mask-border-outset', 'mask-border-repeat',
+                'mask-border-slice', 'mask-border-source', 'mask-border-width',
+                
+                // Lists and Counters
+                'list-style', 'list-style-type', 'list-style-position', 'list-style-image',
+                'counter-reset', 'counter-increment', 'counter-set',
+                
+                // Tables
+                'table-layout', 'border-collapse', 'border-spacing', 'caption-side',
+                'empty-cells', 'vertical-align',
+                
+                // UI and Interaction
+                'cursor', 'user-select', 'pointer-events', 'touch-action', 'scroll-behavior',
+                'scroll-margin', 'scroll-margin-top', 'scroll-margin-right', 'scroll-margin-bottom',
+                'scroll-margin-left', 'scroll-padding', 'scroll-padding-top', 'scroll-padding-right',
+                'scroll-padding-bottom', 'scroll-padding-left', 'scroll-snap-type',
+                'scroll-snap-align', 'scroll-snap-stop', 'overscroll-behavior',
+                'overscroll-behavior-x', 'overscroll-behavior-y', 'resize', 'caret-color',
+                'accent-color', 'appearance', 'will-change', 'contain', 'contain-intrinsic-size',
+                'contain-intrinsic-width', 'contain-intrinsic-height', 'content-visibility',
+                
+                // Modern CSS Features
+                'aspect-ratio', 'object-fit', 'object-position', 'image-rendering',
+                'image-orientation', 'shape-outside', 'shape-margin', 'shape-image-threshold',
+                'clip-path', 'offset', 'offset-path', 'offset-distance', 'offset-rotate',
+                'offset-anchor', 'rotate', 'scale', 'translate', 'inset', 'inset-block',
+                'inset-inline', 'inset-block-start', 'inset-block-end', 'inset-inline-start',
+                'inset-inline-end', 'margin-block', 'margin-inline', 'margin-block-start',
+                'margin-block-end', 'margin-inline-start', 'margin-inline-end',
+                'padding-block', 'padding-inline', 'padding-block-start', 'padding-block-end',
+                'padding-inline-start', 'padding-inline-end', 'border-block',
+                'border-inline', 'border-block-start', 'border-block-end',
+                'border-inline-start', 'border-inline-end', 'block-size', 'inline-size',
+                'min-block-size', 'min-inline-size', 'max-block-size', 'max-inline-size',
+                
+                // Container Queries
+                'container', 'container-type', 'container-name',
+                
+                // Custom Properties
+                'initial-value', 'syntax', 'inherits',
+                
+                // View Transitions
+                'view-transition-name',
+                
+                // Color Schemes
+                'color-scheme', 'forced-color-adjust', 'print-color-adjust'
+            ],
+            
+            tokenizer: {
+                root: [
+                    // Comments
+                    [/\/\*/, 'comment', '@comment'],
+                    [/\/\/.*$/, 'comment'],
+                    
+                    // Strings
+                    [/"([^"\\]|\\.)*$/, 'string.invalid'],
+                    [/'([^'\\]|\\.)*$/, 'string.invalid'],
+                    [/"/, 'string', '@string."'],
+                    [/'/, 'string', '@string.\''],
+                    
+                    
+                    // At-rules with enhanced matching
+                    [/@(charset|import|namespace|media|supports|document|page|font-face|keyframes|viewport|counter-style|font-feature-values|property|layer|container|scope|starting-style|position-try|view-transition)\b/, 'keyword.at-rule'],
+                    [/@[\w-]+/, 'keyword.at-rule'],
+                    
+                    // CSS Variables (custom properties)
+                    [/--[\w-]+/, 'variable.css'],
+                    [/var\s*\(\s*(--[\w-]+)\s*(?:,\s*([^)]+))?\s*\)/, ['function.css', 'variable.css', 'variable.css']],
+                    
+                    // Enhanced function matching with comprehensive list
+                    [/(calc|min|max|clamp|abs|sign|mod|rem|sin|cos|tan|asin|acos|atan|atan2|pow|sqrt|hypot|log|exp)\s*\(/, 'function.math'],
+                    [/(rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch|color|color-mix|color-contrast|device-cmyk)\s*\(/, 'function.color'],
+                    [/(url|src|local|format|tech)\s*\(/, 'function.url'],
+                    [/(linear-gradient|radial-gradient|conic-gradient|repeating-linear-gradient|repeating-radial-gradient|repeating-conic-gradient)\s*\(/, 'function.gradient'],
+                    [/(attr|counter|counters|env|var)\s*\(/, 'function.css'],
+                    [/(blur|brightness|contrast|drop-shadow|grayscale|hue-rotate|invert|opacity|saturate|sepia)\s*\(/, 'function.filter'],
+                    [/(matrix|matrix3d|translate|translate3d|translateX|translateY|translateZ|scale|scale3d|scaleX|scaleY|scaleZ|rotate|rotate3d|rotateX|rotateY|rotateZ|skew|skewX|skewY|perspective)\s*\(/, 'function.transform'],
+                    [/(path|polygon|circle|ellipse|inset)\s*\(/, 'function.shape'],
+                    [/(cubic-bezier|steps|frames)\s*\(/, 'function.timing'],
+                    [/(repeat|minmax|fit-content|symbols|cross-fade)\s*\(/, 'function.css'],
+                    [/[\w-]+\s*\(/, 'function.css'],
+                    
+                    // Pseudo-elements with :: syntax
+                    [/::(before|after|first-line|first-letter|selection|backdrop|placeholder|marker|spelling-error|grammar-error|file-selector-button|webkit-slider-thumb|webkit-slider-runnable-track|webkit-progress-bar|webkit-progress-value|webkit-meter-bar|webkit-meter-optimum-value|webkit-meter-suboptimum-value|webkit-meter-even-less-good-value|webkit-inner-spin-button|webkit-outer-spin-button|webkit-search-cancel-button|webkit-search-decoration|webkit-search-results-button|webkit-search-results-decoration|webkit-details-marker|webkit-calendar-picker-indicator|webkit-clear-button|webkit-color-swatch|webkit-color-swatch-wrapper|moz-progress-bar|moz-range-track|moz-range-thumb|moz-meter-bar|moz-placeholder|ms-clear|ms-reveal|ms-expand|ms-fill|ms-fill-lower|ms-fill-upper|ms-thumb|ms-track|ms-tooltip|view-transition|view-transition-group|view-transition-image-pair|view-transition-old|view-transition-new)\b/, 'tag.pseudo-element'],
+                    [/::[\w-]+/, 'tag.pseudo-element'],
+                    
+                    // Pseudo-classes with enhanced matching
+                    [/:(hover|active|focus|focus-visible|focus-within|visited|link|target|target-within|current|past|future|playing|paused|seeking|buffering|stalled|muted|volume-locked|first-child|last-child|only-child|first-of-type|last-of-type|only-of-type|empty|root|scope|host|defined|enabled|disabled|read-only|read-write|placeholder-shown|default|checked|indeterminate|blank|valid|invalid|in-range|out-of-range|required|optional|user-valid|user-invalid|fullscreen|modal|picture-in-picture|autofill|webkit-autofill|popover-open)\b/, 'tag.pseudo-class'],
+                    [/:(nth-child|nth-last-child|nth-of-type|nth-last-of-type|dir|lang|not|is|where|has|host-context|state)\s*\([^)]*\)/, 'tag.pseudo-class'],
+                    [/:[\w-]+/, 'tag.pseudo-class'],
+                    
+                    // Enhanced property matching with comprehensive list
+                    [/(display|position|top|right|bottom|left|z-index|float|clear|visibility|overflow|overflow-x|overflow-y|overflow-anchor|overflow-clip-margin|overflow-wrap|clip|clip-path|width|height|min-width|min-height|max-width|max-height|margin|margin-top|margin-right|margin-bottom|margin-left|padding|padding-top|padding-right|padding-bottom|padding-left|border|border-width|border-style|border-color|border-top|border-right|border-bottom|border-left|border-radius|border-image|box-sizing|box-shadow|outline|font|font-family|font-size|font-weight|font-style|font-variant|font-stretch|font-display|line-height|letter-spacing|word-spacing|text-align|text-indent|text-transform|text-decoration|text-shadow|color|background|background-color|background-image|background-repeat|background-position|background-size|opacity|flex|flex-direction|flex-wrap|justify-content|align-items|grid|grid-template|grid-template-rows|grid-template-columns|transform|transition|animation|filter|backdrop-filter|mask|cursor|user-select|pointer-events|aspect-ratio|object-fit|container|view-transition-name|color-scheme)(?=\s*:)/, 'attribute.name.css'],
+                    [/[\w-]+(?=\s*:)/, 'attribute.name.css'],
+                    
+                    // Enhanced value matching
+                    [/!(important)\b/, ['operator.css', 'keyword.important']],
+                    
+                    // Numbers with units (enhanced)
+                    [/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?(px|em|rem|ex|ch|vw|vh|vmin|vmax|cm|mm|in|pt|pc|deg|rad|grad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx|fr|%|Q|lh|rlh|vi|vb|svw|svh|lvw|lvh|dvw|dvh|cqw|cqh|cqi|cqb|cqmin|cqmax)\b/, 'number.css'],
+                    [/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/, 'number.css'],
+                    
+                    // Hex colors (enhanced with alpha)
+                    [/#[0-9a-fA-F]{8}\b/, 'number.hex.css'],
+                    [/#[0-9a-fA-F]{6}\b/, 'number.hex.css'],
+                    [/#[0-9a-fA-F]{4}\b/, 'number.hex.css'],
+                    [/#[0-9a-fA-F]{3}\b/, 'number.hex.css'],
+                    
+                    // Named colors and keywords
+                    [/(auto|inherit|initial|unset|revert|revert-layer|transparent|currentColor|none|normal|bold|bolder|lighter|italic|oblique|small-caps|underline|overline|line-through|absolute|relative|fixed|sticky|static|block|inline|inline-block|flex|inline-flex|grid|inline-grid|table|left|right|center|justify|top|bottom|middle|baseline|hidden|visible|collapse|scroll|auto|border-box|content-box|padding-box|ease|ease-in|ease-out|ease-in-out|linear|forwards|backwards|both|infinite|alternate|row|column|wrap|nowrap|flex-start|flex-end|space-between|space-around|space-evenly|stretch|solid|dashed|dotted|double|serif|sans-serif|monospace|cursive|fantasy|system-ui|crosshair|default|pointer|move|text|wait|help|not-allowed|grab|grabbing)\b/, 'keyword.css'],
+                    
+                    // Selectors - IDs
+                    [/#[\w-]+/, 'tag.id.css'],
+                    
+                    // Selectors - Classes
+                    [/\.[\w-]+/, 'tag.class.css'],
+                    
+                    // Attribute selectors
+                    [/\[[\w-]+([~|^$*]?=[\w"-]+)?\]/, 'tag.attribute.css'],
+                    
+                    // Element selectors
+                    [/[a-zA-Z][\w-]*(?=\s*[{,.\s:#\[]|$)/, 'tag.element.css'],
+                    
+                    // Combinators and operators
+                    [/[>+~*]/, 'operator.combinator.css'],
+                    [/[{}()\[\]]/, '@brackets'],
+                    [/[;,]/, 'delimiter.css'],
+                    [/:/, 'operator.css'],
+                    
+                    // Whitespace
+                    [/\s+/, '']
+                ],
+                
+                comment: [
+                    [/[^\/*]+/, 'comment'],
+                    [/\/\*/, 'comment', '@push'],
+                    [/\*\//, 'comment', '@pop'],
+                    [/[\/*]/, 'comment']
+                ],
+                
+                string: [
+                    [/[^\\"']+/, 'string'],
+                    [/\\./, 'string.escape'],                    [/["']/, {
+                        cases: {
+                            '$#==$S2': { token: 'string', next: '@pop' },
+                            '@default': 'string'
+                        }
+                    }]
+                ]
+            }
+        });
 
-            // Theme switching
-            const themeSelector = document.getElementById('themeSelector');
-            themeSelector.addEventListener('change', (e) => {
-                const theme = e.target.value === 'vs-dark' ? 'enhanced-dark' : e.target.value;
-                monaco.editor.setTheme(theme);
-                updateStatus('Theme changed to ' + e.target.value);
-            });
+        // Enhanced theme with comprehensive token coloring
+        monaco.editor.defineTheme('enhanced-dark', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [
+                // Comments
+                { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
+                
+                // Strings and escapes
+                { token: 'string', foreground: 'CE9178' },
+                { token: 'string.escape', foreground: 'D7BA7D', fontStyle: 'bold' },
+                { token: 'string.invalid', foreground: 'F44747', fontStyle: 'underline' },
+                
+                // CSS Variables
+                { token: 'variable.css', foreground: '9CDCFE', fontStyle: 'bold' },
+                
+                // Functions (categorized)
+                { token: 'function.css', foreground: 'DCDCAA' },
+                { token: 'function.math', foreground: 'FFD700', fontStyle: 'bold' },
+                { token: 'function.color', foreground: 'FF69B4', fontStyle: 'bold' },
+                { token: 'function.url', foreground: '87CEEB' },
+                { token: 'function.gradient', foreground: 'DDA0DD', fontStyle: 'bold' },
+                { token: 'function.filter', foreground: '98FB98' },
+                { token: 'function.transform', foreground: 'F0E68C' },
+                { token: 'function.shape', foreground: 'FFA07A' },
+                { token: 'function.timing', foreground: 'B0E0E6' },
+                
+                // At-rules and keywords
+                { token: 'keyword.at-rule', foreground: 'C586C0', fontStyle: 'bold' },
+                { token: 'keyword.css', foreground: '569CD6' },
+                { token: 'keyword.important', foreground: 'FF4500', fontStyle: 'bold' },
+                
+                // Numbers and units
+                { token: 'number.css', foreground: 'B5CEA8' },
+                { token: 'number.hex.css', foreground: 'B5CEA8', fontStyle: 'bold' },
+                
+                // Properties
+                { token: 'attribute.name.css', foreground: '92C5F7', fontStyle: 'bold' },
+                
+                // Pseudo-classes and pseudo-elements
+                { token: 'tag.pseudo-class', foreground: 'D7BA7D', fontStyle: 'italic' },
+                { token: 'tag.pseudo-element', foreground: 'DDA0DD', fontStyle: 'italic bold' },
+                
+                // Selectors
+                { token: 'tag.element.css', foreground: '4EC9B0' },
+                { token: 'tag.id.css', foreground: 'F44747', fontStyle: 'bold' },
+                { token: 'tag.class.css', foreground: 'FFD700', fontStyle: 'bold' },
+                { token: 'tag.attribute.css', foreground: '87CEEB', fontStyle: 'italic' },
+                
+                // Operators and delimiters
+                { token: 'operator.css', foreground: 'D4D4D4' },
+                { token: 'operator.combinator.css', foreground: 'FF6347', fontStyle: 'bold' },
+                { token: 'delimiter.css', foreground: 'D4D4D4' },
+                
+                // Brackets
+                { token: 'delimiter.bracket', foreground: 'FFD700' },
+                { token: 'delimiter.parenthesis', foreground: 'DA70D6' },
+                { token: 'delimiter.square', foreground: '40E0D0' }
+            ],
+            colors: {
+                'editor.background': '#1e1e1e',
+                'editor.foreground': '#D4D4D4',
+                'editorCursor.foreground': '#A7A7A7',
+                'editor.lineHighlightBackground': '#2D2D30',
+                'editorLineNumber.foreground': '#858585',
+                'editorLineNumber.activeForeground': '#C6C6C6',
+                'editor.selectionBackground': '#264F78',
+                'editor.selectionHighlightBackground': '#ADD6FF26',
+                'editor.wordHighlightBackground': '#575757B8',
+                'editor.wordHighlightStrongBackground': '#004972B8',
+                'editorBracketMatch.background': '#0064001A',
+                'editorBracketMatch.border': '#888888'
+            }
+        });
 
-            // Format button
-            document.getElementById('formatBtn').addEventListener('click', () => {
-                editor.getAction('editor.action.formatDocument').run();
-                updateStatus('Code formatted');
-            });
+        // Enhanced light theme
+        monaco.editor.defineTheme('enhanced-light', {
+            base: 'vs',
+            inherit: true,
+            rules: [
+                { token: 'comment', foreground: '008000', fontStyle: 'italic' },
+                { token: 'string', foreground: 'A31515' },
+                { token: 'string.escape', foreground: 'FF0000', fontStyle: 'bold' },
+                { token: 'variable.css', foreground: '001080', fontStyle: 'bold' },
+                { token: 'function.css', foreground: '795E26' },
+                { token: 'function.math', foreground: 'B8860B', fontStyle: 'bold' },
+                { token: 'function.color', foreground: 'C71585', fontStyle: 'bold' },
+                { token: 'function.url', foreground: '4682B4' },
+                { token: 'function.gradient', foreground: '9932CC', fontStyle: 'bold' },
+                { token: 'keyword.at-rule', foreground: 'AF00DB', fontStyle: 'bold' },
+                { token: 'keyword.css', foreground: '0000FF' },
+                { token: 'keyword.important', foreground: 'FF0000', fontStyle: 'bold' },
+                { token: 'number.css', foreground: '098658' },
+                { token: 'number.hex.css', foreground: '098658', fontStyle: 'bold' },
+                { token: 'attribute.name.css', foreground: '0451A5', fontStyle: 'bold' },
+                { token: 'tag.pseudo-class', foreground: '8B4513', fontStyle: 'italic' },
+                { token: 'tag.pseudo-element', foreground: '800080', fontStyle: 'italic bold' },
+                { token: 'tag.element.css', foreground: '800000' },
+                { token: 'tag.id.css', foreground: 'DC143C', fontStyle: 'bold' },
+                { token: 'tag.class.css', foreground: 'FF8C00', fontStyle: 'bold' },
+                { token: 'operator.combinator.css', foreground: 'FF4500', fontStyle: 'bold' }
+            ]
+        });
 
-            // Apply CSS button
-            document.getElementById('applyBtn').addEventListener('click', () => {
-                if (currentLanguage === 'css') {
-                    applyCSSToPreview(editor.getValue());
-                    updateStatus('CSS applied to preview');
-                } else {
-                    updateStatus('Switch to CSS tab to apply styles');
-                }
-            });
+        // Create the editor with enhanced configuration
+        editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+            value: defaultCSS,
+            language: 'css',
+            theme: 'enhanced-dark',
+            fontSize: 14,
+            minimap: { 
+                enabled: true,
+                showSlider: 'always',
+                renderCharacters: false
+            },
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            formatOnPaste: true,
+            formatOnType: true,
+            tabSize: 2,
+            insertSpaces: true,
+            wordWrap: 'on',
+            lineNumbers: 'on',
+            renderLineHighlight: 'all',
+            renderWhitespace: 'boundary',
+            bracketPairColorization: { enabled: true },
+            guides: {
+                bracketPairs: true,
+                bracketPairsHorizontal: true,
+                highlightActiveBracketPair: true,
+                indentation: true,
+                highlightActiveIndentation: true
+            },
+            suggest: {
+                showKeywords: true,
+                showSnippets: true,
+                showColors: true,
+                showFiles: true,
+                showReferences: true,
+                showFolders: true,
+                showTypeParameters: true,
+                showIssues: true,
+                showUsers: true,
+                showValues: true,
+                showMethods: true,
+                showFunctions: true,
+                showConstructors: true,
+                showFields: true,
+                showVariables: true,
+                showClasses: true,
+                showStructs: true,
+                showInterfaces: true,
+                showModules: true,
+                showProperties: true,
+                showEvents: true,
+                showOperators: true,
+                showUnits: true,
+                insertMode: 'replace'
+            },
+            quickSuggestions: {
+                other: true,
+                comments: false,
+                strings: true
+            },
+            parameterHints: { enabled: true },
+            autoClosingBrackets: 'always',
+            autoClosingQuotes: 'always',
+            autoSurround: 'languageDefined',
+            colorDecorators: true,
+            dragAndDrop: true,
+            find: {
+                addExtraSpaceOnTop: false,
+                autoFindInSelection: 'never',
+                seedSearchStringFromSelection: 'always'
+            },
+            folding: true,
+            foldingHighlight: true,
+            foldingStrategy: 'auto',
+            showFoldingControls: 'mouseover',
+            matchBrackets: 'always',
+            occurrencesHighlight: true,
+            selectionHighlight: true,
+            smoothScrolling: true,
+            cursorBlinking: 'blink',
+            cursorSmoothCaretAnimation: true,
+            cursorStyle: 'line',
+            cursorWidth: 2,
+            mouseWheelZoom: true,
+            multiCursorModifier: 'ctrlCmd',
+            wordBasedSuggestions: true,
+            wordBasedSuggestionsMode: 'matchingDocuments'
+        });
 
-            // Auto-apply CSS on change (debounced)
-            let timeoutId;
-            editor.onDidChangeModelContent(() => {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    if (currentLanguage === 'css') {
-                        applyCSSToPreview(editor.getValue());
+        // Enhanced CSS completion provider
+        monaco.languages.registerCompletionItemProvider('css', {
+            provideCompletionItems: function(model, position) {
+                const textUntilPosition = model.getValueInRange({
+                    startLineNumber: 1,
+                    startColumn: 1,
+                    endLineNumber: position.lineNumber,
+                    endColumn: position.column
+                });
+
+                const suggestions = [];
+                
+                // Enhanced property suggestions with descriptions
+                const propertyCompletions = [
+                    {
+                        label: 'aspect-ratio',
+                        kind: monaco.languages.CompletionItemKind.Property,
+                        insertText: 'aspect-ratio: ${1:1 / 1};',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'Sets the preferred aspect ratio for the element'
+                    },
+                    {
+                        label: 'container-type',
+                        kind: monaco.languages.CompletionItemKind.Property,
+                        insertText: 'container-type: ${1|inline-size,size,normal|};',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'Establishes the element as a query container for container queries'
+                    },
+                    {
+                        label: 'view-transition-name',
+                        kind: monaco.languages.CompletionItemKind.Property,
+                        insertText: 'view-transition-name: ${1:transition-name};',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'Provides a name for the element for view transitions'
+                    },
+                    {
+                        label: 'scroll-timeline',
+                        kind: monaco.languages.CompletionItemKind.Property,
+                        insertText: 'scroll-timeline: ${1:timeline-name} ${2|block,inline,x,y|};',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'Creates a scroll-driven timeline for animations'
+                    },
+                    {
+                        label: 'color-scheme',
+                        kind: monaco.languages.CompletionItemKind.Property,
+                        insertText: 'color-scheme: ${1|light,dark,light dark,normal|};',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'Indicates which color schemes an element can be rendered in'
                     }
-                }, 500);
-                
-                updateCursorPosition();
-            });
+                ];
 
-            // Cursor position tracking
-            editor.onDidChangeCursorPosition(updateCursorPosition);
+                // Enhanced function suggestions
+                const functionCompletions = [
+                    {
+                        label: 'clamp()',
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        insertText: 'clamp(${1:min}, ${2:preferred}, ${3:max})',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'Clamps a value between a minimum and maximum'
+                    },
+                    {
+                        label: 'color-mix()',
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        insertText: 'color-mix(in ${1|srgb,hsl,hwb,lab,lch,oklab,oklch|}, ${2:color1} ${3:percentage}, ${4:color2})',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'Mixes two colors in a specified color space'
+                    },
+                    {
+                        label: 'container()',
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        insertText: 'container(${1:name} ${2:query})',
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        documentation: 'Container query function for responsive design'
+                    }
+                ];
 
-            function updateCursorPosition() {
-                const position = editor.getPosition();
-                document.getElementById('cursorPosition').textContent = 
-                    `Ln ${position.lineNumber}, Col ${position.column}`;
+                // Add all completions
+                suggestions.push(...propertyCompletions, ...functionCompletions);
+
+                return { suggestions: suggestions };
             }
+        });
 
-            function updateStatus(message) {
-                document.getElementById('statusText').textContent = message;
-                setTimeout(() => {
-                    document.getElementById('statusText').textContent = 'Ready';
-                }, 3000);
+        // Enhanced hover provider with detailed information
+        monaco.languages.registerHoverProvider('css', {
+            provideHover: function(model, position) {
+                const word = model.getWordAtPosition(position);
+                if (!word) return;
+
+                const hoverInfo = {
+                    'aspect-ratio': {
+                        contents: [
+                            { value: '**aspect-ratio**' },
+                            { value: 'Sets the preferred aspect ratio for the element.' },
+                            { value: '```css\naspect-ratio: 16 / 9;\naspect-ratio: 1;\naspect-ratio: auto;\n```' }
+                        ]
+                    },
+                    'container-type': {
+                        contents: [
+                            { value: '**container-type**' },
+                            { value: 'Establishes the element as a query container for container queries.' },
+                            { value: '```css\ncontainer-type: inline-size;\ncontainer-type: size;\ncontainer-type: normal;\n```' }
+                        ]
+                    },
+                    'clamp': {
+                        contents: [
+                            { value: '**clamp()**' },
+                            { value: 'Clamps a value between a minimum and maximum.' },
+                            { value: '```css\nwidth: clamp(200px, 50%, 400px);\nfont-size: clamp(1rem, 2.5vw, 2rem);\n```' }
+                        ]
+                    },
+                    'color-mix': {
+                        contents: [
+                            { value: '**color-mix()**' },
+                            { value: 'Mixes two colors in a specified color space.' },
+                            { value: '```css\nbackground: color-mix(in srgb, red 50%, blue);\ncolor: color-mix(in hsl, var(--primary) 80%, white);\n```' }
+                        ]
+                    }
+                };
+
+                const info = hoverInfo[word.word];
+                if (info) {
+                    return {
+                        range: new monaco.Range(
+                            position.lineNumber,
+                            word.startColumn,
+                            position.lineNumber,
+                            word.endColumn
+                        ),
+                        contents: info.contents
+                    };
+                }
             }
+        });
 
-            function applyCSSToPreview(css) {
-                const previewBox = document.getElementById('previewBox');
+        // Language switching functionality
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const language = tab.dataset.language;
                 
-                // Remove previous dynamic styles
-                const existingStyle = document.getElementById('dynamic-styles');
-                if (existingStyle) {
-                    existingStyle.remove();
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Switch editor language and content
+                currentLanguage = language;
+                monaco.editor.setModelLanguage(editor.getModel(), language);
+                
+                if (language === 'css') {
+                    editor.setValue(defaultCSS);
+                } else if (language === 'html') {
+                    editor.setValue(defaultHTML);
                 }
                 
-                // Apply new styles
+                updateStatus('Switched to ' + language.toUpperCase());
+            });
+        });
+
+        // Enhanced font size control
+        const fontSizeSlider = document.getElementById('fontSizeSlider');
+        const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+        
+        fontSizeSlider.addEventListener('input', (e) => {
+            const fontSize = parseInt(e.target.value);
+            fontSizeDisplay.textContent = fontSize + 'px';
+            editor.updateOptions({ fontSize: fontSize });
+        });
+
+        // Enhanced theme switching
+        const themeSelector = document.getElementById('themeSelector');
+        themeSelector.addEventListener('change', (e) => {
+            let theme;
+            switch(e.target.value) {
+                case 'vs-dark':
+                    theme = 'enhanced-dark';
+                    break;
+                case 'vs':
+                    theme = 'enhanced-light';
+                    break;
+                case 'hc-black':
+                    theme = 'hc-black';
+                    break;
+                default:
+                    theme = 'enhanced-dark';
+            }
+            monaco.editor.setTheme(theme);
+            updateStatus('Theme changed to ' + e.target.value);
+        });
+
+        // Enhanced format button with better error handling
+        document.getElementById('formatBtn').addEventListener('click', async () => {
+            try {
+                await editor.getAction('editor.action.formatDocument').run();
+                updateStatus('Code formatted successfully');
+            } catch (error) {
+                updateStatus('Formatting error: ' + error.message);
+                console.error('Formatting error:', error);
+            }
+        });
+
+        // Apply CSS button
+        document.getElementById('applyBtn').addEventListener('click', () => {
+            if (currentLanguage === 'css') {
+                applyCSSToPreview(editor.getValue());
+                updateStatus('CSS applied to preview');
+            } else {
+                updateStatus('Switch to CSS tab to apply styles');
+            }
+        });
+
+        // Enhanced auto-apply CSS on change (debounced with error handling)
+        let timeoutId;
+        editor.onDidChangeModelContent(() => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                if (currentLanguage === 'css') {
+                    try {
+                        applyCSSToPreview(editor.getValue());
+                    } catch (error) {
+                        console.error('CSS application error:', error);
+                        updateStatus('CSS application error');
+                    }
+                }
+            }, 500);
+            
+            updateCursorPosition();
+        });
+
+        // Enhanced cursor position tracking
+        editor.onDidChangeCursorPosition((e) => {
+            updateCursorPosition();
+            
+            // Show current property context in status
+            const model = editor.getModel();
+            const lineContent = model.getLineContent(e.position.lineNumber);
+            const propertyMatch = lineContent.match(/^\s*([\w-]+)\s*:/);
+            if (propertyMatch) {
+                const property = propertyMatch[1];
+                updateStatus(`Editing property: ${property}`);
+            }
+        });
+
+        // Enhanced utility functions
+        function updateCursorPosition() {
+            const position = editor.getPosition();
+            const model = editor.getModel();
+            const totalLines = model.getLineCount();
+            const currentLine = position.lineNumber;
+            const progress = Math.round((currentLine / totalLines) * 100);
+            
+            document.getElementById('cursorPosition').textContent = 
+                `Ln ${currentLine}, Col ${position.column} (${progress}%)`;
+        }
+
+        function updateStatus(message) {
+            const statusElement = document.getElementById('statusText');
+            statusElement.textContent = message;
+            statusElement.style.color = message.includes('error') ? '#F44747' : '#4CAF50';
+            
+            setTimeout(() => {
+                statusElement.textContent = 'Ready';
+                statusElement.style.color = '';
+            }, 3000);
+        }
+
+        function applyCSSToPreview(css) {
+            const previewBox = document.getElementById('previewBox');
+            
+            // Remove previous dynamic styles
+            const existingStyle = document.getElementById('dynamic-styles');
+            if (existingStyle) {
+                existingStyle.remove();
+            }
+            
+            // Apply new styles with error handling
+            try {
                 const style = document.createElement('style');
                 style.id = 'dynamic-styles';
                 style.textContent = css;
                 document.head.appendChild(style);
-            }
-
-            // Initialize
-            updateCursorPosition();
-            applyCSSToPreview(defaultCSS);
-            updateStatus('Monaco CSS Editor loaded successfully');
-        });
-
-        // Resizer functionality
-        let isResizing = false;
-        const resizer = document.querySelector('.resizer');
-        const leftPanel = document.querySelector('.editor-panel');
-        const rightPanel = document.querySelector('.preview-panel');
-
-        resizer.addEventListener('mousedown', (e) => {
-            isResizing = true;
-            document.addEventListener('mousemove', handleResize);
-            document.addEventListener('mouseup', stopResize);
-        });
-
-        function handleResize(e) {
-            if (!isResizing) return;
-            
-            const containerWidth = document.querySelector('.main-content').offsetWidth;
-            const rightWidth = containerWidth - e.clientX;
-            
-            if (rightWidth > 200 && rightWidth < containerWidth - 300) {
-                rightPanel.style.width = rightWidth + 'px';
+            } catch (error) {
+                console.error('CSS application error:', error);
+                throw error;
             }
         }
 
-        function stopResize() {
-            isResizing = false;
-            document.removeEventListener('mousemove', handleResize);
-            document.removeEventListener('mouseup', stopResize);
+        // Initialize editor
+        updateCursorPosition();
+        applyCSSToPreview(defaultCSS);
+        updateStatus('Enhanced Monaco CSS Editor loaded with comprehensive syntax highlighting');
+        
+        // Add keyboard shortcuts
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, () => {
+            editor.getAction('editor.action.commentLine').run();
+        });
+        
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF, () => {
+            editor.getAction('editor.action.formatDocument').run();
+        });
+    });
+
+    // Enhanced resizer functionality with smooth transitions
+    let isResizing = false;
+    const resizer = document.querySelector('.resizer');
+    const leftPanel = document.querySelector('.editor-panel');
+    const rightPanel = document.querySelector('.preview-panel');
+
+    resizer.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        document.body.style.cursor = 'ew-resize';
+        document.body.style.userSelect = 'none';
+        document.addEventListener('mousemove', handleResize);
+        document.addEventListener('mouseup', stopResize);
+        e.preventDefault();
+    });
+
+    function handleResize(e) {
+        if (!isResizing) return;
+        
+        const containerWidth = document.querySelector('.main-content').offsetWidth;
+        const rightWidth = Math.max(200, Math.min(containerWidth - 300, containerWidth - e.clientX));
+        
+        rightPanel.style.width = rightWidth + 'px';
+        rightPanel.style.transition = 'none';
+    }
+
+    function stopResize() {
+        isResizing = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        rightPanel.style.transition = '';
+        document.removeEventListener('mousemove', handleResize);
+        document.removeEventListener('mouseup', stopResize);
+    }
+
+    // Add window resize handler for responsive layout
+    window.addEventListener('resize', () => {
+        if (editor) {
+            editor.layout();
         }
-    </script>
+    });
+</script>
+
 </body>
-
 </html>
