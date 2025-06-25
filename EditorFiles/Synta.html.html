@@ -501,78 +501,101 @@
                 }
             });
 
-monaco.languages.setMonarchTokensProvider('javascript', {
-  tokenizer: {
-    root: [
-      // Keywords
-      [/\b(break|case|catch|class|const|continue|debugger|default|delete|do|else|export|extends|finally|for|from|function|get|if|import|in|instanceof|let|new|null|of|return|set|super|switch|this|throw|try|typeof|var|void|while|with|yield|async|await|static)\b/, 'keyword.js'],
-
-      // Constants
-      [/\b(true|false|NaN|Infinity|undefined)\b/, 'constant.language.js'],
-
-      // Types (optional – useful for TS or flow-style code)
-      [/\b(Number|String|Boolean|Array|Object|Function|Symbol|BigInt|Map|Set|WeakMap|WeakSet|Date|RegExp|Error|Promise|any|unknown|never|void)\b/, 'type.js'],
-
-      // Identifiers
-      [/[a-zA-Z_$][\w$]*/, {
-        cases: {
-          '@keywords': 'keyword',
-          '@default': 'identifier.js'
-        }
-      }],
-
-      // Strings
-      [/"/, 'string.js', '@string_double'],
-      [/'/, 'string.js', '@string_single'],
-      [/`/, 'string.js', '@string_backtick'],
-
-      // Comments
-      [/\/\/.*$/, 'comment.js'],
-      [/\/\*/, 'comment.js', '@comment'],
-
-      // Numbers
-      [/\b\d+(_+\d+)*(\.\d+)?([eE][\-+]?\d+)?\b/, 'number.js'],
-
-      // Operators & Symbols
-      [/[{}()]/, '@brackets'],
-      [/[<>](?!@symbols)/, 'operator.js'],
-      [/[=+\-*/%&|^!~?:]/, 'operator.js'],
-      [/[;,\.]/, 'delimiter.js'],
-    ],
-
-    // Multi-line comments
-    comment: [
-      [/[^\/*]+/, 'comment.js'],
-      [/\*\//, 'comment.js', '@pop'],
-      [/[\/*]/, 'comment.js']
-    ],
-
-    // Strings
-    string_double: [
-      [/[^\\"]+/, 'string.js'],
-      [/\\./, 'string.escape.js'],
-      [/"/, 'string.js', '@pop']
-    ],
-    string_single: [
-      [/[^\\']+/, 'string.js'],
-      [/\\./, 'string.escape.js'],
-      [/'/, 'string.js', '@pop']
-    ],
-    string_backtick: [
-      [/[^\\`$]+/, 'string.js'],
-      [/\\./, 'string.escape.js'],
-      [/\$\{/, { token: 'delimiter.bracket.js', next: '@bracketCounting' }],
-      [/`/, 'string.js', '@pop']
-    ],
-
-    bracketCounting: [
-      [/\{/, 'delimiter.bracket.js', '@push'],
-      [/\}/, 'delimiter.bracket.js', '@pop'],
-      { include: 'root' }
-    ]
-  }
+            monaco.languages.setMonarchTokensProvider('javascript', {
+    tokenizer: {
+        root: [
+            // Single-line comments
+            [/\/\/.*$/, 'comment'],
+            // Multi-line comments
+            [/\/\*/, 'comment', '@comment'],
+            
+            // Strings
+            [/"([^"\\]|\\.)*$/, 'string.invalid'],
+            [/'([^'\\]|\\.)*$/, 'string.invalid'],
+            [/"/, 'string', '@string."'],
+            [/'/, 'string', '@string.\''],
+            
+            // Template literals
+            [/`/, 'string.template.js', '@templateString'],
+            
+            // Keywords
+            [/\b(break|case|catch|class|const|continue|debugger|default|delete|do|else|export|extends|finally|for|function|if|import|in|instanceof|let|new|return|super|switch|this|throw|try|typeof|var|void|while|with|yield|async|await|static|public|private|protected|implements|interface|package|abstract|enum)\b/, 'keyword.js'],
+            
+            // Built-in objects and functions
+            [/\b(Array|Date|Math|Object|Promise|console|document|window|setTimeout|setInterval|fetch|JSON|Map|Set|WeakMap|WeakSet)\b/, 'support.function.js'],
+            
+            // Variables
+            [/[a-zA-Z_]\w*(?=\s*[:=])/, 'variable.js'],
+            
+            // Functions and Arrow Functions
+            [/[a-zA-Z_]\w*(?=\s*\()/, 'function.js'],
+            [/=>/, 'operator.arrow.js'],
+            
+            // Numbers
+            [/\d*\.\d+([eE][\-+]?\d+)?/, 'number.js'],
+            [/\d+/, 'number.js'],
+            
+            // Regular expressions
+            [/\/(?=.*\/[gimuy]*)/, { token: 'regexp.delim.js', bracket: '@open', next: '@regexp' }],
+            
+            // Operators
+            [/[+\-*\/%=<>!&|~^]+/, 'operator.js'],
+            
+            // Punctuation
+            [/[{}()\[\];,.]/, 'delimiter.js'],
+            
+            // Destructuring and Object Literals
+            [/{[^}]*}/, 'object.literal.js'],
+            [/\[.*\]/, 'array.literal.js'],
+            
+            // Class Definitions
+            [/\bclass\b\s+[a-zA-Z_]\w*/, 'class.name.js'],
+            
+            // Decorators
+            [/@[a-zA-Z_]\w*(?:\s*\([^)]*\))?\s*(?=\n|;)/, 'decorator.js'],
+            
+            // Whitespace
+            [/\s+/, 'white']
+        ],
+        
+        comment: [
+            [/[^\/*]+/, 'comment'],
+            [/\/\*/, 'comment', '@push'],
+            [/\*\//, 'comment', '@pop'],
+            [/[\/*]/, 'comment']
+        ],
+        
+        string: [
+            [/[^\\"']+/, 'string'],
+            [/\\./, 'string.escape'],
+            [/["']/, {
+                cases: {
+                    '$#==$S2': { token: 'string', next: '@pop' },
+                    '@default': 'string'
+                }
+            }]
+        ],
+        
+        templateString: [
+            [/[^`\\]+/, 'string.template.js'],
+            [/\\./, 'string.escape.template.js'],
+            [/`/, { token: 'string.template.js', next: '@pop' }],
+            [/\${/, { token: 'string.template.js', next: '@interpolation' }]
+        ],
+        
+        interpolation: [
+            [/[^}]+/, 'variable.js'],
+            [/\}/, { token: 'string.template.js', next: '@templateString' }]
+        ],
+        
+        regexp: [
+            { include: '@whitespace' },
+            [/[^\\/]+/, 'regexp.content.js'],
+            [/\//, { token: 'regexp.delim.js', bracket: '@close', next: '@pop' }],
+            [/\\./, 'regexp.escape.js']
+        ]
+    }
 });
-
             // Custom theme for better syntax highlighting
             monaco.editor.defineTheme('enhanced-dark', {
                 base: 'vs-dark',
@@ -591,7 +614,27 @@ monaco.languages.setMonarchTokensProvider('javascript', {
                     { token: 'tag.id.css', foreground: 'F44747', fontStyle: 'bold' },
                     { token: 'tag.class.css', foreground: 'FFD700', fontStyle: 'bold' },
                     { token: 'operator.css', foreground: 'D4D4D4' },
-                    { token: 'delimiter.css', foreground: 'D4D4D4' }
+                    { token: 'delimiter.css', foreground: 'D4D4D4' },
+
+                    { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
+        { token: 'keyword.js', foreground: 'C586C0' },
+        { token: 'support.function.js', foreground: 'DCDCAA' },
+        { token: 'variable.js', foreground: '9CDCFE', fontStyle: 'bold' },
+        { token: 'function.js', foreground: 'DCDCAA' },
+        { token: 'operator.arrow.js', foreground: 'C586C0' },
+        { token: 'number.js', foreground: 'B5CEA8' },
+        { token: 'string', foreground: 'CE9178' },
+        { token: 'string.template.js', foreground: 'CE9178', fontStyle: 'italic' },
+        { token: 'string.escape.template.js', foreground: 'CE9178', fontStyle: 'bold' },
+        { token: 'regexp.delim.js', foreground: 'DE6B74' },
+        { token: 'regexp.content.js', foreground: 'DE6B74' },
+        { token: 'regexp.escape.js', foreground: 'DE6B74', fontStyle: 'bold' },
+        { token: 'operator.js', foreground: 'D4D4D4' },
+        { token: 'delimiter.js', foreground: 'D4D4D4' },
+        { token: 'object.literal.js', foreground: 'D7BA7D' },
+        { token: 'array.literal.js', foreground: 'D7BA7D' },
+        { token: 'class.name.js', foreground: '4EC9B0', fontStyle: 'bold' },
+        { token: 'decorator.js', foreground: 'F44747' }
                 ],
                 colors: {
                     'editor.background': '#1e1e1e'
