@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -253,14 +254,14 @@
             .main-content {
                 flex-direction: column;
             }
-            
+
             .preview-panel {
                 width: 100%;
                 height: 200px;
                 border-left: none;
                 border-top: 1px solid var(--border-color);
             }
-            
+
             .toolbar-controls {
                 flex-direction: column;
                 gap: 8px;
@@ -268,6 +269,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="editor-container">
         <div class="toolbar">
@@ -298,9 +300,9 @@
                 </div>
                 <div id="monaco-editor"></div>
             </div>
-            
+
             <div class="resizer"></div>
-            
+
             <div class="preview-panel">
                 <div class="preview-header">Live Preview</div>
                 <div class="preview-content">
@@ -499,158 +501,77 @@
                 }
             });
 
-            monaco.languages.setMonarchTokensProvider('javascript', {
-    // Set default token for anything not matched by other rules
-    defaultToken: 'identifier',
+monaco.languages.setMonarchTokensProvider('javascript', {
+  tokenizer: {
+    root: [
+      // Keywords
+      [/\b(break|case|catch|class|const|continue|debugger|default|delete|do|else|export|extends|finally|for|from|function|get|if|import|in|instanceof|let|new|null|of|return|set|super|switch|this|throw|try|typeof|var|void|while|with|yield|async|await|static)\b/, 'keyword.js'],
 
-    // List of JavaScript keywords
-    keywords: [
-        'break', 'case', 'catch', 'class', 'continue', 'const', 'debugger', 'default', 'delete',
-        'do', 'else', 'export', 'extends', 'finally', 'for', 'function', 'if',
-        'import', 'in', 'instanceof', 'new', 'return', 'super', 'switch', 'this',
-        'throw', 'try', 'typeof', 'var', 'void', 'while', 'with', 'yield',
-        'async', 'await', 'from', 'as', 'of', 'get', 'set', 'static',
-        // TypeScript specific keywords (often included for broader JS/TS support)
-        'implements', 'interface', 'let', 'package', 'private', 'protected', 'public', 'enum',
-        'abstract', 'declare', 'type', 'readonly'
+      // Constants
+      [/\b(true|false|NaN|Infinity|undefined)\b/, 'constant.language.js'],
+
+      // Types (optional – useful for TS or flow-style code)
+      [/\b(Number|String|Boolean|Array|Object|Function|Symbol|BigInt|Map|Set|WeakMap|WeakSet|Date|RegExp|Error|Promise|any|unknown|never|void)\b/, 'type.js'],
+
+      // Identifiers
+      [/[a-zA-Z_$][\w$]*/, {
+        cases: {
+          '@keywords': 'keyword',
+          '@default': 'identifier.js'
+        }
+      }],
+
+      // Strings
+      [/"/, 'string.js', '@string_double'],
+      [/'/, 'string.js', '@string_single'],
+      [/`/, 'string.js', '@string_backtick'],
+
+      // Comments
+      [/\/\/.*$/, 'comment.js'],
+      [/\/\*/, 'comment.js', '@comment'],
+
+      // Numbers
+      [/\b\d+(_+\d+)*(\.\d+)?([eE][\-+]?\d+)?\b/, 'number.js'],
+
+      // Operators & Symbols
+      [/[{}()\[\]]/, '@brackets'],
+      [/[<>](?!@symbols)/, 'operator.js'],
+      [/[=+\-*/%&|^!~?:]/, 'operator.js'],
+      [/[;,\.]/, 'delimiter.js'],
     ],
 
-    // List of JavaScript built-in constants
-    constants: [
-        'true', 'false', 'null', 'undefined'
+    // Multi-line comments
+    comment: [
+      [/[^\/*]+/, 'comment.js'],
+      [/\*\//, 'comment.js', '@pop'],
+      [/[\/*]/, 'comment.js']
     ],
 
-    // List of JavaScript operators
-    operators: [
-        '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=', '===', '!==',
-        '&&', '||', '++', '--', '+', '-', '*', '/', '&', '|', '^', '%', '<<',
-        '>>', '>>>', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<=',
-        '>>=', '>>>=', '=>', '??', '?.'
+    // Strings
+    string_double: [
+      [/[^\\"]+/, 'string.js'],
+      [/\\./, 'string.escape.js'],
+      [/"/, 'string.js', '@pop']
+    ],
+    string_single: [
+      [/[^\\']+/, 'string.js'],
+      [/\\./, 'string.escape.js'],
+      [/'/, 'string.js', '@pop']
+    ],
+    string_backtick: [
+      [/[^\\`$]+/, 'string.js'],
+      [/\\./, 'string.escape.js'],
+      [/\$\{/, { token: 'delimiter.bracket.js', next: '@bracketCounting' }],
+      [/`/, 'string.js', '@pop']
     ],
 
-    // Common symbols used in operators
-    symbols: /[=><!~?:&|+\-*/^%]+/,
-
-    // Regular expression for common escape sequences in strings and regexes
-    escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
-
-    // Regular expressions for different number formats
-    digits: /\d+(_+\d+)*/,
-    octaldigits: /[0-7]+(_+[0-7]+)*/,
-    binarydigits: /[0-1]+(_+[0-1]+)*/,
-    hexdigits: /[0-9a-fA-F]+(_+[0-9a-fA-F]+)*/,
-
-    // The main tokenizer for our language
-    tokenizer: {
-        root: [
-            // Function declarations: 'function' keyword followed by an identifier
-            [/function(\s*)([a-zA-Z_$][\w$]*)/, ['keyword', 'white', 'entity.name.function']],
-            // Class declarations: 'class' keyword followed by an identifier
-            [/class(\s*)([a-zA-Z_$][\w$]*)/, ['keyword', 'white', 'entity.name.type']],
-            // Variable declarations: 'const', 'let', 'var' followed by an identifier
-            [/(const|let|var)(\s*)([a-zA-Z_$][\w$]*)/, ['keyword', 'white', 'variable.declaration']],
-
-            // General identifiers (must come after specific declarations to avoid overriding)
-            [/[a-zA-Z_$][\w$]*/, {
-                cases: {
-                    '@keywords': 'keyword', // Highlight keywords
-                    '@constants': 'constant', // Highlight built-in constants (true, false, null, undefined)
-                    // Highlight common built-in objects/globals as support classes or functions
-                    'console|Math|Date|Array|Object|String|Number|Boolean|RegExp|Promise|JSON|Map|Set|Symbol': 'support.class',
-                    'setTimeout|setInterval|parseInt|parseFloat|isNaN|isFinite|decodeURI|encodeURI': 'support.function',
-                    '@default': 'identifier' // Default for other identifiers
-                }
-            }],
-
-            // Whitespace
-            [/\s+/, 'white'],
-
-            // Comments
-            [/\/\*/, 'comment', '@comment'], // Multi-line comment start
-            [/\/\/.*$/, 'comment'], // Single-line comment
-
-            // Regular expressions (heuristic: matches /.../ if it looks like a regex, not division)
-            // This is a simplified heuristic and might misinterpret division operators in some contexts.
-            [/\/(?=([^\\\/]|\\.)+\/[gimsuy]*\b)/, { token: 'regexp', bracket: '@open', next: '@regexp' }],
-
-            // Numbers
-            [/(@digits)[eE]([\-+]?(@digits))?/, 'number.float'], // Floating point with exponent
-            [/(@digits)\.(@digits)([eE][\-+]?(@digits))?/, 'number.float'], // Floating point
-            [/0[xX](@hexdigits)/, 'number.hex'], // Hexadecimal numbers
-            [/0[oO](@octaldigits)/, 'number.octal'], // Octal numbers
-            [/0[bB](@binarydigits)/, 'number.binary'], // Binary numbers
-            [/(@digits)/, 'number'], // Integer numbers
-
-            // Strings
-            [/"/, 'string', '@string_double'], // Double-quoted string
-            [/'/, 'string', '@string_single'], // Single-quoted string
-            [/`/, 'string.template', '@string_backtick'], // Template literal (backticks)
-
-            // Punctuation and operators
-            [/[{}()\[\]]/, '@brackets'], // Brackets and parentheses
-            [/@symbols/, { // Operators
-                cases: {
-                    '@operators': 'operator',
-                    '@default': '' // No token for other symbols
-                }
-            }],
-            [/[;,.]/, 'delimiter'], // Delimiters like semicolon, comma, dot
-        ],
-
-        // State for multi-line comments
-        comment: [
-            [/[^\/*]+/, 'comment'], // Comment content
-            [/\/\*/, 'comment', '@push'], // Nested multi-line comment
-            [/\*\//, 'comment', '@pop'], // End of multi-line comment
-            [/[\/*]/, 'comment'] // Other comment characters
-        ],
-
-        // State for double-quoted strings
-        string_double: [
-            [/[^\\"]+/, 'string'], // String content
-            [/@escapes/, 'string.escape'], // Valid escape sequences
-            [/\\./, 'string.escape.invalid'], // Invalid escape sequences
-            [/"/, 'string', '@pop'] // End of string
-        ],
-
-        // State for single-quoted strings
-        string_single: [
-            [/[^\\']+/, 'string'], // String content
-            [/@escapes/, 'string.escape'], // Valid escape sequences
-            [/\\./, 'string.escape.invalid'], // Invalid escape sequences
-            [/'/, 'string', '@pop'] // End of string
-        ],
-
-        // State for template literals (backticks)
-        string_backtick: [
-            [/\$\{/, { token: 'delimiter.bracket', bracket: '@open', next: '@bracketCounting' }], // Template interpolation start
-            [/[^\\`$]+/, 'string.template'], // Template literal content
-            [/@escapes/, 'string.escape'], // Valid escape sequences
-            [/\\./, 'string.escape.invalid'], // Invalid escape sequences
-            [/`/, 'string.template', '@pop'] // End of template literal
-        ],
-
-        // State for handling expressions inside template literal interpolations
-        bracketCounting: [
-            [/{/, { token: 'delimiter.bracket', bracket: '@open', next: '@bracketCounting' }], // Nested opening brace
-            [/}/, { token: 'delimiter.bracket', bracket: '@close', next: '@pop' }], // Closing brace, pop back to string_backtick
-            { include: 'root' } // Recursively tokenize content inside the interpolation
-        ],
-
-        // State for regular expressions
-        regexp: [
-            // The closing slash and flags
-            [/(\/)([gimsuy]*)/, { token: 'regexp', bracket: '@close', next: '@pop' }],
-            // Regular expression content
-            [/[^\\/]+/, 'regexp'],
-            // Escaped characters within regex
-            [/@escapes/, 'regexp.escape'],
-            // Invalid escape sequences
-            [/\\./, 'regexp.escape.invalid'],
-        ],
-    },
+    bracketCounting: [
+      [/\{/, 'delimiter.bracket.js', '@push'],
+      [/\}/, 'delimiter.bracket.js', '@pop'],
+      { include: 'root' }
+    ]
+  }
 });
-
 
             // Custom theme for better syntax highlighting
             monaco.editor.defineTheme('enhanced-dark', {
@@ -670,60 +591,7 @@
                     { token: 'tag.id.css', foreground: 'F44747', fontStyle: 'bold' },
                     { token: 'tag.class.css', foreground: 'FFD700', fontStyle: 'bold' },
                     { token: 'operator.css', foreground: 'D4D4D4' },
-                    { token: 'delimiter.css', foreground: 'D4D4D4' },
-                       // JS Comments
-    { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
-
-    // JS Keywords
-    { token: 'keyword', foreground: 'C586C0' },
-
-    // JS Constants (true, false, null, undefined)
-    { token: 'constant', foreground: '569CD6', fontStyle: 'bold' },
-
-    // Built-in classes like Math, Date
-    { token: 'support.class', foreground: '4EC9B0' },
-
-    // Built-in functions like parseInt, setTimeout
-    { token: 'support.function', foreground: 'DCDCAA' },
-
-    // Function declaration identifier
-    { token: 'entity.name.function', foreground: 'DCDCAA', fontStyle: 'bold' },
-
-    // Class name
-    { token: 'entity.name.type', foreground: '4EC9B0' },
-
-    // Variable name in declaration
-    { token: 'variable.declaration', foreground: '9CDCFE' },
-
-    // Regular identifiers (variables, props)
-    { token: 'identifier', foreground: 'D4D4D4' },
-
-    // JS Numbers
-    { token: 'number', foreground: 'B5CEA8' },
-    { token: 'number.float', foreground: 'B5CEA8' },
-    { token: 'number.hex', foreground: 'B5CEA8', fontStyle: 'bold' },
-    { token: 'number.octal', foreground: 'B5CEA8' },
-    { token: 'number.binary', foreground: 'B5CEA8' },
-
-    // JS Strings
-    { token: 'string', foreground: 'CE9178' },
-    { token: 'string.escape', foreground: 'D7BA7D' },
-    { token: 'string.escape.invalid', foreground: 'F44747', fontStyle: 'bold' },
-    { token: 'string.template', foreground: 'CE9178' },
-
-    // JS RegExp
-    { token: 'regexp', foreground: 'D16969' },
-    { token: 'regexp.escape', foreground: 'D7BA7D' },
-    { token: 'regexp.escape.invalid', foreground: 'F44747', fontStyle: 'bold' },
-
-    // JS Operators & Symbols
-    { token: 'operator', foreground: 'D4D4D4' },
-    { token: 'delimiter', foreground: 'D4D4D4' },
-    { token: 'delimiter.bracket', foreground: 'D4D4D4' },
-
-    // JSX/Decorator-like annotations (if used)
-    { token: 'annotation', foreground: 'C8C8C8', fontStyle: 'italic' },
-
+                    { token: 'delimiter.css', foreground: 'D4D4D4' }
                 ],
                 colors: {
                     'editor.background': '#1e1e1e'
@@ -892,4 +760,5 @@
         }
     </script>
 </body>
+
 </html>
