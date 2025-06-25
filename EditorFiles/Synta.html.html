@@ -670,7 +670,60 @@
                     { token: 'tag.id.css', foreground: 'F44747', fontStyle: 'bold' },
                     { token: 'tag.class.css', foreground: 'FFD700', fontStyle: 'bold' },
                     { token: 'operator.css', foreground: 'D4D4D4' },
-                    { token: 'delimiter.css', foreground: 'D4D4D4' }
+                    { token: 'delimiter.css', foreground: 'D4D4D4' },
+                       // JS Comments
+    { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
+
+    // JS Keywords
+    { token: 'keyword', foreground: 'C586C0' },
+
+    // JS Constants (true, false, null, undefined)
+    { token: 'constant', foreground: '569CD6', fontStyle: 'bold' },
+
+    // Built-in classes like Math, Date
+    { token: 'support.class', foreground: '4EC9B0' },
+
+    // Built-in functions like parseInt, setTimeout
+    { token: 'support.function', foreground: 'DCDCAA' },
+
+    // Function declaration identifier
+    { token: 'entity.name.function', foreground: 'DCDCAA', fontStyle: 'bold' },
+
+    // Class name
+    { token: 'entity.name.type', foreground: '4EC9B0' },
+
+    // Variable name in declaration
+    { token: 'variable.declaration', foreground: '9CDCFE' },
+
+    // Regular identifiers (variables, props)
+    { token: 'identifier', foreground: 'D4D4D4' },
+
+    // JS Numbers
+    { token: 'number', foreground: 'B5CEA8' },
+    { token: 'number.float', foreground: 'B5CEA8' },
+    { token: 'number.hex', foreground: 'B5CEA8', fontStyle: 'bold' },
+    { token: 'number.octal', foreground: 'B5CEA8' },
+    { token: 'number.binary', foreground: 'B5CEA8' },
+
+    // JS Strings
+    { token: 'string', foreground: 'CE9178' },
+    { token: 'string.escape', foreground: 'D7BA7D' },
+    { token: 'string.escape.invalid', foreground: 'F44747', fontStyle: 'bold' },
+    { token: 'string.template', foreground: 'CE9178' },
+
+    // JS RegExp
+    { token: 'regexp', foreground: 'D16969' },
+    { token: 'regexp.escape', foreground: 'D7BA7D' },
+    { token: 'regexp.escape.invalid', foreground: 'F44747', fontStyle: 'bold' },
+
+    // JS Operators & Symbols
+    { token: 'operator', foreground: 'D4D4D4' },
+    { token: 'delimiter', foreground: 'D4D4D4' },
+    { token: 'delimiter.bracket', foreground: 'D4D4D4' },
+
+    // JSX/Decorator-like annotations (if used)
+    { token: 'annotation', foreground: 'C8C8C8', fontStyle: 'italic' },
+
                 ],
                 colors: {
                     'editor.background': '#1e1e1e'
