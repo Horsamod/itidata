@@ -499,6 +499,159 @@
                 }
             });
 
+            monaco.languages.setMonarchTokensProvider('javascript', {
+    // Set default token for anything not matched by other rules
+    defaultToken: 'identifier',
+
+    // List of JavaScript keywords
+    keywords: [
+        'break', 'case', 'catch', 'class', 'continue', 'const', 'debugger', 'default', 'delete',
+        'do', 'else', 'export', 'extends', 'finally', 'for', 'function', 'if',
+        'import', 'in', 'instanceof', 'new', 'return', 'super', 'switch', 'this',
+        'throw', 'try', 'typeof', 'var', 'void', 'while', 'with', 'yield',
+        'async', 'await', 'from', 'as', 'of', 'get', 'set', 'static',
+        // TypeScript specific keywords (often included for broader JS/TS support)
+        'implements', 'interface', 'let', 'package', 'private', 'protected', 'public', 'enum',
+        'abstract', 'declare', 'type', 'readonly'
+    ],
+
+    // List of JavaScript built-in constants
+    constants: [
+        'true', 'false', 'null', 'undefined'
+    ],
+
+    // List of JavaScript operators
+    operators: [
+        '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=', '===', '!==',
+        '&&', '||', '++', '--', '+', '-', '*', '/', '&', '|', '^', '%', '<<',
+        '>>', '>>>', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<=',
+        '>>=', '>>>=', '=>', '??', '?.'
+    ],
+
+    // Common symbols used in operators
+    symbols: /[=><!~?:&|+\-*/^%]+/,
+
+    // Regular expression for common escape sequences in strings and regexes
+    escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
+
+    // Regular expressions for different number formats
+    digits: /\d+(_+\d+)*/,
+    octaldigits: /[0-7]+(_+[0-7]+)*/,
+    binarydigits: /[0-1]+(_+[0-1]+)*/,
+    hexdigits: /[0-9a-fA-F]+(_+[0-9a-fA-F]+)*/,
+
+    // The main tokenizer for our language
+    tokenizer: {
+        root: [
+            // Function declarations: 'function' keyword followed by an identifier
+            [/function(\s*)([a-zA-Z_$][\w$]*)/, ['keyword', 'white', 'entity.name.function']],
+            // Class declarations: 'class' keyword followed by an identifier
+            [/class(\s*)([a-zA-Z_$][\w$]*)/, ['keyword', 'white', 'entity.name.type']],
+            // Variable declarations: 'const', 'let', 'var' followed by an identifier
+            [/(const|let|var)(\s*)([a-zA-Z_$][\w$]*)/, ['keyword', 'white', 'variable.declaration']],
+
+            // General identifiers (must come after specific declarations to avoid overriding)
+            [/[a-zA-Z_$][\w$]*/, {
+                cases: {
+                    '@keywords': 'keyword', // Highlight keywords
+                    '@constants': 'constant', // Highlight built-in constants (true, false, null, undefined)
+                    // Highlight common built-in objects/globals as support classes or functions
+                    'console|Math|Date|Array|Object|String|Number|Boolean|RegExp|Promise|JSON|Map|Set|Symbol': 'support.class',
+                    'setTimeout|setInterval|parseInt|parseFloat|isNaN|isFinite|decodeURI|encodeURI': 'support.function',
+                    '@default': 'identifier' // Default for other identifiers
+                }
+            }],
+
+            // Whitespace
+            [/\s+/, 'white'],
+
+            // Comments
+            [/\/\*/, 'comment', '@comment'], // Multi-line comment start
+            [/\/\/.*$/, 'comment'], // Single-line comment
+
+            // Regular expressions (heuristic: matches /.../ if it looks like a regex, not division)
+            // This is a simplified heuristic and might misinterpret division operators in some contexts.
+            [/\/(?=([^\\\/]|\\.)+\/[gimsuy]*\b)/, { token: 'regexp', bracket: '@open', next: '@regexp' }],
+
+            // Numbers
+            [/(@digits)[eE]([\-+]?(@digits))?/, 'number.float'], // Floating point with exponent
+            [/(@digits)\.(@digits)([eE][\-+]?(@digits))?/, 'number.float'], // Floating point
+            [/0[xX](@hexdigits)/, 'number.hex'], // Hexadecimal numbers
+            [/0[oO](@octaldigits)/, 'number.octal'], // Octal numbers
+            [/0[bB](@binarydigits)/, 'number.binary'], // Binary numbers
+            [/(@digits)/, 'number'], // Integer numbers
+
+            // Strings
+            [/"/, 'string', '@string_double'], // Double-quoted string
+            [/'/, 'string', '@string_single'], // Single-quoted string
+            [/`/, 'string.template', '@string_backtick'], // Template literal (backticks)
+
+            // Punctuation and operators
+            [/[{}()\[\]]/, '@brackets'], // Brackets and parentheses
+            [/@symbols/, { // Operators
+                cases: {
+                    '@operators': 'operator',
+                    '@default': '' // No token for other symbols
+                }
+            }],
+            [/[;,.]/, 'delimiter'], // Delimiters like semicolon, comma, dot
+        ],
+
+        // State for multi-line comments
+        comment: [
+            [/[^\/*]+/, 'comment'], // Comment content
+            [/\/\*/, 'comment', '@push'], // Nested multi-line comment
+            [/\*\//, 'comment', '@pop'], // End of multi-line comment
+            [/[\/*]/, 'comment'] // Other comment characters
+        ],
+
+        // State for double-quoted strings
+        string_double: [
+            [/[^\\"]+/, 'string'], // String content
+            [/@escapes/, 'string.escape'], // Valid escape sequences
+            [/\\./, 'string.escape.invalid'], // Invalid escape sequences
+            [/"/, 'string', '@pop'] // End of string
+        ],
+
+        // State for single-quoted strings
+        string_single: [
+            [/[^\\']+/, 'string'], // String content
+            [/@escapes/, 'string.escape'], // Valid escape sequences
+            [/\\./, 'string.escape.invalid'], // Invalid escape sequences
+            [/'/, 'string', '@pop'] // End of string
+        ],
+
+        // State for template literals (backticks)
+        string_backtick: [
+            [/\$\{/, { token: 'delimiter.bracket', bracket: '@open', next: '@bracketCounting' }], // Template interpolation start
+            [/[^\\`$]+/, 'string.template'], // Template literal content
+            [/@escapes/, 'string.escape'], // Valid escape sequences
+            [/\\./, 'string.escape.invalid'], // Invalid escape sequences
+            [/`/, 'string.template', '@pop'] // End of template literal
+        ],
+
+        // State for handling expressions inside template literal interpolations
+        bracketCounting: [
+            [/{/, { token: 'delimiter.bracket', bracket: '@open', next: '@bracketCounting' }], // Nested opening brace
+            [/}/, { token: 'delimiter.bracket', bracket: '@close', next: '@pop' }], // Closing brace, pop back to string_backtick
+            { include: 'root' } // Recursively tokenize content inside the interpolation
+        ],
+
+        // State for regular expressions
+        regexp: [
+            // The closing slash and flags
+            [/(\/)([gimsuy]*)/, { token: 'regexp', bracket: '@close', next: '@pop' }],
+            // Regular expression content
+            [/[^\\/]+/, 'regexp'],
+            // Escaped characters within regex
+            [/@escapes/, 'regexp.escape'],
+            // Invalid escape sequences
+            [/\\./, 'regexp.escape.invalid'],
+        ],
+    },
+});
+
+
             // Custom theme for better syntax highlighting
             monaco.editor.defineTheme('enhanced-dark', {
                 base: 'vs-dark',
