@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android Code Editor with Sora Editor - Complete Implementation</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        pre {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .code-block {
+            max-height: none;
+            border-radius: 8px;
+        }
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .file-header {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 0.5rem 1rem;
+            border-radius: 4px 4px 0 0;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .step-number {
+            background: #4299e1;
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        body {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .feature-icon {
+            color: #4299e1;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-code text-blue-600 mr-3"></i>
+                Android Code Editor with Sora Editor
+            </h1>
+            <p class="text-lg text-gray-600">Complete Java implementation with TextMate support</p>
+        </div>
+
+        <!-- Overview -->
+        <div class="section-header">
+            <h2 class="text-2xl font-bold"><i class="fas fa-info-circle mr-2"></i>Overview</h2>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <p class="mb-4">This guide provides a complete implementation of an Android code editor using the Sora Editor library with Java. The editor includes syntax highlighting, auto-completion, and TextMate grammar support.</p>
+            
+            <h3 class="text-xl font-semibold mb-3">Key Features:</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex items-center"><i class="fas fa-palette feature-icon"></i>Syntax highlighting with TextMate</div>
+                <div class="flex items-center"><i class="fas fa-magic feature-icon"></i>Auto-completion</div>
+                <div class="flex items-center"><i class="fas fa-indent feature-icon"></i>Auto-indent</div>
+                <div class="flex items-center"><i class="fas fa-search feature-icon"></i>Search and replace</div>
+                <div class="flex items-center"><i class="fas fa-undo feature-icon"></i>Undo/Redo functionality</div>
+                <div class="flex items-center"><i class="fas fa-expand feature-icon"></i>Text scaling</div>
+                <div class="flex items-center"><i class="fas fa-file-code feature-icon"></i>Multiple language support</div>
+                <div class="flex items-center"><i class="fas fa-paint-brush feature-icon"></i>Customizable themes</div>
+            </div>
+        </div>
+
+        <!-- Project Setup -->
+        <div class="section-header">
+            <h2 class="text-2xl font-bold"><i class="fas fa-cogs mr-2"></i>Project Setup</h2>
+        </div>
+
+        <!-- Step 1: Project Structure -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="step-number">1</div>
+                <h3 class="text-xl font-semibold">Project Structure</h3>
+            </div>
+            <div class="file-header">Project Directory Structure</div>
+            <pre class="code-block p-4 bg-gray-900 text-green-400 rounded-b-lg">
+MyCodeEditor/
+├── app/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── com/
+│   │   │   │       └── example/
+│   │   │   │           └── codeeditor/
+│   │   │   │               ├── MainActivity.java
+│   │   │   │               ├── EditorActivity.java
+│   │   │   │               ├── FileManager.java
+│   │   │   │               └── ThemeManager.java
+│   │   │   ├── res/
+│   │   │   │   ├── layout/
+│   │   │   │   │   ├── activity_main.xml
+│   │   │   │   │   ├── activity_editor.xml
+│   │   │   │   │   └── item_file.xml
+│   │   │   │   ├── values/
+│   │   │   │   │   ├── strings.xml
+│   │   │   │   │   ├── colors.xml
+│   │   │   │   │   └── themes.xml
+│   │   │   │   └── menu/
+│   │   │   │       └── editor_menu.xml
+│   │   │   ├── assets/
+│   │   │   │   └── textmate/
+│   │   │   │       ├── languages.json
+│   │   │   │       ├── java/
+│   │   │   │       │   ├── syntaxes/
+│   │   │   │       │   │   └── java.tmLanguage.json
+│   │   │   │       │   └── language-configuration.json
+│   │   │   │       ├── themes/
+│   │   │   │       │   ├── dark-plus.json
+│   │   │   │       │   └── light-plus.json
+│   │   │   │       └── kotlin/
+│   │   │   │           ├── syntaxes/
+│   │   │   │           │   └── kotlin.tmLanguage.json
+│   │   │   │           └── language-configuration.json
+│   │   │   └── AndroidManifest.xml
+│   │   └── build.gradle
+│   └── build.gradle
+├── gradle/
+└── settings.gradle
+</pre>
+        </div>
+
+        <!-- Step 2: Dependencies -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="step-number">2</div>
+                <h3 class="text-xl font-semibold">Dependencies Configuration</h3>
+            </div>
+            
+            <div class="file-header">app/build.gradle</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.example.codeeditor'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.example.codeeditor"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        // Enable core library desugaring for TextMate
+        coreLibraryDesugaringEnabled true
+    }
+}
+
+dependencies {
+    // Sora Editor dependencies
+    implementation platform('io.github.rosemoe:editor-bom:0.23.7')
+    implementation 'io.github.rosemoe:editor'
+    implementation 'io.github.rosemoe:language-textmate'
+    implementation 'io.github.rosemoe:language-java'
+    
+    // Core library desugaring
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+    
+    // Android dependencies
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+</pre>
+        </div>
+
+        <!-- Step 3: MainActivity -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="step-number">3</div>
+                <h3 class="text-xl font-semibold">MainActivity Implementation</h3>
+            </div>
+            
+            <div class="file-header">MainActivity.java</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+package com.example.codeeditor;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Environment;
+import android.view.View;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+    
+    private RecyclerView recyclerView;
+    private FileAdapter fileAdapter;
+    private List&lt;File&gt; fileList;
+    private FloatingActionButton fabNewFile;
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        initViews();
+        setupRecyclerView();
+        loadFiles();
+        
+        // Initialize TextMate registry
+        TextMateManager.getInstance().initializeTextMate(this);
+    }
+    
+    private void initViews() {
+        recyclerView = findViewById(R.id.recyclerView);
+        fabNewFile = findViewById(R.id.fabNewFile);
+        
+        fabNewFile.setOnClickListener(v -&gt; createNewFile());
+    }
+    
+    private void setupRecyclerView() {
+        fileList = new ArrayList&lt;&gt;();
+        fileAdapter = new FileAdapter(fileList, this::openFile);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(fileAdapter);
+    }
+    
+    private void loadFiles() {
+        // Load files from the app's external files directory
+        File directory = new File(getExternalFilesDir(null), "projects");
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        
+        File[] files = directory.listFiles();
+        if (files != null) {
+            fileList.clear();
+            for (File file : files) {
+                if (file.isFile()) {
+                    fileList.add(file);
+                }
+            }
+            fileAdapter.notifyDataSetChanged();
+        }
+    }
+    
+    private void openFile(File file) {
+        Intent intent = new Intent(this, EditorActivity.class);
+        intent.putExtra("file_path", file.getAbsolutePath());
+        startActivity(intent);
+    }
+    
+    private void createNewFile() {
+        // Create a new file dialog or default file
+        File directory = new File(getExternalFilesDir(null), "projects");
+        File newFile = new File(directory, "NewFile.java");
+        
+        try {
+            if (newFile.createNewFile()) {
+                FileManager.writeToFile(newFile, "// New Java file\npublic class NewFile {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}");
+                loadFiles();
+                openFile(newFile);
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error creating file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadFiles(); // Refresh file list when returning to this activity
+    }
+}
+</pre>
+        </div>
+
+        <!-- Step 4: EditorActivity -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="step-number">4</div>
+                <h3 class="text-xl font-semibold">EditorActivity Implementation</h3>
+            </div>
+            
+            <div class="file-header">EditorActivity.java</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+package com.example.codeeditor;
+
+import android.graphics.Typeface;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import io.github.rosemoe.sora.widget.CodeEditor;
+import io.github.rosemoe.sora.lang.Language;
+import io.github.rosemoe.sora.lang.EmptyLanguage;
+import io.github.rosemoe.sora.lang.java.JavaLanguage;
+import io.github.rosemoe.sora.langs.textmate.TextMateLanguage;
+import io.github.rosemoe.sora.langs.textmate.TextMateColorScheme;
+import io.github.rosemoe.sora.langs.textmate.registry.ThemeRegistry;
+import io.github.rosemoe.sora.widget.schemes.EditorColorScheme;
+
+import java.io.File;
+
+public class EditorActivity extends AppCompatActivity {
+    
+    private CodeEditor editor;
+    private File currentFile;
+    private String currentTheme = "dark-plus";
+    private String currentLanguage = "java";
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_editor);
+        
+        setupToolbar();
+        setupEditor();
+        loadFile();
+    }
+    
+    private void setupToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+    
+    private void setupEditor() {
+        editor = findViewById(R.id.editor);
+        
+        // Basic editor configuration
+        editor.setTypefaceText(Typeface.MONOSPACE);
+        editor.setTextSize(14);
+        editor.setLineSpacing(2f);
+        editor.setNonPrintablePaintingFlags(
+            CodeEditor.FLAG_DRAW_WHITESPACE_LEADING | 
+            CodeEditor.FLAG_DRAW_LINE_SEPARATOR | 
+            CodeEditor.FLAG_DRAW_WHITESPACE_IN_SELECTION
+        );
+        
+        // Set up TextMate color scheme
+        applyTheme(currentTheme);
+        
+        // Set up language
+        applyLanguage(currentLanguage);
+    }
+    
+    private void loadFile() {
+        String filePath = getIntent().getStringExtra("file_path");
+        if (filePath != null) {
+            currentFile = new File(filePath);
+            
+            // Set title
+            getSupportActionBar().setTitle(currentFile.getName());
+            
+            // Detect language from file extension
+            String fileName = currentFile.getName();
+            if (fileName.endsWith(".java")) {
+                currentLanguage = "java";
+            } else if (fileName.endsWith(".kt")) {
+                currentLanguage = "kotlin";
+            } else if (fileName.endsWith(".xml")) {
+                currentLanguage = "xml";
+            } else if (fileName.endsWith(".js")) {
+                currentLanguage = "javascript";
+            } else if (fileName.endsWith(".py")) {
+                currentLanguage = "python";
+            } else {
+                currentLanguage = "text";
+            }
+            
+            // Apply language
+            applyLanguage(currentLanguage);
+            
+            // Load file content
+            String content = FileManager.readFromFile(currentFile);
+            editor.setText(content);
+        }
+    }
+    
+    private void applyTheme(String themeName) {
+        try {
+            ThemeRegistry.getInstance().setTheme(themeName);
+            editor.setColorScheme(TextMateColorScheme.create(ThemeRegistry.getInstance()));
+            currentTheme = themeName;
+        } catch (Exception e) {
+            Toast.makeText(this, "Error applying theme: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    private void applyLanguage(String languageName) {
+        try {
+            Language language;
+            
+            switch (languageName) {
+                case "java":
+                    // Use TextMate for Java
+                    language = TextMateLanguage.create("source.java", true);
+                    break;
+                case "kotlin":
+                    language = TextMateLanguage.create("source.kotlin", true);
+                    break;
+                case "xml":
+                    language = TextMateLanguage.create("text.xml", true);
+                    break;
+                case "javascript":
+                    language = TextMateLanguage.create("source.js", true);
+                    break;
+                case "python":
+                    language = TextMateLanguage.create("source.python", true);
+                    break;
+                default:
+                    language = new EmptyLanguage();
+                    break;
+            }
+            
+            editor.setEditorLanguage(language);
+            currentLanguage = languageName;
+        } catch (Exception e) {
+            Toast.makeText(this, "Error applying language: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.editor_menu, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if (id == R.id.action_save) {
+            saveFile();
+            return true;
+        } else if (id == R.id.action_undo) {
+            editor.undo();
+            return true;
+        } else if (id == R.id.action_redo) {
+            editor.redo();
+            return true;
+        } else if (id == R.id.action_search) {
+            showSearchDialog();
+            return true;
+        } else if (id == R.id.action_theme_dark) {
+            applyTheme("dark-plus");
+            return true;
+        } else if (id == R.id.action_theme_light) {
+            applyTheme("light-plus");
+            return true;
+        }
+        
+        return super.onOptionsItemSelected(item);
+    }
+    
+    private void saveFile() {
+        if (currentFile != null) {
+            String content = editor.getText().toString();
+            if (FileManager.writeToFile(currentFile, content)) {
+                Toast.makeText(this, "File saved successfully", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Error saving file", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    
+    private void showSearchDialog() {
+        // Implement search functionality
+        editor.getSearcher().gotoNext();
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (editor != null) {
+            editor.release();
+        }
+    }
+    
+    @Override
+    public void onBackPressed() {
+        // Auto-save before leaving
+        if (currentFile != null) {
+            saveFile();
+        }
+        super.onBackPressed();
+    }
+}
+</pre>
+        </div>
+
+        <!-- Step 5: Supporting Classes -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="step-number">5</div>
+                <h3 class="text-xl font-semibold">Supporting Classes</h3>
+            </div>
+            
+            <div class="file-header">FileManager.java</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+package com.example.codeeditor;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class FileManager {
+    
+    public static String readFromFile(File file) {
+        StringBuilder content = new StringBuilder();
+        
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+        
+        return content.toString();
+    }
+    
+    public static boolean writeToFile(File file, String content) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write(content);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static String getFileExtension(String fileName) {
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex == -1) {
+            return "";
+        }
+        return fileName.substring(lastDotIndex + 1);
+    }
+    
+    public static String getFileNameWithoutExtension(String fileName) {
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex == -1) {
+            return fileName;
+        }
+        return fileName.substring(0, lastDotIndex);
+    }
+}
+</pre>
+            
+            <div class="file-header mt-4">TextMateManager.java</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+package com.example.codeeditor;
+
+import android.content.Context;
+
+import io.github.rosemoe.sora.langs.textmate.registry.FileProviderRegistry;
+import io.github.rosemoe.sora.langs.textmate.registry.provider.AssetsFileResolver;
+import io.github.rosemoe.sora.langs.textmate.registry.ThemeRegistry;
+import io.github.rosemoe.sora.langs.textmate.registry.model.ThemeModel;
+import io.github.rosemoe.sora.langs.textmate.registry.GrammarRegistry;
+import io.github.rosemoe.sora.langs.textmate.registry.model.IThemeSource;
+
+public class TextMateManager {
+    
+    private static TextMateManager instance;
+    private boolean isInitialized = false;
+    
+    private TextMateManager() {}
+    
+    public static TextMateManager getInstance() {
+        if (instance == null) {
+            instance = new TextMateManager();
+        }
+        return instance;
+    }
+    
+    public void initializeTextMate(Context context) {
+        if (isInitialized) return;
+        
+        try {
+            // Add file provider for assets
+            FileProviderRegistry.getInstance().addFileProvider(
+                new AssetsFileResolver(context.getApplicationContext().getAssets())
+            );
+            
+            // Load themes
+            loadThemes();
+            
+            // Load grammars
+            loadGrammars();
+            
+            isInitialized = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void loadThemes() {
+        try {
+            ThemeRegistry themeRegistry = ThemeRegistry.getInstance();
+            
+            // Load dark theme
+            String darkThemePath = "textmate/themes/dark-plus.json";
+            ThemeModel darkTheme = new ThemeModel(
+                IThemeSource.fromInputStream(
+                    FileProviderRegistry.getInstance().tryGetInputStream(darkThemePath),
+                    darkThemePath,
+                    null
+                ),
+                "dark-plus"
+            );
+            darkTheme.setDark(true);
+            themeRegistry.loadTheme(darkTheme);
+            
+            // Load light theme
+            String lightThemePath = "textmate/themes/light-plus.json";
+            ThemeModel lightTheme = new ThemeModel(
+                IThemeSource.fromInputStream(
+                    FileProviderRegistry.getInstance().tryGetInputStream(lightThemePath),
+                    lightThemePath,
+                    null
+                ),
+                "light-plus"
+            );
+            lightTheme.setDark(false);
+            themeRegistry.loadTheme(lightTheme);
+            
+            // Set default theme
+            themeRegistry.setTheme("dark-plus");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void loadGrammars() {
+        try {
+            GrammarRegistry.getInstance().loadGrammars("textmate/languages.json");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+</pre>
+            
+            <div class="file-header mt-4">FileAdapter.java</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+package com.example.codeeditor;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.File;
+import java.util.List;
+
+public class FileAdapter extends RecyclerView.Adapter&lt;FileAdapter.FileViewHolder&gt; {
+    
+    private List&lt;File&gt; files;
+    private OnFileClickListener listener;
+    
+    public interface OnFileClickListener {
+        void onFileClick(File file);
+    }
+    
+    public FileAdapter(List&lt;File&gt; files, OnFileClickListener listener) {
+        this.files = files;
+        this.listener = listener;
+    }
+    
+    @NonNull
+    @Override
+    public FileViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+            .inflate(R.layout.item_file, parent, false);
+        return new FileViewHolder(view);
+    }
+    
+    @Override
+    public void onBindViewHolder(@NonNull FileViewHolder holder, int position) {
+        File file = files.get(position);
+        holder.bind(file);
+    }
+    
+    @Override
+    public int getItemCount() {
+        return files.size();
+    }
+    
+    class FileViewHolder extends RecyclerView.ViewHolder {
+        private ImageView iconView;
+        private TextView nameView;
+        private TextView sizeView;
+        
+        public FileViewHolder(@NonNull View itemView) {
+            super(itemView);
+            iconView = itemView.findViewById(R.id.iconView);
+            nameView = itemView.findViewById(R.id.nameView);
+            sizeView = itemView.findViewById(R.id.sizeView);
+            
+            itemView.setOnClickListener(v -&gt; {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && listener != null) {
+                    listener.onFileClick(files.get(position));
+                }
+            });
+        }
+        
+        public void bind(File file) {
+            nameView.setText(file.getName());
+            sizeView.setText(formatFileSize(file.length()));
+            
+            // Set icon based on file extension
+            String extension = FileManager.getFileExtension(file.getName());
+            switch (extension) {
+                case "java":
+                    iconView.setImageResource(R.drawable.ic_java);
+                    break;
+                case "kt":
+                    iconView.setImageResource(R.drawable.ic_kotlin);
+                    break;
+                case "xml":
+                    iconView.setImageResource(R.drawable.ic_xml);
+                    break;
+                case "js":
+                    iconView.setImageResource(R.drawable.ic_javascript);
+                    break;
+                case "py":
+                    iconView.setImageResource(R.drawable.ic_python);
+                    break;
+                default:
+                    iconView.setImageResource(R.drawable.ic_file);
+                    break;
+            }
+        }
+        
+        private String formatFileSize(long size) {
+            if (size &lt; 1024) {
+                return size + " B";
+            } else if (size &lt; 1024 * 1024) {
+                return (size / 1024) + " KB";
+            } else {
+                return (size / (1024 * 1024)) + " MB";
+            }
+        }
+    }
+}
+</pre>
+        </div>
+
+        <!-- Step 6: Layout Files -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="step-number">6</div>
+                <h3 class="text-xl font-semibold">Layout Files</h3>
+            </div>
+            
+            <div class="file-header">activity_main.xml</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;androidx.coordinatorlayout.widget.CoordinatorLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"&gt;
+
+    &lt;com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"&gt;
+
+        &lt;com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:title="Code Editor"
+            app:titleTextColor="@android:color/white" /&gt;
+
+    &lt;/com.google.android.material.appbar.AppBarLayout&gt;
+
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" /&gt;
+
+    &lt;com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabNewFile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="?attr/colorPrimary" /&gt;
+
+&lt;/androidx.coordinatorlayout.widget.CoordinatorLayout&gt;
+</pre>
+            
+            <div class="file-header mt-4">activity_editor.xml</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"&gt;
+
+    &lt;com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"&gt;
+
+        &lt;androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:titleTextColor="@android:color/white" /&gt;
+
+    &lt;/com.google.android.material.appbar.AppBarLayout&gt;
+
+    &lt;io.github.rosemoe.sora.widget.CodeEditor
+        android:id="@+id/editor"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:text="// Welcome to Code Editor"
+        app:textSize="14sp" /&gt;
+
+&lt;/LinearLayout&gt;
+</pre>
+            
+            <div class="file-header mt-4">item_file.xml</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"&gt;
+
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"&gt;
+
+        &lt;ImageView
+            android:id="@+id/iconView"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_file" /&gt;
+
+        &lt;LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"&gt;
+
+            &lt;TextView
+                android:id="@+id/nameView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="File Name"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" /&gt;
+
+            &lt;TextView
+                android:id="@+id/sizeView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="File Size"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="12sp" /&gt;
+
+        &lt;/LinearLayout&gt;
+
+    &lt;/LinearLayout&gt;
+
+&lt;/androidx.cardview.widget.CardView&gt;
+</pre>
+        </div>
+
+        <!-- Step 7: Resources -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="step-number">7</div>
+                <h3 class="text-xl font-semibold">Resource Files</h3>
+            </div>
+            
+            <div class="file-header">res/menu/editor_menu.xml</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"&gt;
+
+    &lt;item
+        android:id="@+id/action_save"
+        android:icon="@drawable/ic_save"
+        android:title="Save"
+        app:showAsAction="ifRoom" /&gt;
+
+    &lt;item
+        android:id="@+id/action_undo"
+        android:icon="@drawable/ic_undo"
+        android:title="Undo"
+        app:showAsAction="ifRoom" /&gt;
+
+    &lt;item
+        android:id="@+id/action_redo"
+        android:icon="@drawable/ic_redo"
+        android:title="Redo"
+        app:showAsAction="ifRoom" /&gt;
+
+    &lt;item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search"
+        android:title="Search"
+        app:showAsAction="ifRoom" /&gt;
+
+    &lt;item
+        android:id="@+id/action_theme"
+        android:title="Theme"
+        app:showAsAction="never"&gt;
+        &lt;menu&gt;
+            &lt;item
+                android:id="@+id/action_theme_dark"
+                android:title="Dark Theme" /&gt;
+            &lt;item
+                android:id="@+id/action_theme_light"
+                android:title="Light Theme" /&gt;
+        &lt;/menu&gt;
+    &lt;/item&gt;
+
+&lt;/menu&gt;
+</pre>
+            
+            <div class="file-header mt-4">res/values/strings.xml</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+&lt;resources&gt;
+    &lt;string name="app_name"&gt;Code Editor&lt;/string&gt;
+    &lt;string name="action_save"&gt;Save&lt;/string&gt;
+    &lt;string name="action_undo"&gt;Undo&lt;/string&gt;
+    &lt;string name="action_redo"&gt;Redo&lt;/string&gt;
+    &lt;string name="action_search"&gt;Search&lt;/string&gt;
+    &lt;string name="new_file"&gt;New File&lt;/string&gt;
+    &lt;string name="open_file"&gt;Open File&lt;/string&gt;
+    &lt;string name="save_file"&gt;Save File&lt;/string&gt;
+    &lt;string name="file_saved"&gt;File saved successfully&lt;/string&gt;
+    &lt;string name="file_save_error"&gt;Error saving file&lt;/string&gt;
+    &lt;string name="file_load_error"&gt;Error loading file&lt;/string&gt;
+&lt;/resources&gt;
+</pre>
+            
+            <div class="file-header mt-4">res/values/colors.xml</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+&lt;resources&gt;
+    &lt;color name="purple_200"&gt;#FFBB86FC&lt;/color&gt;
+    &lt;color name="purple_500"&gt;#FF6200EE&lt;/color&gt;
+    &lt;color name="purple_700"&gt;#FF3700B3&lt;/color&gt;
+    &lt;color name="teal_200"&gt;#FF03DAC5&lt;/color&gt;
+    &lt;color name="teal_700"&gt;#FF018786&lt;/color&gt;
+    &lt;color name="black"&gt;#FF000000&lt;/color&gt;
+    &lt;color name="white"&gt;#FFFFFFFF&lt;/color&gt;
+    &lt;color name="dark_blue"&gt;#FF1E88E5&lt;/color&gt;
+    &lt;color name="editor_background"&gt;#FF1E1E1E&lt;/color&gt;
+    &lt;color name="editor_text"&gt;#FFD4D4D4&lt;/color&gt;
+&lt;/resources&gt;
+</pre>
+        </div>
+
+        <!-- Step 8: TextMate Configuration -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="step-number">8</div>
+                <h3 class="text-xl font-semibold">TextMate Configuration</h3>
+            </div>
+            
+            <div class="file-header">assets/textmate/languages.json</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+{
+  "languages": [
+    {
+      "grammar": "textmate/java/syntaxes/java.tmLanguage.json",
+      "name": "java",
+      "scopeName": "source.java",
+      "languageConfiguration": "textmate/java/language-configuration.json"
+    },
+    {
+      "grammar": "textmate/kotlin/syntaxes/kotlin.tmLanguage.json",
+      "name": "kotlin",
+      "scopeName": "source.kotlin",
+      "languageConfiguration": "textmate/kotlin/language-configuration.json"
+    },
+    {
+      "grammar": "textmate/xml/syntaxes/xml.tmLanguage.json",
+      "name": "xml",
+      "scopeName": "text.xml",
+      "languageConfiguration": "textmate/xml/language-configuration.json"
+    },
+    {
+      "grammar": "textmate/javascript/syntaxes/javascript.tmLanguage.json",
+      "name": "javascript",
+      "scopeName": "source.js",
+      "languageConfiguration": "textmate/javascript/language-configuration.json"
+    },
+    {
+      "grammar": "textmate/python/syntaxes/python.tmLanguage.json",
+      "name": "python",
+      "scopeName": "source.python",
+      "languageConfiguration": "textmate/python/language-configuration.json"
+    }
+  ]
+}
+</pre>
+            
+            <div class="file-header mt-4">assets/textmate/java/language-configuration.json</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+{
+  "comments": {
+    "lineComment": "//",
+    "blockComment": ["/*", "*/"]
+  },
+  "brackets": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"]
+  ],
+  "autoClosingPairs": [
+    { "open": "{", "close": "}" },
+    { "open": "[", "close": "]" },
+    { "open": "(", "close": ")" },
+    { "open": "\"", "close": "\"", "notIn": ["string"] },
+    { "open": "'", "close": "'", "notIn": ["string", "comment"] }
+  ],
+  "surroundingPairs": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+    ["\"", "\""],
+    ["'", "'"]
+  ],
+  "wordPattern": "(-?\\d*\\.\\d\\w*)|([^\\`\\~\\!\\@\\#\\%\\^\\&\\*\\(\\)\\-\\=\\+\\[\\{\\]\\}\\\\\\|\\;\\:\\'\\\"\\,\\.\\<\\>\\/\\?\\s]+)",
+  "indentationRules": {
+    "increaseIndentPattern": "^((?!.*?/\\*).*\\*/)?(\\s*)?\\b(if|else|for|while|do|switch|case|default|try|catch|finally|synchronized|class|interface|enum|@interface|static|public|private|protected|abstract|final|native|strictfp|transient|volatile)\\b.*\\{\\s*$",
+    "decreaseIndentPattern": "^\\s*\\}"
+  }
+}
+</pre>
+        </div>
+
+        <!-- Step 9: Permissions -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="step-number">9</div>
+                <h3 class="text-xl font-semibold">AndroidManifest.xml</h3>
+            </div>
+            
+            <div class="file-header">AndroidManifest.xml</div>
+            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"&gt;
+
+    &lt;!-- Permissions --&gt;
+    &lt;uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /&gt;
+    &lt;uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /&gt;
+    &lt;uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" /&gt;
+
+    &lt;application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.CodeEditor"
+        tools:targetApi="31"&gt;
+        
+        &lt;activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CodeEditor"&gt;
+            &lt;intent-filter&gt;
+                &lt;action android:name="android.intent.action.MAIN" /&gt;
+                &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+            &lt;/intent-filter&gt;
+        &lt;/activity&gt;
+        
+        &lt;activity
+            android:name=".EditorActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.CodeEditor.NoActionBar" /&gt;
+        
+    &lt;/application&gt;
+
+&lt;/manifest&gt;
+</pre>
+        </div>
+
+        <!-- Step 10: Usage Instructions -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center mb-4">
+                <div class="step-number">10</div>
+                <h3 class="text-xl font-semibold">Usage Instructions</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-blue-800 mb-2">
+                        <i class="fas fa-rocket text-blue-600 mr-2"></i>Getting Started
+                    </h4>
+                    <ol class="list-decimal list-inside space-y-2 text-sm">
+                        <li>Create a new Android project in Android Studio</li>
+                        <li>Copy all the provided files to their respective directories</li>
+                        <li>Add the dependencies to your build.gradle file</li>
+                        <li>Download TextMate grammar files from the official repositories</li>
+                        <li>Place the grammar files in assets/textmate/ folders</li>
+                        <li>Build and run the application</li>
+                    </ol>
+                </div>
+                
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-green-800 mb-2">
+                        <i class="fas fa-cog text-green-600 mr-2"></i>Configuration
+                    </h4>
+                    <ul class="list-disc list-inside space-y-2 text-sm">
+                        <li>Ensure Java 17 compatibility in build.gradle</li>
+                        <li>Enable core library desugaring for TextMate</li>
+                        <li>Add required permissions for file access</li>
+                        <li>Configure TextMate themes and grammars</li>
+                        <li>Set up proper file associations</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-yellow-50 rounded-lg">
+                <h4 class="font-semibold text-yellow-800 mb-2">
+                    <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>Important Notes
+                </h4>
+                <ul class="list-disc list-inside space-y-1 text-sm">
+                    <li>Always call <code>editor.release()</code> in the <code>onDestroy()</code> method</li>
+                    <li>TextMate grammars must be initialized before using the editor</li>
+                    <li>File permissions are required for external storage access</li>
+                    <li>Use proper thread handling for file operations</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Features Overview -->
+        <div class="section-header">
+            <h2 class="text-2xl font-bold"><i class="fas fa-star mr-2"></i>Advanced Features</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">
+                    <i class="fas fa-palette text-purple-600 mr-2"></i>Syntax Highlighting
+                </h3>
+                <ul class="space-y-2 text-sm">
+                    <li>• TextMate grammar support for multiple languages</li>
+                    <li>• Customizable color themes (Dark/Light)</li>
+                    <li>• Real-time syntax analysis</li>
+                    <li>• Language-specific configurations</li>
+                </ul>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">
+                    <i class="fas fa-magic text-green-600 mr-2"></i>Smart Features
+                </h3>
+                <ul class="space-y-2 text-sm">
+                    <li>• Intelligent auto-completion</li>
+                    <li>• Auto-indentation and formatting</li>
+                    <li>• Bracket matching and auto-closing</li>
+                    <li>• Code folding and outlining</li>
+                </ul>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">
+                    <i class="fas fa-tools text-blue-600 mr-2"></i>Editor Tools
+                </h3>
+                <ul class="space-y-2 text-sm">
+                    <li>• Search and replace functionality</li>
+                    <li>• Multi-level undo/redo</li>
+                    <li>• Line numbers and minimap</li>
+                    <li>• Text scaling and zoom</li>
+                </ul>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">
+                    <i class="fas fa-file-code text-orange-600 mr-2"></i>File Management
+                </h3>
+                <ul class="space-y-2 text-sm">
+                    <li>• Multiple file format support</li>
+                    <li>• Auto-save functionality</li>
+                    <li>• File type detection</li>
+                    <li>• Recent files tracking</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Conclusion -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">
+                <i class="fas fa-check-circle mr-2"></i>Conclusion
+            </h2>
+            <p class="text-lg mb-4">
+                This comprehensive Android code editor implementation provides a solid foundation for building powerful code editing applications. The Sora Editor library offers excellent performance and extensibility for various programming languages.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <div class="bg-white bg-opacity-20 px-4 py-2 rounded-lg">
+                    <i class="fas fa-github mr-2"></i>Open Source
+                </div>
+                <div class="bg-white bg-opacity-20 px-4 py-2 rounded-lg">
+                    <i class="fas fa-mobile-alt mr-2"></i>Android Native
+                </div>
+                <div class="bg-white bg-opacity-20 px-4 py-2 rounded-lg">
+                    <i class="fas fa-code mr-2"></i>Java Implementation
+                </div>
+                <div class="bg-white bg-opacity-20 px-4 py-2 rounded-lg">
+                    <i class="fas fa-paint-brush mr-2"></i>TextMate Support
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
