@@ -242,14 +242,14 @@ dependencies {
         </div>
 
         <!-- Step 3: MainActivity -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="flex items-center mb-4">
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="flex items-center mb-4 p-4">
                 <div class="step-number">3</div>
                 <h3 class="text-xl font-semibold">MainActivity Implementation</h3>
             </div>
             
             <div class="file-header">MainActivity.java</div>
-            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+            <pre class="code-block bg-gray-900 rounded-b-lg"><code class="language-java">
 package com.example.codeeditor;
 
 import android.content.Intent;
@@ -349,18 +349,19 @@ public class MainActivity extends AppCompatActivity {
         loadFiles(); // Refresh file list when returning to this activity
     }
 }
+</code>
 </pre>
         </div>
 
         <!-- Step 4: EditorActivity -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="flex items-center mb-4">
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="flex items-center p-4 mb-4">
                 <div class="step-number">4</div>
                 <h3 class="text-xl font-semibold">EditorActivity Implementation</h3>
             </div>
             
             <div class="file-header">EditorActivity.java</div>
-            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+            <pre class="code-block bg-gray-900 rounded-b-lg"><code class="language-java">
 package com.example.codeeditor;
 
 import android.graphics.Typeface;
@@ -571,7 +572,7 @@ public class EditorActivity extends AppCompatActivity {
         }
         super.onBackPressed();
     }
-}
+}</code>
 </pre>
         </div>
 
