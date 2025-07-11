@@ -18,14 +18,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/xml.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/json.min.js"></script>
-    <script>
-        // Initialize Highlight.js
-        document.addEventListener('DOMContentLoaded', (event) => {
-            document.querySelectorAll('pre code').forEach((el) => {
-                hljs.highlightElement(el);
-            });
-        });
-    </script>
     <style>
         pre {
             background-color: #1e1e1e;
@@ -1331,5 +1323,56 @@ public class FileAdapter extends RecyclerView.Adapter&lt;FileAdapter.FileViewHol
             </div>
         </div>
     </div>
+
+    <script>
+        // Initialize Highlight.js
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
+            
+            // Add copy buttons to all file headers
+            addCopyButtons();
+        });
+
+        function addCopyButtons() {
+            // Find all file headers and add copy buttons
+            const fileHeaders = document.querySelectorAll('.file-header');
+            fileHeaders.forEach(header => {
+                // Check if button already exists
+                if (!header.querySelector('.copy-btn')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'copy-btn';
+                    btn.innerHTML = '<i class="far fa-copy"></i> Copy';
+                    btn.onclick = function() { copyCode(this); };
+                    header.appendChild(btn);
+                }
+            });
+        }
+
+        function copyCode(button) {
+            // Find the associated code block
+            const codeBlock = button.closest('.bg-white').querySelector('code');
+            const codeText = codeBlock.textContent;
+            
+            // Create a temporary textarea to copy from
+            const textarea = document.createElement('textarea');
+            textarea.value = codeText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            
+            // Visual feedback
+            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            button.classList.add('copied');
+            
+            // Reset after 2 seconds
+            setTimeout(() => {
+                button.innerHTML = '<i class="far fa-copy"></i> Copy';
+                button.classList.remove('copied');
+            }, 2000);
+        }
+    </script>
 </body>
 </html>
