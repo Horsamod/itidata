@@ -897,7 +897,7 @@ public class FileAdapter extends RecyclerView.Adapter&lt;FileAdapter.FileViewHol
 </pre>
             
             <div class="file-header mt-4">activity_editor.xml</div>
-            <pre class="code-block p bg-gray-900 rounded-b-lg"><code class="language-xml">
+            <pre class="code-block bg-gray-900 rounded-b-lg"><code class="language-xml">
 &lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -930,7 +930,7 @@ public class FileAdapter extends RecyclerView.Adapter&lt;FileAdapter.FileViewHol
 </pre>
             
             <div class="file-header mt-4">item_file.xml</div>
-            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+            <pre class="code-block bg-gray-900 rounded-b-lg"><code class="language-java">
 &lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -980,19 +980,19 @@ public class FileAdapter extends RecyclerView.Adapter&lt;FileAdapter.FileViewHol
 
     &lt;/LinearLayout&gt;
 
-&lt;/androidx.cardview.widget.CardView&gt;
+&lt;/androidx.cardview.widget.CardView&gt;</code>
 </pre>
         </div>
 
         <!-- Step 7: Resources -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="flex items-center mb-4">
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="flex items-center p-4 mb-4">
                 <div class="step-number">7</div>
                 <h3 class="text-xl font-semibold">Resource Files</h3>
             </div>
             
             <div class="file-header">res/menu/editor_menu.xml</div>
-            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+            <pre class="code-block bg-gray-900 rounded-b-lg"><code class="language-xml">
 &lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"&gt;
@@ -1035,11 +1035,11 @@ public class FileAdapter extends RecyclerView.Adapter&lt;FileAdapter.FileViewHol
         &lt;/menu&gt;
     &lt;/item&gt;
 
-&lt;/menu&gt;
+&lt;/menu&gt;</code>
 </pre>
             
             <div class="file-header mt-4">res/values/strings.xml</div>
-            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+            <pre class="code-block bg-gray-900 rounded-b-lg"><code class="language-xml">
 &lt;resources&gt;
     &lt;string name="app_name"&gt;Code Editor&lt;/string&gt;
     &lt;string name="action_save"&gt;Save&lt;/string&gt;
@@ -1052,11 +1052,11 @@ public class FileAdapter extends RecyclerView.Adapter&lt;FileAdapter.FileViewHol
     &lt;string name="file_saved"&gt;File saved successfully&lt;/string&gt;
     &lt;string name="file_save_error"&gt;Error saving file&lt;/string&gt;
     &lt;string name="file_load_error"&gt;Error loading file&lt;/string&gt;
-&lt;/resources&gt;
+&lt;/resources&gt;</code>
 </pre>
             
             <div class="file-header mt-4">res/values/colors.xml</div>
-            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+            <pre class="code-block bg-gray-900 rounded-b-lg"><code class="language-java">
 &lt;resources&gt;
     &lt;color name="purple_200"&gt;#FFBB86FC&lt;/color&gt;
     &lt;color name="purple_500"&gt;#FF6200EE&lt;/color&gt;
@@ -1068,19 +1068,19 @@ public class FileAdapter extends RecyclerView.Adapter&lt;FileAdapter.FileViewHol
     &lt;color name="dark_blue"&gt;#FF1E88E5&lt;/color&gt;
     &lt;color name="editor_background"&gt;#FF1E1E1E&lt;/color&gt;
     &lt;color name="editor_text"&gt;#FFD4D4D4&lt;/color&gt;
-&lt;/resources&gt;
+&lt;/resources&gt;</code>
 </pre>
         </div>
 
         <!-- Step 8: TextMate Configuration -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="flex items-center mb-4">
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="flex items-center p-4 mb-4">
                 <div class="step-number">8</div>
                 <h3 class="text-xl font-semibold">TextMate Configuration</h3>
             </div>
             
             <div class="file-header">assets/textmate/languages.json</div>
-            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+            <pre class="code-block bg-gray-900 rounded-b-lg"><code class="language-json">
 {
   "languages": [
     {
@@ -1114,11 +1114,11 @@ public class FileAdapter extends RecyclerView.Adapter&lt;FileAdapter.FileViewHol
       "languageConfiguration": "textmate/python/language-configuration.json"
     }
   ]
-}
+}</code>
 </pre>
             
             <div class="file-header mt-4">assets/textmate/java/language-configuration.json</div>
-            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+            <pre class="code-block bg-gray-900 rounded-b-lg"><code class="language-json">
 {
   "comments": {
     "lineComment": "//",
@@ -1148,19 +1148,19 @@ public class FileAdapter extends RecyclerView.Adapter&lt;FileAdapter.FileViewHol
     "increaseIndentPattern": "^((?!.*?/\\*).*\\*/)?(\\s*)?\\b(if|else|for|while|do|switch|case|default|try|catch|finally|synchronized|class|interface|enum|@interface|static|public|private|protected|abstract|final|native|strictfp|transient|volatile)\\b.*\\{\\s*$",
     "decreaseIndentPattern": "^\\s*\\}"
   }
-}
+}</code>
 </pre>
         </div>
 
         <!-- Step 9: Permissions -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="flex items-center mb-4">
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="flex items-center p-4 mb-4">
                 <div class="step-number">9</div>
                 <h3 class="text-xl font-semibold">AndroidManifest.xml</h3>
             </div>
             
             <div class="file-header">AndroidManifest.xml</div>
-            <pre class="code-block p-4 bg-gray-900 rounded-b-lg">
+            <pre class="code-block bg-gray-900 rounded-b-lg"><code class="language-xml">
 &lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"&gt;
@@ -1199,13 +1199,13 @@ public class FileAdapter extends RecyclerView.Adapter&lt;FileAdapter.FileViewHol
         
     &lt;/application&gt;
 
-&lt;/manifest&gt;
+&lt;/manifest&gt;</code>
 </pre>
         </div>
 
         <!-- Step 10: Usage Instructions -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="flex items-center mb-4">
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="flex items-center p-4 mb-4">
                 <div class="step-number">10</div>
                 <h3 class="text-xl font-semibold">Usage Instructions</h3>
             </div>
