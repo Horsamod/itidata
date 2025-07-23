@@ -1,85 +1,125 @@
 [
-    {
-        "rollNumber": "R210819008923",
-        "examSystem": "A",
-        "traineeName": "ABHRA CHAKRABORTY",
-        "academicSession": "Aug 2021",
-        "semester": "Annual All",
-        "tradeName": "Fitter (NSQF)",
-        "examSession": "Jul 2023",
-        "itiCode": "PU19000098",
-        "itiName": "Burdwan A.P.C Roy Private ITI",
-        "overallResult": "Pass",
-        "resultDate": "19-Aug-2023",
-        "marks": [
-            {
-                "year": "Year-1",
-                "tradeTheoryMax": 100,
-                "tradeTheorySecured": 86,
-                "employabilitySkillsMax": 50,
-                "employabilitySkillsSecured": 36,
-                "tradePracticalMax": 250,
-                "tradePracticalSecured": 221,
-                "formativeAssessmentMax": 200,
-                "formativeAssessmentSecured": 178,
-                "totalMax": 600,
-                "totalSecured": 521
-            },
-            {
-                "year": "Year-2",
-                "tradeTheoryMax": 100,
-                "tradeTheorySecured": 88,
-                "employabilitySkillsMax": 50,
-                "employabilitySkillsSecured": 42,
-                "tradePracticalMax": 250,
-                "tradePracticalSecured": 221,
-                "formativeAssessmentMax": 200,
-                "formativeAssessmentSecured": 176,
-                "totalMax": 600,
-                "totalSecured": 527
-            }
-        ]
-    },
-    {
-        "rollNumber": "R210819008924",
-        "examSystem": "A",
-        "traineeName": "Test ABHRA CHAKRABORTY",
-        "academicSession": "Aug 2022",
-        "semester": "Annual All",
-        "tradeName": "Fitter (NSQF)",
-        "examSession": "Jul 2024",
-        "itiCode": "PU19000096",
-        "itiName": "Burdwan A.P.C Roy Private ITI",
-        "overallResult": "Pass",
-        "resultDate": "19-Aug-2023",
-        "marks": [
-            {
-                "year": "Year-1",
-                "tradeTheoryMax": 100,
-                "tradeTheorySecured": 76,
-                "employabilitySkillsMax": 50,
-                "employabilitySkillsSecured": 46,
-                "tradePracticalMax": 250,
-                "tradePracticalSecured": 221,
-                "formativeAssessmentMax": 200,
-                "formativeAssessmentSecured": 188,
-                "totalMax": 600,
-                "totalSecured": 561
-            },
-            {
-                "year": "Year-2",
-                "tradeTheoryMax": 100,
-                "tradeTheorySecured": 80,
-                "employabilitySkillsMax": 50,
-                "employabilitySkillsSecured": 42,
-                "tradePracticalMax": 250,
-                "tradePracticalSecured": 221,
-                "formativeAssessmentMax": 200,
-                "formativeAssessmentSecured": 176,
-                "totalMax": 600,
-                "totalSecured": 528
-            }
-        ]
-    }
-
+  {
+    "rollNumber": "R210819008923",
+    "examSystem": "A",
+    "traineeName": "ABHRA CHAKRABORTY",
+    "academicSession": "Aug 2021",
+    "semester": "Annual All",
+    "tradeName": "Fitter (NSQF)",
+    "examSession": "Jul 2023",
+    "itiCode": "PU19000098",
+    "itiName": "Burdwan A.P.C Roy Private ITI",
+    "overallResult": "Pass",
+    "resultDate": "19-Aug-2023",
+    "marks": [
+      {
+        "year": "Year-1",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 86,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 36,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 221,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 178,
+        "totalMax": 600,
+        "totalSecured": 521
+      },
+      {
+        "year": "Year-2",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 88,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 42,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 221,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 176,
+        "totalMax": 600,
+        "totalSecured": 527
+      }
+    ]
+  },
+  {
+    "rollNumber": "R210819008924",
+    "examSystem": "A",
+    "traineeName": "Test ABHRA CHAKRABORTY",
+    "academicSession": "Aug 2022",
+    "semester": "Annual All",
+    "tradeName": "Fitter (NSQF)",
+    "examSession": "Jul 2024",
+    "itiCode": "PU19000096",
+    "itiName": "Burdwan A.P.C Roy Private ITI",
+    "overallResult": "Pass",
+    "resultDate": "19-Aug-2023",
+    "marks": [
+      {
+        "year": "Year-1",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 76,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 46,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 221,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 188,
+        "totalMax": 600,
+        "totalSecured": 561
+      },
+      {
+        "year": "Year-2",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 80,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 42,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 221,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 176,
+        "totalMax": 600,
+        "totalSecured": 528
+      }
+    ]
+  },
+  {
+    "rollNumber": "57875567",
+    "examSystem": "A",
+    "traineeName": "Amdaduk",
+    "academicSession": "Aug 2021",
+    "semester": "Anual All",
+    "tradeName": "Fitter",
+    "examSession": "Jul 2021",
+    "itiCode": "858877",
+    "itiName": "Dagaldanga iti",
+    "overallResult": "Pass",
+    "resultDate": "29 aug",
+    "marks": [
+      {
+        "year": "Year-1",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 35,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 49,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 125,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 46,
+        "totalMax": 600,
+        "totalSecured": 255
+      },
+      {
+        "year": "Year-2",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 36,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 42,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 85,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 200,
+        "totalMax": 600,
+        "totalSecured": 363
+      }
+    ]
+  }
 ]
