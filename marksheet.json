@@ -39,5 +39,47 @@
                 "totalSecured": 527
             }
         ]
+    },
+    {
+        "rollNumber": "R210819008924",
+        "examSystem": "A",
+        "traineeName": "Test ABHRA CHAKRABORTY",
+        "academicSession": "Aug 2022",
+        "semester": "Annual All",
+        "tradeName": "Fitter (NSQF)",
+        "examSession": "Jul 2024",
+        "itiCode": "PU19000096",
+        "itiName": "Burdwan A.P.C Roy Private ITI",
+        "overallResult": "Pass",
+        "resultDate": "19-Aug-2023",
+        "marks": [
+            {
+                "year": "Year-1",
+                "tradeTheoryMax": 100,
+                "tradeTheorySecured": 76,
+                "employabilitySkillsMax": 50,
+                "employabilitySkillsSecured": 46,
+                "tradePracticalMax": 250,
+                "tradePracticalSecured": 221,
+                "formativeAssessmentMax": 200,
+                "formativeAssessmentSecured": 188,
+                "totalMax": 600,
+                "totalSecured": 561
+            },
+            {
+                "year": "Year-2",
+                "tradeTheoryMax": 100,
+                "tradeTheorySecured": 80,
+                "employabilitySkillsMax": 50,
+                "employabilitySkillsSecured": 42,
+                "tradePracticalMax": 250,
+                "tradePracticalSecured": 221,
+                "formativeAssessmentMax": 200,
+                "formativeAssessmentSecured": 176,
+                "totalMax": 600,
+                "totalSecured": 528
+            }
+        ]
     }
+
 ]
