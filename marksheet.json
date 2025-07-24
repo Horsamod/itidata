@@ -3,14 +3,31 @@
     "rollNumber": "R180845091532",
     "examSystem": "A",
     "traineeName": "ABHRA CHAKRABORTY",
-    "academicSession": "Aug 2021",
+    
     "semester": "Annual All",
     "tradeName": "Fitter (NSQF)",
-    "examSession": "Jul 2023",
-    "itiCode": "PU19000098",
-    "itiName": "Burdwan A.P.C Roy Private ITI",
+    "examSession": "Jul 2020",
+    
+    
     "overallResult": "Pass",
-    "resultDate": "19-Aug-2023",
+    "resultDate": "30-Aug-2022",
+
+"certificateNumber": "220940200529628",
+    "certificateType": "1",
+    
+    "fatherName": "JALALUDDIN MONDAL",
+    "itiCode": "PR19000171",
+    "itiName": "BANKURA PRIVATE ITI",
+    "itiAddress": "DHALDANGA, BANKURA, BANKURA, WEST BENGAL-722101",
+    
+    "trainingDuration": "Aug-2020 To Jul-2022",
+    "certified": true,
+    "certificateIssueDate": "30-Aug-2022",
+    "rollNumber": "R170821030977",
+    
+    "academicSession": "Aug 2020",
+    "examSession": "Jul 2022",
+    "overallResult": "Pass",
     "marks": [
       {
         "year": "Year-1",
@@ -30,7 +47,7 @@
       {
         "year": "Year-2",
         "examSession": "Jul 2023",
-        "resultDate": "19-Aug-2023",
+        "resultDate": "30-Aug-2023",
         "tradeTheoryMax": 100,
         "tradeTheorySecured": 88,
         "employabilitySkillsMax": 50,
