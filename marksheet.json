@@ -268,5 +268,45 @@
         "totalSecured": 524
       }
     ]
-  }
+  },
+
+    {
+        "rollNumber": "R180845091532",
+        "examSystem": "A",
+        "traineeName": "John Doe",
+        "academicSession": "Aug 2021",
+        "tradeName": "Electrician",
+        "itiCode": "GU01000022",
+        "itiName": "Government ITI, Mumbai",
+        "overallResult": "Pass",
+        "examSession": "Jul 2023",
+        "resultDate": "19-Aug-2023",
+        "marks": [
+            {
+                "year": "Year-1",
+                "tradeTheorySecured": 63,
+                "employabilitySkillsSecured": 36,
+                "workshopCalculationSecured": 29,
+                "engineeringDrawingSecured": 46,
+                "tradePracticalSecured": 171,
+                "formativeAssessmentSecured": 140,
+                "examSession": "Jul 2022",
+                "resultDate": "15-Aug-2022",
+                "totalSecured": 485
+            },
+            {
+                "year": "Year-2",
+                "tradeTheorySecured": 90,
+                "employabilitySkillsSecured": 0,
+                "workshopCalculationSecured": 48,
+                "engineeringDrawingSecured": 46,
+                "tradePracticalSecured": 220,
+                "formativeAssessmentSecured": 200,
+                "examSession": "Jul 2023",
+                "resultDate": "19-Aug-2023",
+                "totalSecured": 604
+            }
+        ]
+    }
+
 ]
