@@ -38,5 +38,45 @@
         "totalSecured": 560
       }
     ]
+  },
+  {
+    "certificateNumber": "242093481603927",
+    "certificateType": "1",
+    "fatherName": "SAIDUL ISLAM MONDAL",
+    "itiAddress": "DHALDANGA, BANKURA BANKURA, WEST BENGAL 722101",
+    "trainingDuration": "Aug 2023 to July 2024",
+    "certified": true,
+    "certificateIssueDate": "07-Sep-2024",
+    "rollNumber": "R230930807635",
+    "examSystem": "A",
+    "traineeName": "NABIR GOLAM MONDAL",
+    "academicSession": "Aug 2023",
+    "tradeName": "Fitter",
+    "examSession": "July 2024",
+    "itiCode": "PR19000171",
+    "itiName": "BANKURA PRIVATE ITI",
+    "overallResult": "Pass",
+    "resultDate": "07-Sep-2024",
+    "marks": [
+      {
+        "year": "Year-1",
+        "examSession": "July 2024",
+        "resultDate": "07-Sep-2024",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 85,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 47,
+        "workshopCalculationMax": 50,
+        "workshopCalculationSecured": 35,
+        "engineeringDrawingMax": 50,
+        "engineeringDrawingSecured": 38,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 226,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 165,
+        "totalMax": 700,
+        "totalSecured": 596
+      }
+    ]
   }
 ]
