@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced PDF Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+    <style>
+        .preview-container { max-height: 600px; overflow: auto; border: 1px solid #e5e7eb; position: relative; }
+        .sidebar { width: 300px; max-height: 600px; overflow-y: auto; }
+        .animate-pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .draggable { position: absolute; cursor: move; border: 1px dashed #3b82f6; }
+        .draggable.selected { border: 2px solid #3b82f6; }
+        .toolbar { display: flex; gap: 10px; margin-bottom: 10px; }
+        .element-item { padding: 8px; border-bottom: 1px solid #e5e7eb; cursor: pointer; }
+        .element-item:hover { background-color: #f3f4f6; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto p-8 max-w-6xl bg-white rounded-xl shadow-2xl flex space-x-6">
+        <div class="flex-1">
+            <h1 class="text-4xl font-extrabold text-center text-indigo-800 mb-8">Advanced PDF Editor</h1>
+            <div id="form-container" class="space-y-6">
+                <div>
+                    <label for="pdfUpload" class="block text-sm font-medium text-gray-700">Upload PDF</label>
+                    <input type="file" id="pdfUpload" accept="application/pdf" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div id="editorTools" class="hidden">
+                    <div class="toolbar">
+                        <button id="addTextBtn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700">Add Text</button>
+                        <button id="addImageBtn" class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700">Add Image</button>
+                        <button id="undoBtn" class="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700" disabled>Undo</button>
+                        <button id="redoBtn" class="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700" disabled>Redo</button>
+                    </div>
+                    <div id="textOptions" class="hidden space-y-4 p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <label for="textContent" class="block text-sm font-medium text-gray-700">Text Content</label>
+                            <input type="text" id="textContent" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter text">
+                        </div>
+                        <div>
+                            <label for="fontFamily" class="block text-sm font-medium text-gray-700">Font Family</label>
+                            <select id="fontFamily" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="Helvetica">Helvetica</option>
+                                <option value="TimesRoman">Times Roman</option>
+                                <option value="Courier">Courier</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="fontSize" class="block text-sm font-medium text-gray-700">Font Size</label>
+                            <select id="fontSize" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="10">10px</option>
+                                <option value="12" selected>12px</option>
+                                <option value="14">14px</option>
+                                <option value="16">16px</option>
+                                <option value="20">20px</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="textColor" class="block text-sm font-medium text-gray-700">Text Color</label>
+                            <select id="textColor" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="black">Black</option>
+                                <option value="blue">Blue</option>
+                                <option value="red">Red</option>
+                            </select>
+                        </div>
+                        <button id="applyTextBtn" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Apply Text</button>
+                    </div>
+                    <div id="imageOptions" class="hidden space-y-4 p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <label for="imageUpload" class="block text-sm font-medium text-gray-700">Upload Image</label>
+                            <input type="file" id="imageUpload" accept="image/*" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="imageWidth" class="block text-sm font-medium text-gray-700">Image Width (px)</label>
+                            <input type="number" id="imageWidth" value="100" min="10" max="500" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <button id="applyImageBtn" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Apply Image</button>
+                    </div>
+                </div>
+                <div class="flex space-x-4">
+                    <button id="saveBtn" class="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200 hidden">Save PDF</button>
+                </div>
+                <div id="message" class="hidden text-center text-sm mt-4 p-3 rounded-lg"></div>
+                <div id="previewContainer" class="hidden mt-6 preview-container p-4 bg-gray-50 rounded-lg relative">
+                    <div class="flex justify-end mb-2">
+                        <button id="zoomIn" class="bg-gray-200 px-2 py-1 rounded">+</button>
+                        <button id="zoomOut" class="bg-gray-200 px-2 py-1 rounded mx-2">-</button>
+                        <button id="prevPage" class="bg-gray-200 px-2 py-1 rounded">Prev</button>
+                        <button id="nextPage" class="bg-gray-200 px-2 py-1 rounded ml-2">Next</button>
+                    </div>
+                    <canvas id="pdfPreview"></canvas>
+                </div>
+            </div>
+        </div>
+        <div id="sidebar" class="sidebar hidden p-4 bg-gray-50 rounded-lg">
+            <h2 class="text-lg font-semibold text-gray-700 mb-4">PDF Elements</h2>
+            <div id="textElements" class="mb-4">
+                <h3 class="text-sm font-medium text-gray-600">Text</h3>
+                <div id="textList" class="space-y-2"></div>
+            </div>
+            <div id="imageElements">
+                <h3 class="text-sm font-medium text-gray-600">Images</h3>
+                <div id="imageList" class="space-y-2"></div>
+            </div>
+        </div>
+        <div id="loading" class="hidden flex items-center justify-center mt-6">
+            <div class="w-8 h-8 border-4 border-t-indigo-600 border-gray-300 rounded-full animate-spin"></div>
+            <span class="ml-3 text-gray-600 font-medium">Processing...</span>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            let pdfDoc = null;
+            let pdfBytes = null;
+            let currentPage = 1;
+            let currentScale = 1.0;
+            let elements = [];
+            let history = [];
+            let historyIndex = -1;
+            let selectedElement = null;
+
+            // Helper function to show messages
+            function showMessage(message, type) {
+                $('#message')
+                    .text(message)
+                    .removeClass('hidden text-red-600 text-green-600 bg-red-100 bg-green-100')
+                    .addClass(`text-${type === 'error' ? 'red' : 'green'}-600 bg-${type === 'error' ? 'red' : 'green'}-100`)
+                    .fadeIn();
+                setTimeout(() => $('#message').fadeOut(), 5000);
+            }
+
+            // Helper function to toggle loading state
+            function toggleLoading(show) {
+                $('#loading').toggleClass('hidden', !show);
+                $('#saveBtn, #addTextBtn, #addImageBtn').prop('disabled', show);
+            }
+
+            // Helper function to toggle preview and sidebar
+            function togglePreview(show) {
+                $('#previewContainer, #editorTools, #saveBtn, #sidebar').toggleClass('hidden', !show);
+                if (show) {
+                    renderPDFPreview();
+                    renderSidebar();
+                }
+            }
+
+            // Extract existing text and images (simplified for PDFLib limitations)
+            async function extractElements() {
+                elements = [];
+                const form = pdfDoc.getForm();
+                const fields = form.getFields();
+                fields.forEach((field, index) => {
+                    if (field instanceof PDFLib.PDFTextField) {
+                        elements.push({
+                            type: 'text',
+                            content: field.getText() || '',
+                            x: 50,
+                            y: 50,
+                            size: 12,
+                            font: 'Helvetica',
+                            color: 'black',
+                            page: 1,
+                            originalIndex: index
+                        });
+                    }
+                });
+                // Image extraction is limited; assume images are already embedded
+                // Add placeholder for detected images (requires server-side parsing for accuracy)
+                const pages = pdfDoc.getPages();
+                pages.forEach((page, pageIndex) => {
+                    // Placeholder for image detection (not fully supported by PDFLib)
+                    elements.push({
+                        type: 'image',
+                        src: '',
+                        x: 50,
+                        y: 50,
+                        width: 100,
+                        height: 75,
+                        page: pageIndex + 1,
+                        originalIndex: -1
+                    });
+                });
+            }
+
+            // Render sidebar
+            function renderSidebar() {
+                $('#textList, #imageList').empty();
+                elements.forEach((el, index) => {
+                    if (el.page === currentPage) {
+                        const list = el.type === 'text' ? '#textList' : '#imageList';
+                        $(list).append(`
+                            <div class="element-item" data-index="${index}">
+                                ${el.type === 'text' ? el.content.substring(0, 20) + (el.content.length > 20 ? '...' : '') : 'Image ' + index}
+                                <button class="edit-btn text-blue-600 hover:underline ml-2" data-index="${index}">Edit</button>
+                            </div>
+                        `);
+                    }
+                });
+                $('.edit-btn').click(function() {
+                    const index = $(this).data('index');
+                    selectedElement = index;
+                    const el = elements[index];
+                    if (el.type === 'text') {
+                        $('#textContent').val(el.content);
+                        $('#fontFamily').val(el.font);
+                        $('#fontSize').val(el.size);
+                        $('#textColor').val(el.color);
+                        $('#textOptions').removeClass('hidden');
+                        $('#imageOptions').addClass('hidden');
+                    } else {
+                        $('#imageWidth').val(el.width);
+                        $('#imageOptions').removeClass('hidden');
+                        $('#textOptions').addClass('hidden');
+                    }
+                });
+            }
+
+            // Render PDF preview
+            async function renderPDFPreview() {
+                const canvas = document.getElementById('pdfPreview');
+                const context = canvas.getContext('2d');
+                const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+                const page = await pdf.getPage(currentPage);
+                const viewport = page.getViewport({ scale: currentScale });
+
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                await page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                }).promise;
+
+                $('.draggable').remove();
+                elements.forEach((el, index) => {
+                    if (el.page === currentPage) {
+                        const div = $(`#element-${index}`);
+                        if (!div.length) {
+                            const elementDiv = $('<div>')
+                                .addClass('draggable')
+                                .attr('id', `element-${index}`)
+                                .css({
+                                    left: el.x,
+                                    top: el.y,
+                                    width: el.width || 'auto',
+                                    height: el.height || 'auto'
+                                })
+                                .appendTo('#previewContainer');
+                            if (el.type === 'text') {
+                                elementDiv.text(el.content).css({
+                                    fontSize: `${el.size}px`,
+                                    color: el.color,
+                                    fontFamily: el.font === 'TimesRoman' ? 'Times New Roman' : el.font
+                                });
+                            } else if (el.src) {
+                                elementDiv.append($('<img>').attr('src', el.src).css({ width: '100%', height: '100%' }));
+                            }
+                            makeDraggable(elementDiv, index);
+                        }
+                    }
+                });
+                renderSidebar();
+            }
+
+            // Make elements draggable
+            function makeDraggable(element, index) {
+                element.draggable({
+                    containment: '#previewContainer',
+                    stop: (event, ui) => {
+                        elements[index].x = ui.position.left;
+                        elements[index].y = ui.position.top;
+                        addToHistory();
+                        renderPDFPreview();
+                    }
+                }).click(() => {
+                    $('.draggable').removeClass('selected');
+                    element.addClass('selected');
+                    selectedElement = index;
+                    const el = elements[index];
+                    if (el.type === 'text') {
+                        $('#textContent').val(el.content);
+                        $('#fontFamily').val(el.font);
+                        $('#fontSize').val(el.size);
+                        $('#textColor').val(el.color);
+                        $('#textOptions').removeClass('hidden');
+                        $('#imageOptions').addClass('hidden');
+                    } else {
+                        $('#imageWidth').val(el.width);
+                        $('#imageOptions').removeClass('hidden');
+                        $('#textOptions').addClass('hidden');
+                    }
+                });
+            }
+
+            // Add to history
+            function addToHistory() {
+                history = history.slice(0, historyIndex + 1);
+                history.push(JSON.parse(JSON.stringify(elements)));
+                historyIndex++;
+                $('#undoBtn').prop('disabled', historyIndex <= 0);
+                $('#redoBtn').prop('disabled', historyIndex >= history.length - 1);
+            }
+
+            // Undo/Redo
+            $('#undoBtn').click(() => {
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    elements = JSON.parse(JSON.stringify(history[historyIndex]));
+                    renderPDFPreview();
+                    $('#undoBtn').prop('disabled', historyIndex <= 0);
+                    $('#redoBtn').prop('disabled', false);
+                }
+            });
+
+            $('#redoBtn').click(() => {
+                if (historyIndex < history.length - 1) {
+                    historyIndex++;
+                    elements = JSON.parse(JSON.stringify(history[historyIndex]));
+                    renderPDFPreview();
+                    $('#undoBtn').prop('disabled', false);
+                    $('#redoBtn').prop('disabled', historyIndex >= history.length - 1);
+                }
+            });
+
+            // Zoom controls
+            $('#zoomIn').click(() => {
+                currentScale += 0.2;
+                $('.draggable').each((i, el) => {
+                    const scaleFactor = currentScale / (currentScale - 0.2);
+                    $(el).css({
+                        left: parseFloat($(el).css('left')) * scaleFactor,
+                        top: parseFloat($(el).css('top')) * scaleFactor,
+                        width: el.style.width ? parseFloat(el.style.width) * scaleFactor : 'auto',
+                        height: el.style.height ? parseFloat(el.style.height) * scaleFactor : 'auto'
+                    });
+                    elements[i].x *= scaleFactor;
+                    elements[i].y *= scaleFactor;
+                    if (elements[i].width) elements[i].width *= scaleFactor;
+                    if (elements[i].height) elements[i].height *= scaleFactor;
+                });
+                renderPDFPreview();
+            });
+
+            $('#zoomOut').click(() => {
+                if (currentScale > 0.2) {
+                    currentScale -= 0.2;
+                    $('.draggable').each((i, el) => {
+                        const scaleFactor = currentScale / (currentScale + 0.2);
+                        $(el).css({
+                            left: parseFloat($(el).css('left')) * scaleFactor,
+                            top: parseFloat($(el).css('top')) * scaleFactor,
+                            width: el.style.width ? parseFloat(el.style.width) * scaleFactor : 'auto',
+                            height: el.style.height ? parseFloat(el.style.height) * scaleFactor : 'auto'
+                        });
+                        elements[i].x *= scaleFactor;
+                        elements[i].y *= scaleFactor;
+                        if (elements[i].width) elements[i].width *= scaleFactor;
+                        if (elements[i].height) elements[i].height *= scaleFactor;
+                    });
+                    renderPDFPreview();
+                }
+            });
+
+            // Page navigation
+            $('#prevPage').click(async () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderPDFPreview();
+                }
+            });
+
+            $('#nextPage').click(async () => {
+                const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+                if (currentPage < pdf.numPages) {
+                    currentPage++;
+                    renderPDFPreview();
+                }
+            });
+
+            // PDF upload
+            $('#pdfUpload').change(async function(event) {
+                const file = event.target.files[0];
+                if (!file || !file.type.match('pdf')) {
+                    showMessage('Please upload a valid PDF file.', 'error');
+                    return;
+                }
+
+                toggleLoading(true);
+                try {
+                    pdfBytes = await file.arrayBuffer();
+                    pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+                    currentPage = 1;
+                    currentScale = 1.0;
+                    await extractElements();
+                    history = [];
+                    historyIndex = -1;
+                    $('#undoBtn, #redoBtn').prop('disabled', true);
+                    togglePreview(true);
+                    showMessage('PDF loaded successfully!', 'success');
+                } catch (error) {
+                    showMessage(`Error loading PDF: ${error.message}`, 'error');
+                } finally {
+                    toggleLoading(false);
+                }
+            });
+
+            // Add text
+            $('#addTextBtn').click(() => {
+                selectedElement = null;
+                $('#textContent').val('');
+                $('#fontFamily').val('Helvetica');
+                $('#fontSize').val('12');
+                $('#textColor').val('black');
+                $('#textOptions').removeClass('hidden');
+                $('#imageOptions').addClass('hidden');
+                $('#textContent').focus();
+            });
+
+            $('#applyTextBtn').click(() => {
+                const content = $('#textContent').val().trim();
+                const font = $('#fontFamily').val();
+                const size = parseInt($('#fontSize').val());
+                const color = $('#textColor').val();
+                if (!content) {
+                    showMessage('Please enter text content.', 'error');
+                    return;
+                }
+                if (selectedElement !== null) {
+                    elements[selectedElement] = {
+                        ...elements[selectedElement],
+                        content,
+                        font,
+                        size,
+                        color
+                    };
+                } else {
+                    elements.push({
+                        type: 'text',
+                        content,
+                        x: 50,
+                        y: 50,
+                        size,
+                        font,
+                        color,
+                        page: currentPage
+                    });
+                }
+                addToHistory();
+                renderPDFPreview();
+                $('#textOptions').addClass('hidden');
+                $('#textContent').val('');
+                showMessage('Text updated successfully!', 'success');
+            });
+
+            // Add/Replace image
+            $('#addImageBtn').click(() => {
+                selectedElement = null;
+                $('#imageUpload').val('');
+                $('#imageWidth').val('100');
+                $('#imageOptions').removeClass('hidden');
+                $('#textOptions').addClass('hidden');
+                $('#imageUpload').click();
+            });
+
+            $('#imageUpload').change(async function(event) {
+                const file = event.target.files[0];
+                if (!file || !file.type.match('image.*')) {
+                    showMessage('Please upload a valid image file.', 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    $('#applyImageBtn').prop('disabled', false);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            $('#applyImageBtn').click(async () => {
+                const file = $('#imageUpload')[0].files[0];
+                const width = parseInt($('#imageWidth').val());
+                if (!file) {
+                    showMessage('Please select an image.', 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    if (selectedElement !== null && elements[selectedElement].type === 'image') {
+                        elements[selectedElement] = {
+                            ...elements[selectedElement],
+                            src: reader.result,
+                            width,
+                            height: width * 0.75
+                        };
+                    } else {
+                        elements.push({
+                            type: 'image',
+                            src: reader.result,
+                            x: 50,
+                            y: 50,
+                            width,
+                            height: width * 0.75,
+                            page: currentPage
+                        });
+                    }
+                    addToHistory();
+                    renderPDFPreview();
+                    $('#imageOptions').addClass('hidden');
+                    $('#imageUpload').val('');
+                    $('#applyImageBtn').prop('disabled', true);
+                    showMessage('Image updated successfully!', 'success');
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Save PDF
+            $('#saveBtn').click(async () => {
+                if (!pdfDoc) {
+                    showMessage('No PDF loaded.', 'error');
+                    return;
+                }
+                toggleLoading(true);
+                try {
+                    const modifiedDoc = await PDFLib.PDFDocument.load(pdfBytes);
+                    const fontMap = {
+                        Helvetica: PDFLib.StandardFonts.Helvetica,
+                        TimesRoman: PDFLib.StandardFonts.TimesRoman,
+                        Courier: PDFLib.StandardFonts.Courier
+                    };
+                    const colorMap = {
+                        black: PDFLib.rgb(0, 0, 0),
+                        blue: PDFLib.rgb(0, 0, 1),
+                        red: PDFLib.rgb(1, 0, 0)
+                    };
+
+                    // Update form fields if they exist
+                    const form = modifiedDoc.getForm();
+                    elements.forEach(el => {
+                        if (el.type === 'text' && el.originalIndex !== undefined) {
+                            const field = form.getFields()[el.originalIndex];
+                            if (field instanceof PDFLib.PDFTextField) {
+                                field.setText(el.content);
+                            }
+                        }
+                    });
+
+                    // Add new elements
+                    for (const el of elements) {
+                        const page = modifiedDoc.getPage(el.page - 1);
+                        if (el.type === 'text' && el.originalIndex === undefined) {
+                            const font = await modifiedDoc.embedFont(fontMap[el.font]);
+                            page.drawText(el.content, {
+                                x: el.x / currentScale,
+                                y: page.getHeight() - (el.y + el.size) / currentScale,
+                                size: el.size / currentScale,
+                                font,
+                                color: colorMap[el.color]
+                            });
+                        } else if (el.type === 'image' && el.src) {
+                            const imgData = el.src.split(',')[1];
+                            const imgType = el.src.match(/^data:image\/(\w+)/)[1];
+                            let img;
+                            if (imgType === 'jpeg' || imgType === 'jpg') {
+                                img = await modifiedDoc.embedJpg(imgData);
+                            } else if (imgType === 'png') {
+                                img = await modifiedDoc.embedPng(imgData);
+                            }
+                            page.drawImage(img, {
+                                x: el.x / currentScale,
+                                y: page.getHeight() - (el.y + el.height) / currentScale,
+                                width: el.width / currentScale,
+                                height: el.height / currentScale
+                            });
+                        }
+                    }
+
+                    const modifiedBytes = await modifiedDoc.save();
+                    const blob = new Blob([modifiedBytes], { type: 'application/pdf' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'edited_pdf.pdf';
+                    link.click();
+                    showMessage('PDF saved successfully!', 'success');
+                } catch (error) {
+                    showMessage(`Error saving PDF: ${error.message}`, 'error');
+                } finally {
+                    toggleLoading(false);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
