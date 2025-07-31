@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entities Grid</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    body.dark {
+      background-color: #1a1a1a;
+      color: #ffffff;
+    }
+    .toolbar {
+      position: sticky;
+      top: 0;
+      height: 52px;
+      background-color: #ffffff;
+      padding: 0 20px;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .dark .toolbar {
+      background-color: #2c2c2c;
+    }
+    .toolbar input, .toolbar button {
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      background-color: white;
+    }
+    .dark .toolbar input, .dark .toolbar button {
+      background-color: #3a3a3a;
+      border-color: #555;
+      color: #fff;
+    }
+    .toolbar input {
+      flex: 1;
+      min-width: 100px;
+    }
+    .toolbar button {
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+    }
+    .toolbar button i {
+      font-size: 20px;
+    }
+    .toolbar button.filter-btn {
+      background-color: #E8F3FE;
+    }
+    .dark .toolbar button.filter-btn {
+      background-color: #01080F23;
+    }
+    .toolbar button.filter-btn:hover {
+      background-color: #DEE9F3;
+    }
+    .dark .toolbar button.filter-btn:hover {
+      background-color: #161E2623;
+    }
+    .toolbar button.theme-btn {
+      background-color: #DEE9F3;
+    }
+    .dark .toolbar button.theme-btn {
+      background-color: #01080F23;
+    }
+    .toolbar button.theme-btn:hover {
+      background-color: #DEE9F3;
+    }
+    .dark .toolbar button.theme-btn:hover {
+      background-color: #161E2623;
+    }
+    .filter-menu {
+      position: absolute;
+      top: 52px;
+      right: 20px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 11;
+      display: none;
+      width: 150px;
+    }
+    .dark .filter-menu {
+      background-color: #2c2c2c;
+      border-color: #444;
+    }
+    .filter-menu div {
+      padding: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .filter-menu div:hover {
+      background-color: #f0f0f0;
+    }
+    .dark .filter-menu div:hover {
+      background-color: #3a3a3a;
+    }
+    .sidebar-overlay {
+      position: fixed;
+      top: 52px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 52px);
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 8;
+      display: none;
+    }
+    .sidebar-overlay.show {
+      display: block;
+    }
+    .sidebar {
+      position: fixed;
+      top: 52px;
+      left: -200px;
+      width: 200px;
+      height: calc(100vh - 52px);
+      background-color: #ffffff;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      transition: left 0.3s ease;
+      z-index: 9;
+    }
+    .dark .sidebar {
+      background-color: #2c2c2c;
+    }
+    .sidebar.open {
+      left: 0;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar li {
+      padding: 15px 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .sidebar li:hover {
+      background-color: #f0f0f0;
+    }
+    .dark .sidebar li:hover {
+      background-color: #3a3a3a;
+    }
+    .sidebar li.active {
+      background-color: #e0e0e0;
+      font-weight: bold;
+    }
+    .dark .sidebar li.active {
+      background-color: #4a4a4a;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      padding: 20px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .converter-container {
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .converter-section {
+      margin-bottom: 20px;
+    }
+    .converter-section h3 {
+      margin-bottom: 10px;
+    }
+    .converter-container textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+    .dark .converter-container textarea {
+      background-color: #3a3a3a;
+      border-color: #555;
+      color: #fff;
+    }
+    .converter-container button {
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: none;
+      background-color: #E8F3FE;
+      cursor: pointer;
+    }
+    .dark .converter-container button {
+      background-color: #01080F23;
+      color: #fff;
+    }
+    .converter-container button:hover {
+      background-color: #DEE9F3;
+    }
+    .dark .converter-container button:hover {
+      background-color: #161E2623;
+    }
+    .converter-container .result {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: white;
+      word-break: break-all;
+    }
+    .dark .converter-container .result {
+      background-color: #3a3a3a;
+      border-color: #555;
+      color: #fff;
+    }
+    .not-found {
+      text-align: center;
+      padding: 20px;
+      font-size: 18px;
+      color: #666;
+    }
+    .dark .not-found {
+      color: #ccc;
+    }
+    .card {
+      width: 100px;
+      height: 100px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+    }
+    .dark .card {
+      background-color: #2c2c2c;
+      border-color: #444;
+    }
+    .card.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .card.hidden {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    .card.active {
+      z-index: 1000;
+    }
+    .card span {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    .card code {
+      font-size: 12px;
+      color: #555;
+    }
+    .dark .card code {
+      color: #ccc;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      font-size: 18px;
+      color: #666;
+    }
+    .dark .loading {
+      color: #ccc;
+    }
+    .context-menu {
+      position: absolute;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1001;
+      display: none;
+      width: 150px;
+    }
+    .dark .context-menu {
+      background-color: #2c2c2c;
+      border-color: #444;
+    }
+    .context-menu div {
+      padding: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .context-menu div:hover {
+      background-color: #f0f0f0;
+    }
+    .dark .context-menu div:hover {
+      background-color: #3a3a3a;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1002;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      max-width: 300px;
+      font-size: 14px;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button id="sidebarToggle" title="Toggle Sidebar"><i class="ri-menu-line"></i></button>
+    <input type="text" id="search" placeholder="Search by number, symbol, or name">
+    <button class="filter-btn" id="filterBtn" title="Sort Options"><i class="ri-filter-3-line"></i></button>
+    <div class="filter-menu" id="filterMenu">
+      <div onclick="setSort('asc')">Sort Ascending</div>
+      <div onclick="setSort('desc')">Sort Descending</div>
+    </div>
+    <button class="theme-btn" id="themeToggle" title="Toggle Theme"><i class="ri-sun-line"></i></button>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="sidebar" id="sidebar">
+    <ul>
+      <li id="nav-all" class="active" onclick="switchView('all')">All Entities</li>
+      <li id="nav-emojis" onclick="switchView('emojis')">Emojis</li>
+      <li id="nav-symbols" onclick="switchView('symbols')">Symbolic Entities</li>
+      <li id="nav-converter" onclick="switchView('converter')">Convert to Entity</li>
+    </ul>
+  </div>
+  <div class="container" id="container"></div>
+  <div class="converter-container" id="converterContainer" style="display: none;">
+    <div class="converter-section">
+      <h3>Text to HTML Entities</h3>
+      <textarea id="converterInput" placeholder="Enter text or emojis to convert to HTML entities"></textarea>
+      <button onclick="convertToEntities()">Convert to Entities</button>
+      <div class="result" id="converterResult"></div>
+    </div>
+    <div class="converter-section">
+      <h3>HTML Entities to Text</h3>
+      <textarea id="entityInput" placeholder="Enter HTML entities (e.g., &amp;#128512; or &amp;copy;) to convert to text"></textarea>
+      <button onclick="convertFromEntities()">Convert to Text</button>
+      <div class="result" id="entityResult"></div>
+    </div>
+  </div>
+  <div class="loading" id="loading">Loading more...</div>
+  <script>
+    const container = document.getElementById('container');
+    const loading = document.getElementById('loading');
+    const searchInput = document.getElementById('search');
+    const filterBtn = document.getElementById('filterBtn');
+    const filterMenu = document.getElementById('filterMenu');
+    const themeToggle = document.getElementById('themeToggle');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const converterContainer = document.getElementById('converterContainer');
+    const converterInput = document.getElementById('converterInput');
+    const converterResult = document.getElementById('converterResult');
+    const entityInput = document.getElementById('entityInput');
+    const entityResult = document.getElementById('entityResult');
+    const batchSize = 1000;
+    let currentIndex = 0;
+    let activeContextMenu = null;
+    let activeCard = null;
+    let currentView = 'all';
+    let entities = [];
+    let filteredEntities = [];
+
+    // Define exclusion ranges and individual entities
+    const exclusionRanges = [
+      [127, 160],
+      [1970, 1983],
+      [1, 31],
+      [1525, 1535],
+      [2043, 2047],
+      [2221, 2275],
+      [2641, 2648],
+      [2679, 2688],
+      [2802, 2816],
+      [9211, 9215],
+      [9204, 9207],
+      [8384, 8399],
+      [8287, 8303],
+      [8232, 8239],
+      [8192, 8079],
+      [3676, 3712],
+      [4059, 4095],
+      [3808, 3839],
+      [11158, 11263],
+      [11104, 11156],
+      [2140, 2207]
+    ];
+    const excludedSingles = [1565,2209,2436,1367,1368,1806,2094,2095,];
+
+    // Define entity ranges
+    const allEntities = Array.from({ length: 100000 }, (_, i) => i);
+    const emojiRanges = [
+      [0x1F300, 0x1F5FF], // Miscellaneous Symbols and Pictographs
+      [0x1F600, 0x1F64F], // Emoticons
+      [0x1F680, 0x1F6FF], // Transport and Map Symbols
+      [0x1F900, 0x1F9FF], // Supplemental Symbols and Pictographs
+      [0x2600, 0x26FF],   // Miscellaneous Symbols
+      [0x2700, 0x27BF],   // Dingbats
+      [0xFE00, 0xFE0F],   // Variation Selectors
+      [0x1F1E6, 0x1F1FF] // Regional Indicator Symbols
+    ].map(([start, end]) => [start - 0x10000, end - 0x10000]);
+    const symbolRanges = [
+      [0x0020, 0x007F], // Basic Latin (punctuation, symbols)
+      [0x00A0, 0x00FF], // Latin-1 Supplement
+      [0x2000, 0x206F], // General Punctuation
+      [0x20A0, 0x20CF], // Currency Symbols
+      [0x2190, 0x21FF], // Arrows
+      [0x2200, 0x22FF], // Mathematical Operators
+      [0x2300, 0x23FF], // Miscellaneous Technical
+      [0x2500, 0x257F], // Box Drawing
+      [0x25A0, 0x25FF], // Geometric Shapes
+      [0x2600, 0x26FF], // Miscellaneous Symbols
+      [0x2700, 0x27BF], // Dingbats
+      [0x2B00, 0x2BFF]  // Miscellaneous Symbols and Arrows
+    ];
+
+    // Named entities for symbols
+    const namedEntities = {
+      169: 'copy',
+      174: 'reg',
+      8482: 'trade',
+      38: 'amp',
+      60: 'lt',
+      62: 'gt',
+      163: 'pound',
+      8364: 'euro',
+      165: 'yen',
+      176: 'deg',
+      177: 'plusmn',
+      181: 'micro',
+      215: 'times',
+      247: 'divide'
+    };
+
+    // Reverse named entities lookup
+    const reverseNamedEntities = Object.fromEntries(
+      Object.entries(namedEntities).map(([code, name]) => [name, parseInt(code)])
+    );
+
+    // Check if an index is excluded
+    function isExcluded(index) {
+      return exclusionRanges.some(([start, end]) => index >= start && index <= end) ||
+             excludedSingles.includes(index);
+    }
+
+    // Generate entities based on view
+    function generateEntities(view) {
+      let result = [];
+      if (view === 'all') {
+        result = allEntities.filter(index => !isExcluded(index));
+      } else if (view === 'emojis') {
+        emojiRanges.forEach(([start, end]) => {
+          for (let i = start; i <= end; i++) {
+            const index = i + 0x10000;
+            if (!isExcluded(index)) {
+              result.push(index);
+            }
+          }
+        });
+      } else if (view === 'symbols') {
+        symbolRanges.forEach(([start, end]) => {
+          for (let i = start; i <= end; i++) {
+            if (i >= 0x0020 && !/[a-zA-Z0-9]/.test(String.fromCodePoint(i)) && !isExcluded(i)) {
+              result.push(i);
+            }
+          }
+        });
+      }
+      return result;
+    }
+
+    // Convert text to HTML entities
+    function convertToEntities() {
+      const input = converterInput.value;
+      let result = '';
+      for (let char of input) {
+        const codePoint = char.codePointAt(0);
+        const namedEntity = namedEntities[codePoint] ? `&${namedEntities[codePoint]};` : null;
+        result += namedEntity || `&#${codePoint};`;
+      }
+      converterResult.textContent = result;
+      showToast('Converted to HTML entities');
+    }
+
+    // Convert HTML entities to text
+    function convertFromEntities() {
+      let input = entityInput.value.trim();
+      let result = '';
+      
+      // Handle both numeric (&#...;) and named (&...;) entities
+      input = input.replace(/&#(\d+);|&([a-zA-Z]+);/g, (match, num, name) => {
+        if (num) {
+          const codePoint = parseInt(num);
+          return isExcluded(codePoint) ? '' : String.fromCodePoint(codePoint);
+        }
+        if (name && reverseNamedEntities[name]) {
+          return String.fromCodePoint(reverseNamedEntities[name]);
+        }
+        return match;
+      });
+      
+      result = input;
+      entityResult.textContent = result;
+      showToast('Converted to text');
+    }
+
+    // Intersection Observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          entry.target.classList.remove('hidden');
+        } else {
+          entry.target.classList.add('hidden');
+          entry.target.classList.remove('visible');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '100px'
+    });
+
+    // Create card
+    function createCard(index) {
+      const card = document.createElement('div');
+      card.className = 'card hidden';
+      card.dataset.index = index;
+      const namedEntity = namedEntities[index] && currentView === 'symbols' ? `&${namedEntities[index]};` : '';
+      const displayText = currentView === 'all' || currentView === 'symbols' ? String.fromCodePoint(index) : String.fromCodePoint(index);
+      card.innerHTML = `
+        <span id="entity-${index}">${displayText}</span>
+        <code id="code-${index}">&amp;#${index};${namedEntity ? ` or ${namedEntity}` : ''}</code>
+        <div class="context-menu" id="menu-${index}">
+          <div onclick="copyToClipboard('entity-${index}')">Copy ${currentView === 'emojis' ? 'Emoji' : 'Symbol'}</div>
+          <div onclick="copyToClipboard('code-${index}')">Copy Code</div>
+        </div>
+      `;
+      card.addEventListener('click', (e) => toggleContextMenu(e, index, card));
+      return card;
+    }
+
+    // Toast notification
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.classList.add('show'), 100);
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Copy to clipboard
+    function copyToClipboard(elementId) {
+      const text = document.getElementById(elementId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`Copied to clipboard: ${text}`);
+      });
+    }
+
+    // Toggle context menu
+    function toggleContextMenu(e, index, card) {
+      e.stopPropagation();
+      if (activeContextMenu) {
+        activeContextMenu.style.display = 'none';
+        activeCard.classList.remove('active');
+      }
+      const menu = document.getElementById(`menu-${index}`);
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      
+      // Calculate position to keep menu within viewport
+      const cardRect = card.getBoundingClientRect();
+      const menuWidth = 150; // Context menu width
+      const menuHeight = 80; // Approximate height for two items
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      let top = e.clientY - cardRect.top + 10;
+      let left = e.clientX - cardRect.left + 10;
+      
+      // Adjust if menu would exceed viewport right edge
+      if (cardRect.left + left + menuWidth > viewportWidth - 10) {
+        left = cardRect.width - menuWidth - 10;
+      }
+      // Adjust if menu would exceed viewport bottom edge
+      if (cardRect.top + top + menuHeight > viewportHeight - 10) {
+        top = cardRect.height - menuHeight - 10;
+      }
+      // Ensure menu doesn't go off the left or top edge
+      if (cardRect.left + left < 10) {
+        left = 10 - cardRect.left;
+      }
+      if (cardRect.top + top < 10) {
+        top = 10 - cardRect.top;
+      }
+      
+      menu.style.top = `${top}px`;
+      menu.style.left = `${left}px`;
+      card.classList.add('active');
+      activeContextMenu = menu;
+      activeCard = card;
+    }
+
+    // Hide sidebar function
+    function hideSidebar() {
+      sidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('show');
+      sidebarToggle.innerHTML = '<i class="ri-menu-line"></i>';
+    }
+
+    // Show sidebar function
+    function showSidebar() {
+      sidebar.classList.add('open');
+      sidebarOverlay.classList.add('show');
+      sidebarToggle.innerHTML = '<i class="ri-close-line"></i>';
+    }
+
+    // Close context menu on click outside
+    document.addEventListener('click', (e) => {
+      if (activeContextMenu && !e.target.closest('.card')) {
+        activeContextMenu.style.display = 'none';
+        activeCard.classList.remove('active');
+        activeContextMenu = null;
+        activeCard = null;
+      }
+      if (!e.target.closest('.filter-btn') && !e.target.closest('.filter-menu')) {
+        filterMenu.style.display = 'none';
+      }
+    });
+
+    // Sidebar overlay click to hide sidebar
+    sidebarOverlay.addEventListener('click', () => {
+      hideSidebar();
+    });
+
+    // Load batch of cards
+    function loadBatch() {
+      const fragment = document.createDocumentFragment();
+      const endIndex = Math.min(currentIndex + batchSize, filteredEntities.length);
+      
+      for (let i = currentIndex; i < endIndex; i++) {
+        const card = createCard(filteredEntities[i]);
+        fragment.appendChild(card);
+        observer.observe(card);
+      }
+      
+      container.appendChild(fragment);
+      currentIndex = endIndex;
+      
+      if (currentIndex >= filteredEntities.length) {
+        loading.style.display = 'none';
+      }
+    }
+
+    // Clear and reload cards
+    function reloadCards() {
+      container.innerHTML = '';
+      currentIndex = 0;
+      loading.style.display = filteredEntities.length > 0 ? 'block' : 'none';
+      if (filteredEntities.length === 0) {
+        container.innerHTML = '<div class="not-found">Not Found</div>';
+      } else {
+        loadBatch();
+      }
+    }
+
+    // Switch view
+    function switchView(view) {
+      currentView = view;
+      document.querySelectorAll('.sidebar li').forEach(li => li.classList.remove('active'));
+      document.getElementById(`nav-${view}`).classList.add('active');
+      
+      if (view === 'converter') {
+        container.style.display = 'none';
+        converterContainer.style.display = 'block';
+        loading.style.display = 'none';
+        searchInput.style.display = 'none';
+        filterBtn.style.display = 'none';
+        converterInput.value = '';
+        converterResult.textContent = '';
+        entityInput.value = '';
+        entityResult.textContent = '';
+      } else {
+        container.style.display = 'grid';
+        converterContainer.style.display = 'none';
+        searchInput.style.display = 'block';
+        filterBtn.style.display = 'flex';
+        entities = generateEntities(view);
+        filteredEntities = [...entities];
+        searchInput.value = '';
+        reloadCards();
+      }
+      
+      hideSidebar();
+    }
+
+    // Search functionality
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase();
+      filteredEntities = entities.filter(index => {
+        const entity = String.fromCodePoint(index).toLowerCase();
+        const code = `&#${index};`.toLowerCase();
+        const namedEntity = namedEntities[index] && currentView === 'symbols' ? `&${namedEntities[index]};`.toLowerCase() : '';
+        return index.toString().includes(query) || entity.includes(query) || code.includes(query) || namedEntity.includes(query);
+      });
+      reloadCards();
+    });
+
+    // Sort functionality
+    function setSort(order) {
+      filteredEntities.sort((a, b) => order === 'asc' ? a - b : b - a);
+      filterMenu.style.display = 'none';
+      reloadCards();
+    }
+
+    // Filter button toggle
+    filterBtn.addEventListener('click', () => {
+      filterMenu.style.display = filterMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Theme toggle
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      themeToggle.innerHTML = document.body.classList.contains('dark') ? '<i class="ri-moon-line"></i>' : '<i class="ri-sun-line"></i>';
+    });
+
+    // Sidebar toggle
+    sidebarToggle.addEventListener('click', () => {
+      if (sidebar.classList.contains('open')) {
+        hideSidebar();
+      } else {
+        showSidebar();
+      }
+    });
+
+    // Initial load
+    entities = generateEntities('all');
+    filteredEntities = [...entities];
+    reloadCards();
+    
+    // Load more on scroll
+    window.addEventListener('scroll', () => {
+      if (currentIndex >= filteredEntities.length || currentView === 'converter') return;
+      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+      if (scrollTop + clientHeight >= scrollHeight - 200) {
+        loadBatch();
+      }
+    });
+  </script>
+</body>
+</html>
