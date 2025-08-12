@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Data URI Previewer</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #95a5a6;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --text: #333;
+            --bg: #f5f5f5;
+            --card-bg: white;
+            --border: #ddd;
+            --shadow: rgba(0,0,0,0.1);
+        }
+        .dark-mode {
+            --text: #ecf0f1;
+            --bg: #2c3e50;
+            --card-bg: #34495e;
+            --border: #4a6278;
+            --shadow: rgba(0,0,0,0.3);
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            resize: vertical;
+            transition: border 0.3s;
+            background-color: var(--card-bg);
+            color: var(--text);
+        }
+        textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button.secondary {
+            background-color: var(--secondary);
+        }
+        button.danger {
+            background-color: var(--danger);
+        }
+        button.success {
+            background-color: var(--success);
+        }
+        .preview-container {
+            margin-top: 20px;
+            text-align: center;
+            padding: 20px;
+            background-color: var(--bg);
+            border-radius: 8px;
+            border: 2px dashed var(--border);
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #imagePreview {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+        .error {
+            color: var(--danger);
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-radius: 4px;
+            display: none;
+        }
+        .info {
+            color: var(--primary);
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(52, 152, 219, 0.1);
+            border-radius: 4px;
+            display: none;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .zoom-controls {
+            display: flex;
+            gap: 10px;
+        }
+        .file-input {
+            display: none;
+        }
+        .file-label {
+            padding: 12px 20px;
+            background-color: #9b59b6;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-grow: 1;
+        }
+        .file-label:hover {
+            background-color: #8e44ad;
+            transform: translateY(-2px);
+        }
+        .size-info {
+            font-size: 14px;
+            color: var(--secondary);
+            margin-top: 10px;
+            text-align: center;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px var(--shadow);
+            z-index: 100;
+        }
+        .format-selector {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .format-btn {
+            padding: 8px 12px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .format-btn.active {
+            background-color: var(--primary);
+        }
+        .drag-drop {
+            border: 2px dashed var(--primary);
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .drag-drop.active {
+            display: block;
+        }
+        .drag-drop p {
+            margin: 0;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌓</button>
+    
+    <div class="container">
+        <h1>Image Data URI Previewer</h1>
+        <p class="subtitle">Preview, analyze, and convert image data URIs</p>
+        
+        <div class="drag-drop" id="dragDrop">
+            <p>📁 Drop image file here to generate data URI</p>
+        </div>
+        
+        <div class="input-group">
+            <textarea id="dataUriInput" placeholder='Paste your image data URI here (e.g., data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...)'></textarea>
+            
+            <div class="format-selector">
+                <button class="format-btn active" data-format="all">All Formats</button>
+                <button class="format-btn" data-format="png">PNG</button>
+                <button class="format-btn" data-format="jpeg">JPEG</button>
+                <button class="format-btn" data-format="gif">GIF</button>
+                <button class="format-btn" data-format="webp">WebP</button>
+            </div>
+            
+            <div class="button-group">
+                <button id="previewButton">🔍 Preview Image</button>
+                <label for="fileUpload" class="file-label">📁 Upload Image</label>
+                <input type="file" id="fileUpload" class="file-input" accept="image/*">
+                <button id="clearButton" class="secondary">🗑️ Clear</button>
+            </div>
+        </div>
+        
+        <div class="preview-container">
+            <img id="imagePreview" alt="Image preview will appear here">
+            <div id="errorMessage" class="error"></div>
+            <div id="infoMessage" class="info"></div>
+            <div class="size-info" id="sizeInfo"></div>
+            <div class="size-info" id="typeInfo"></div>
+            
+            <div class="controls">
+                <div class="zoom-controls">
+                    <button id="zoomIn">➕ Zoom In</button>
+                    <button id="zoomOut">➖ Zoom Out</button>
+                    <button id="zoomReset">↻ Reset Zoom</button>
+                </div>
+                <div>
+                    <button id="copyUri" class="success">📋 Copy URI</button>
+                    <button id="downloadImage" class="success">💾 Download Image</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const dataUriInput = document.getElementById('dataUriInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const errorMessage = document.getElementById('errorMessage');
+        const infoMessage = document.getElementById('infoMessage');
+        const sizeInfo = document.getElementById('sizeInfo');
+        const typeInfo = document.getElementById('typeInfo');
+        const previewButton = document.getElementById('previewButton');
+        const clearButton = document.getElementById('clearButton');
+        const fileUpload = document.getElementById('fileUpload');
+        const zoomIn = document.getElementById('zoomIn');
+        const zoomOut = document.getElementById('zoomOut');
+        const zoomReset = document.getElementById('zoomReset');
+        const copyUri = document.getElementById('copyUri');
+        const downloadImage = document.getElementById('downloadImage');
+        const themeToggle = document.getElementById('themeToggle');
+        const formatBtns = document.querySelectorAll('.format-btn');
+        const dragDrop = document.getElementById('dragDrop');
+        
+        // Current state
+        let currentScale = 1;
+        let currentDataUri = '';
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load example on first visit
+            if (!localStorage.getItem('visited')) {
+                loadExample();
+                localStorage.setItem('visited', 'true');
+            }
+            
+            // Set up drag and drop
+            setupDragDrop();
+        });
+        
+        // Theme toggle
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+        
+        // Format selector
+        formatBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                formatBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterExamples(btn.dataset.format);
+            });
+        });
+        
+        // Preview button
+        previewButton.addEventListener('click', previewImage);
+        
+        // Clear button
+        clearButton.addEventListener('click', () => {
+            dataUriInput.value = '';
+            imagePreview.src = '';
+            imagePreview.style.transform = 'scale(1)';
+            errorMessage.style.display = 'none';
+            infoMessage.style.display = 'none';
+            sizeInfo.textContent = '';
+            typeInfo.textContent = '';
+            currentScale = 1;
+            currentDataUri = '';
+        });
+        
+        // File upload
+        fileUpload.addEventListener('change', handleFileUpload);
+        
+        // Zoom controls
+        zoomIn.addEventListener('click', () => {
+            if (imagePreview.src) {
+                currentScale += 0.1;
+                applyZoom();
+            }
+        });
+        
+        zoomOut.addEventListener('click', () => {
+            if (imagePreview.src && currentScale > 0.2) {
+                currentScale -= 0.1;
+                applyZoom();
+            }
+        });
+        
+        zoomReset.addEventListener('click', () => {
+            currentScale = 1;
+            applyZoom();
+        });
+        
+        // Copy URI
+        copyUri.addEventListener('click', copyDataUri);
+        
+        // Download image
+        downloadImage.addEventListener('click', downloadImageFile);
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+Enter to preview
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                previewImage();
+            }
+        });
+        
+        function applyZoom() {
+            if (imagePreview.src) {
+                imagePreview.style.transform = `scale(${currentScale})`;
+                sizeInfo.textContent = `Zoom: ${Math.round(currentScale * 100)}% | ` + 
+                                     `Display size: ${Math.round(imagePreview.naturalWidth * currentScale)}×${Math.round(imagePreview.naturalHeight * currentScale)}px`;
+            }
+        }
+        
+        function previewImage() {
+            const dataUri = dataUriInput.value.trim();
+            
+            // Clear previous state
+            errorMessage.style.display = 'none';
+            infoMessage.style.display = 'none';
+            currentScale = 1;
+            
+            if (!dataUri) {
+                showError('Please enter an image data URI or upload an image');
+                return;
+            }
+            
+            if (!dataUri.startsWith('data:image/')) {
+                showError('The URI should start with "data:image/" followed by the image format');
+                return;
+            }
+            
+            try {
+                // Test if the URI is valid
+                imagePreview.onerror = function() {
+                    showError('Failed to load the image. Please check the data URI format.');
+                    imagePreview.src = '';
+                };
+                
+                imagePreview.onload = function() {
+                    currentDataUri = dataUri;
+                    showInfo('Image preview loaded successfully');
+                    updateImageInfo();
+                    applyZoom();
+                };
+                
+                imagePreview.src = dataUri;
+            } catch (e) {
+                showError('Invalid data URI format: ' + e.message);
+            }
+        }
+        
+        function updateImageInfo() {
+            if (!imagePreview.src) return;
+            
+            // Extract image type from data URI
+            const typeMatch = currentDataUri.match(/^data:(image\/\w+);/);
+            const imageType = typeMatch ? typeMatch[1] : 'Unknown';
+            
+            // Calculate approximate size
+            const base64Length = currentDataUri.length - (currentDataUri.indexOf(',') + 1);
+            const sizeInBytes = Math.ceil(base64Length * 3 / 4);
+            const sizeInKb = (sizeInBytes / 1024).toFixed(2);
+            
+            // Update info displays
+            typeInfo.textContent = `Type: ${imageType} | Size: ~${sizeInKb} KB`;
+            sizeInfo.textContent = `Original size: ${imagePreview.naturalWidth}×${imagePreview.naturalHeight}px | Zoom: 100%`;
+        }
+        
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check if it's an image
+            if (!file.type.startsWith('image/')) {
+                showError('Please select an image file');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Create data URI from the file
+                const dataUri = e.target.result;
+                dataUriInput.value = dataUri;
+                previewImage();
+            };
+            reader.onerror = function() {
+                showError('Error reading file');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function copyDataUri() {
+            if (!currentDataUri) {
+                showError('No data URI to copy');
+                return;
+            }
+            
+            try {
+                navigator.clipboard.writeText(currentDataUri)
+                    .then(() => {
+                        showInfo('Data URI copied to clipboard!');
+                    })
+                    .catch(err => {
+                        showError('Failed to copy: ' + err);
+                    });
+            } catch (e) {
+                // Fallback for older browsers
+                dataUriInput.select();
+                document.execCommand('copy');
+                showInfo('Data URI copied to clipboard!');
+            }
+        }
+        
+        function downloadImageFile() {
+            if (!currentDataUri || !imagePreview.src) {
+                showError('No image to download');
+                return;
+            }
+            
+            try {
+                // Extract file extension from data URI
+                const formatMatch = currentDataUri.match(/^data:image\/(\w+);/);
+                const extension = formatMatch ? formatMatch[1] : 'png';
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = `image.${extension}`;
+                link.href = currentDataUri;
+                link.click();
+            } catch (e) {
+                showError('Error generating download: ' + e.message);
+            }
+        }
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            infoMessage.style.display = 'none';
+        }
+        
+        function showInfo(message) {
+            infoMessage.textContent = message;
+            infoMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+        
+        function loadExample() {
+            const exampleUri = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj4KICA8cmVjdCB4PSIxMCIgeT0iMTAiIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiBmaWxsPSIjMzQ5OGRiIiBzdHJva2U9IiMyOTgwYjkiIHN0cm9rZS13aWR0aD0iNSIvPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iNjAiIGZpbGw9IiNlNzRjM2MiIHN0cm9rZT0iI2MwMzliMiIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPHRleHQgeD0iMTAwIiB5PSIxMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRhdGEgVVJJPC90ZXh0PgogIDx0ZXh0IHg9IjEwMCIgeT0iMTQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5FeGFtcGxlPC90ZXh0Pgo8L3N2Zz4=';
+            dataUriInput.value = exampleUri;
+            previewImage();
+        }
+        
+        function setupDragDrop() {
+            // Show drag drop area when dragging files
+            document.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dragDrop.classList.add('active');
+            });
+            
+            document.addEventListener('dragleave', () => {
+                dragDrop.classList.remove('active');
+            });
+            
+            document.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dragDrop.classList.remove('active');
+                
+                if (e.dataTransfer.files.length) {
+                    fileUpload.files = e.dataTransfer.files;
+                    handleFileUpload({ target: fileUpload });
+                }
+            });
+        }
+        
+        function filterExamples(format) {
+            // This function would filter examples if we had multiple
+            // Currently just a placeholder for future functionality
+        }
+    </script>
+</body>
+</html>
