@@ -137,5 +137,69 @@
         "totalSecured": 491
       }
     ]
+  },
+  {
+    "rollNumber": "1234567890",
+    "certificateNumber": "0987654321",
+    "traineeName": "AMDADUL HAQUE SARDAR",
+    "fatherName": "MOHAMMAD SAHAN SARDAR",
+    "motherName": "MORTUBA SARDAR",
+    "dateOfBirth": "01-Feb-1999",
+    "itiName": "BANKURA PRIVATE ITI",
+    "itiCode": "PR0095870",
+    "itiAddress": "DHALDANGA, BANKURA",
+    "district": "BANKURA",
+    "state": "WESTBENGAL",
+    "academicSession": "Aug 2016",
+    "year": "All",
+    "examSession": "Jul 2018",
+    "resultDate": "30-Aug-2018",
+    "tradeName": "Electrical",
+    "trainingDuration": "Aug 2016 To Jul 2018",
+    "level": "Level-2",
+    "certificateType": "1",
+    "certificateIssueDate": "07-Sep-2018",
+    "certified": true,
+    "overallResult": "Pass",
+    "marks": [
+      {
+        "year": "Year-1",
+        "examSession": "Jul 2017",
+        "resultDate": "19-Aug-2017",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 85,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 46,
+        "workshopCalculationMax": 50,
+        "workshopCalculationSecured": 40,
+        "engineeringDrawingMax": 50,
+        "engineeringDrawingSecured": 38,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 236,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 182,
+        "totalMax": 700,
+        "totalSecured": 627
+      },
+      {
+        "year": "Year-2",
+        "examSession": "Jul 2018",
+        "resultDate": "30-Aug-2018",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 76,
+        "employabilitySkillsMax": 0,
+        "employabilitySkillsSecured": 0,
+        "workshopCalculationMax": 50,
+        "workshopCalculationSecured": 38,
+        "engineeringDrawingMax": 50,
+        "engineeringDrawingSecured": 45,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 216,
+        "formativeAssessmentMax": 250,
+        "formativeAssessmentSecured": 189,
+        "totalMax": 650,
+        "totalSecured": 564
+      }
+    ]
   }
 ]
