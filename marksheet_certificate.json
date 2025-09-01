@@ -145,5 +145,72 @@
         "totalSecured": 560
       }
     ]
+  },
+  {
+    "rollNumber": "R160819039817",
+    "certificateNumber": "18194008209759",
+    "traineeName": "MANIK JANA",
+    "fatherName": "SANTOSH KUMAR JANA",
+    "motherName": "ARATI RANI JANA",
+    "dateOfBirth": "05-Mar-1998",
+    "itiName": "MECHEDA VIDYASAGAR PRIVATE ITI",
+    "itiCode": "PR19000189",
+    "itiAddress": "Dupjora, Mecheda, Kolaghat",
+    "district": "MEDINIPUR EAST",
+    "state": "WEST BENGAL",
+    "pinCode": "721137",
+    "academicSession": "Aug 2016",
+    "year": "All",
+    "examSystem": "A",
+    "examSession": "Jul 2018",
+    "resultDate": "29-Aug-2018",
+    "tradeName": "Fitter",
+    "trainingDuration": "Aug 2016 To Jul 2018",
+    "level": "Level-5",
+    "certificateType": "1",
+    "certificateIssueDate": "29-Aug-2018",
+    "certified": true,
+    "overallResult": "Pass",
+    "disable": null,
+    "marks": [
+      {
+        "year": "Year-1",
+        "examSession": "Jul 2017",
+        "resultDate": "07-Aug-2017",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 61,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 33,
+        "workshopCalculationMax": 50,
+        "workshopCalculationSecured": 41,
+        "engineeringDrawingMax": 50,
+        "engineeringDrawingSecured": 32,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 168,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 158,
+        "totalMax": 700,
+        "totalSecured": 493
+      },
+      {
+        "year": "Year-2",
+        "examSession": "Jul 2018",
+        "resultDate": "29-Aug-2018",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 81,
+        "employabilitySkillsMax": 0,
+        "employabilitySkillsSecured": 0,
+        "workshopCalculationMax": 50,
+        "workshopCalculationSecured": 47,
+        "engineeringDrawingMax": 50,
+        "engineeringDrawingSecured": 37,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 204,
+        "formativeAssessmentMax": 250,
+        "formativeAssessmentSecured": 194,
+        "totalMax": 650,
+        "totalSecured": 563
+      }
+    ]
   }
 ]
