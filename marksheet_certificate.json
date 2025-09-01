@@ -1,45 +1,5 @@
 [
   {
-    "certificateNumber": "90877868668766",
-    "certificateType": "1",
-    "fatherName": "Rugy mondal",
-    "itiAddress": "Suyh uytu,9uuu yiy west",
-    "trainingDuration": "2024 to 2025",
-    "certified": true,
-    "certificateIssueDate": "Aug 2025",
-    "rollNumber": "97787777867700",
-    "examSystem": "A",
-    "traineeName": "Ouytt",
-    "academicSession": "Aug 2024",
-    "tradeName": "Welder",
-    "examSession": "Jul 2025",
-    "itiCode": "768686",
-    "itiName": "Fii utih iti",
-    "overallResult": "Pass",
-    "resultDate": "21Aug 2025",
-    "marks": [
-      {
-        "year": "Year-1",
-        "examSession": "2025",
-        "resultDate": "2025",
-        "tradeTheoryMax": 100,
-        "tradeTheorySecured": 54,
-        "employabilitySkillsMax": 50,
-        "employabilitySkillsSecured": 36,
-        "workshopCalculationMax": 50,
-        "workshopCalculationSecured": 45,
-        "engineeringDrawingMax": 50,
-        "engineeringDrawingSecured": 42,
-        "tradePracticalMax": 250,
-        "tradePracticalSecured": 211,
-        "formativeAssessmentMax": 200,
-        "formativeAssessmentSecured": 172,
-        "totalMax": 700,
-        "totalSecured": 560
-      }
-    ]
-  },
-  {
     "certificateNumber": "242093481603927",
     "certificateType": "1",
     "fatherName": "SAIDUL ISLAM MONDAL",
@@ -200,6 +160,54 @@
         "formativeAssessmentSecured": 189,
         "totalMax": 650,
         "totalSecured": 564
+      }
+    ]
+  },
+  {
+    "rollNumber": "97787777867700",
+    "certificateNumber": "90877868668766",
+    "traineeName": "Ouytt",
+    "fatherName": "Rugy mondal",
+    "motherName": "moyiyti",
+    "dateOfBirth": "15 aufgf",
+    "itiName": "Fii utih iti",
+    "itiCode": "768686",
+    "itiAddress": "Suyh uytu,9uuu yiy west",
+    "district": "ytry",
+    "state": "fgfdg",
+    "pinCode": "gdfgfd",
+    "academicSession": "Aug 2024",
+    "year": "Year-1",
+    "examSystem": "A",
+    "examSession": "Jul 2025",
+    "resultDate": "21Aug 2025",
+    "tradeName": "Welder",
+    "trainingDuration": "2024 to 2025",
+    "level": "Level-5",
+    "certificateType": "1",
+    "certificateIssueDate": "Aug 2025",
+    "certified": true,
+    "overallResult": "Pass",
+    "disable": "https://ncvtmis.gov.in",
+    "marks": [
+      {
+        "year": "Year-1",
+        "examSession": "2025",
+        "resultDate": "2025",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 54,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 36,
+        "workshopCalculationMax": 50,
+        "workshopCalculationSecured": 45,
+        "engineeringDrawingMax": 50,
+        "engineeringDrawingSecured": 42,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 211,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 172,
+        "totalMax": 700,
+        "totalSecured": 560
       }
     ]
   }
