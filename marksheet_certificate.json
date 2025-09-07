@@ -222,5 +222,54 @@
         "totalSecured": 491
       }
     ]
+  },
+  {
+    "rollNumber": "hthth",
+    "certificateNumber": "fdgfrdgdfrgdf",
+    "traineeName": "DHEDRYHERHYTR",
+    "fatherName": "DFGSDGDRG",
+    "motherName": "DGGRG",
+    "dateOfBirth": "fgrdgrdg",
+    "itiName": "rfdgredgter",
+    "itiCode": "GVERSGWZEGT",
+    "itiAddress": "hioljoil",
+    "district": "HJHKI",
+    "state": "HHIHJI",
+    "pinCode": "jhijil",
+    "academicSession": "jikljj",
+    "year": "Year-1",
+    "examSystem": "A",
+    "examSession": "uhyio",
+    "resultDate": "huihuihui",
+    "tradeName": "Electrician",
+    "trainingDuration": "ipouopjkp",
+    "level": "2",
+    "certificateType": "1",
+    "certificateIssueDate": "354535435454",
+    "certified": true,
+    "overallResult": "Pass",
+    "disable": "https://ncvtmis.gov.in",
+    "submissionDate": "2025-09-07T11:35:48.034Z",
+    "marks": [
+      {
+        "year": "Year-1",
+        "examSession": "756",
+        "resultDate": "7667",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 35,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 35,
+        "workshopCalculationMax": 50,
+        "workshopCalculationSecured": 35,
+        "engineeringDrawingMax": 50,
+        "engineeringDrawingSecured": 35,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 35,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 35,
+        "totalMax": 700,
+        "totalSecured": 210
+      }
+    ]
   }
 ]
