@@ -106,54 +106,5 @@
       }
     ],
     "submissionDate": "2025-09-07T10:30:53.317Z"
-  },
-  {
-    "rollNumber": "Uddu",
-    "certificateNumber": "Ufif",
-    "traineeName": "UDFIF",
-    "fatherName": "UF7D8F",
-    "motherName": "UFUF",
-    "dateOfBirth": "Uddu",
-    "itiName": "Cuduf",
-    "itiCode": "HCUC",
-    "itiAddress": "Duudd",
-    "district": "DUDD",
-    "state": "CIC",
-    "pinCode": "Kvfi",
-    "academicSession": "Jcfif",
-    "year": "Year-1",
-    "examSystem": "A",
-    "examSession": "Uduf",
-    "resultDate": "Uddi",
-    "tradeName": "Fitter",
-    "trainingDuration": "Ufifif",
-    "level": "4",
-    "certificateType": "1",
-    "certificateIssueDate": "29-Aug-2018",
-    "certified": true,
-    "overallResult": "Pass",
-    "disable": null,
-    "submissionDate": "2025-09-12T12:41:19.021Z",
-    "marks": [
-      {
-        "year": "Year-1",
-        "examSession": "Yud8f",
-        "resultDate": "Ufifif",
-        "tradeTheoryMax": 100,
-        "tradeTheorySecured": 23,
-        "employabilitySkillsMax": 50,
-        "employabilitySkillsSecured": 25,
-        "workshopCalculationMax": 50,
-        "workshopCalculationSecured": 25,
-        "engineeringDrawingMax": 50,
-        "engineeringDrawingSecured": 25,
-        "tradePracticalMax": 250,
-        "tradePracticalSecured": 140,
-        "formativeAssessmentMax": 200,
-        "formativeAssessmentSecured": 145,
-        "totalMax": 700,
-        "totalSecured": 383
-      }
-    ]
   }
 ]
