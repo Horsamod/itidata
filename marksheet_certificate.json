@@ -174,5 +174,73 @@
         "totalSecured": 532
       }
     ]
+  },
+  {
+    "rollNumber": "R210809230709",
+    "certificateNumber": "230990251004315",
+    "traineeName": "ANJARUL HOQUE",
+    "fatherName": "ATIKUL SK",
+    "motherName": "MORJINA BIBI",
+    "dateOfBirth": "21-Feb-2005",
+    "itiName": "GOVERNMENT ITI SAGARDIGHI running under PTP",
+    "itiCode": "GR19000167",
+    "itiAddress": "POPARA,VILL & P.O-SA",
+    "district": "MURSHIDABAD",
+    "state": "WEST BENGAL",
+    "pinCode": "742226",
+    "academicSession": "Aug 2021",
+    "year": "All",
+    "examSystem": "A",
+    "examSession": "Jul 2023",
+    "resultDate": "07-Aug-2023",
+    "tradeName": "Fitter",
+    "trainingDuration": "Aug 2021 to Jul 2023",
+    "level": "5",
+    "certificateType": "1",
+    "certificateIssueDate": "07-Aug-2023",
+    "certified": true,
+    "overallResult": "Pass",
+    "disable": null,
+    "submissionDate": "2025-09-15T13:36:18.675Z",
+    "marks": [
+      {
+        "year": "Year-1",
+        "examSession": "Jul 2022",
+        "resultDate": "19-Aug-2022",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 74,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 44,
+        "workshopCalculationMax": 50,
+        "workshopCalculationSecured": 34,
+        "engineeringDrawingMax": 50,
+        "engineeringDrawingSecured": 42,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 197,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 148,
+        "totalMax": 700,
+        "totalSecured": 539
+      },
+      {
+        "year": "Year-2",
+        "examSession": "Jul 2023",
+        "resultDate": "07-Aug-2023",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 58,
+        "employabilitySkillsMax": 0,
+        "employabilitySkillsSecured": 0,
+        "workshopCalculationMax": 50,
+        "workshopCalculationSecured": 35,
+        "engineeringDrawingMax": 50,
+        "engineeringDrawingSecured": 38,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 205,
+        "formativeAssessmentMax": 250,
+        "formativeAssessmentSecured": 196,
+        "totalMax": 650,
+        "totalSecured": 532
+      }
+    ]
   }
 ]
