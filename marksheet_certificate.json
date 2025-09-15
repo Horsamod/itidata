@@ -268,7 +268,7 @@
     "certificateIssueDate": "18-Sep-2025",
     "certified": true,
     "overallResult": "Pass",
-    "disable": null,
+    "disable": "https://ncvtmis.gov.in",
     "submissionDate": "2025-09-15T20:08:38.203Z",
     "marks": [
       {
