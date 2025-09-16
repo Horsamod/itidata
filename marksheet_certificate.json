@@ -242,5 +242,73 @@
         "totalSecured": 532
       }
     ]
+  },
+  {
+    "rollNumber": "R210809246780",
+    "certificateNumber": "230990251004864",
+    "traineeName": "HASMOT ALI KHAN",
+    "fatherName": "MANJAR ALI KHAN",
+    "motherName": "HABIBA KHAN",
+    "dateOfBirth": "01-Apr-2004",
+    "itiName": "BANKURA PRIVATE ITI",
+    "itiCode": "PR1900167",
+    "itiAddress": "KADMAGHATI,CHATARKANALI",
+    "district": "BANKURA",
+    "state": "WEST BENGAL",
+    "pinCode": "722104",
+    "academicSession": "Aug 2022",
+    "year": "All",
+    "examSystem": "A",
+    "examSession": "Jul 2024",
+    "resultDate": "07-Aug-2024",
+    "tradeName": "Welder",
+    "trainingDuration": "Jul 2022 To Aug 2024",
+    "level": "4",
+    "certificateType": "1",
+    "certificateIssueDate": "07-Jul-2024",
+    "certified": true,
+    "overallResult": "Pass",
+    "disable": null,
+    "submissionDate": "2025-09-16T00:58:29.145Z",
+    "marks": [
+      {
+        "year": "Year-1",
+        "examSession": "Jul 2023",
+        "resultDate": "19-Aug-2024",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 74,
+        "employabilitySkillsMax": 50,
+        "employabilitySkillsSecured": 38,
+        "workshopCalculationMax": 50,
+        "workshopCalculationSecured": 42,
+        "engineeringDrawingMax": 50,
+        "engineeringDrawingSecured": 45,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 212,
+        "formativeAssessmentMax": 200,
+        "formativeAssessmentSecured": 178,
+        "totalMax": 700,
+        "totalSecured": 589
+      },
+      {
+        "year": "Year-2",
+        "examSession": "Jul 2024",
+        "resultDate": "07-Aug-2024",
+        "tradeTheoryMax": 100,
+        "tradeTheorySecured": 65,
+        "employabilitySkillsMax": 0,
+        "employabilitySkillsSecured": 0,
+        "workshopCalculationMax": 50,
+        "workshopCalculationSecured": 42,
+        "engineeringDrawingMax": 50,
+        "engineeringDrawingSecured": 44,
+        "tradePracticalMax": 250,
+        "tradePracticalSecured": 188,
+        "formativeAssessmentMax": 250,
+        "formativeAssessmentSecured": 180,
+        "totalMax": 650,
+        "totalSecured": 519
+      }
+    ]
   }
 ]
