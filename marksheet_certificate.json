@@ -174,54 +174,5 @@
         "totalSecured": 532
       }
     ]
-  },
-  {
-    "rollNumber": "Ufiifici",
-    "certificateNumber": "Jducfi",
-    "traineeName": "UFIVVJCJ UDUR",
-    "fatherName": "JFFJFI JFFI",
-    "motherName": "HDDJCJC URR",
-    "dateOfBirth": "21-Feb-2005",
-    "itiName": "GOVERNMENT ITI SAGARDIGHI",
-    "itiCode": "GR19000167",
-    "itiAddress": "POPARA,VILL & P.O-SA",
-    "district": "MURSHIDABAD",
-    "state": "WEST BENGAL",
-    "pinCode": "742226",
-    "academicSession": "Aug 2016",
-    "year": "Year-1",
-    "examSystem": "A",
-    "examSession": "July 2024",
-    "resultDate": "29-Aug-2018",
-    "tradeName": "Welder",
-    "trainingDuration": "Aug 2023 to July 2024",
-    "level": null,
-    "certificateType": "1",
-    "certificateIssueDate": "07-Sep-2024",
-    "certified": true,
-    "overallResult": "Pass",
-    "disable": "https://ncvtmis.gov.in",
-    "submissionDate": "2025-09-23T14:15:56.047Z",
-    "marks": [
-      {
-        "year": "Year-1",
-        "examSession": "Jul 2017",
-        "resultDate": "07-Sep-2024",
-        "tradeTheoryMax": 100,
-        "tradeTheorySecured": 63,
-        "employabilitySkillsMax": 50,
-        "employabilitySkillsSecured": 45,
-        "workshopCalculationMax": 50,
-        "workshopCalculationSecured": 36,
-        "engineeringDrawingMax": 50,
-        "engineeringDrawingSecured": 36,
-        "tradePracticalMax": 250,
-        "tradePracticalSecured": 145,
-        "formativeAssessmentMax": 200,
-        "formativeAssessmentSecured": 152,
-        "totalMax": 700,
-        "totalSecured": 477
-      }
-    ]
   }
 ]
