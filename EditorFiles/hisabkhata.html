@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HisabKhata — Plain JS</title>
+
+  <!-- Styles (based on your styles.css with small adjustments for single file) -->
+  <style>
+  /* ---------- BEGIN styles (adapted) ---------- */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; line-height: 1.4; }
+  :root {
+    --primary: #4361ee; --success: #10b981; --danger: #ef4444; --dark: #1e293b;
+    --light: #f8fafc; --gray: #e2e8f0; --border: #cbd5e1; --bg-gradient: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+  }
+  body { font-family: 'Inter', 'Noto Sans Bengali', sans-serif; background: var(--bg-gradient); color: var(--dark); min-height: 100vh; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+  .card { background: rgba(255, 255, 255); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2); transition: transform .2s, box-shadow .2s; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
+  .btn { padding: 0.75rem 1.5rem; border: none; border-radius: .75rem; font-weight:600; cursor:pointer; transition: all .2s; display:inline-flex; align-items:center; gap:.5rem; font-size:1rem; text-decoration:none; }
+  .btn-primary { background:var(--primary); color:white; }
+  .btn-success { background:var(--success); color:white; }
+  .btn-danger { background:var(--danger); color:white; }
+  .btn-sm { padding:.5rem 1rem; font-size:.875rem; }
+  .input, .select { padding:.75rem 1rem; border:2px solid var(--border); border-radius:.75rem; font-size:1rem; transition:border .2s; width:100%; }
+  .input:focus, .select:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(67,97,238,0.1); }
+  .table { width:100%; border-collapse: collapse; margin-top:1rem; font-size:.95rem; }
+  .table th { background:var(--gray); padding:.75rem; text-align:left; font-weight:600; color:var(--dark); border-bottom:2px solid var(--border); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .table td { padding:.5rem; border-bottom:1px solid var(--border); max-width:110px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .table tr:hover { background: rgba(67,97,238,0.05); }
+  .modal-overlay { position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000; padding:1rem; }
+  .modal { background:white; border-radius:1rem; width:100%; max-width:500px; max-height:90vh; overflow-y:auto; padding:1.5rem; box-shadow:0 10px 40px rgba(0,0,0,0.2); }
+  .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+  .modal-close { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#64748b; }
+  .tabs { display:flex; overflow-x:auto; gap:.5rem; margin-bottom:1rem; padding-bottom:.5rem; }
+  .tab { padding:.5rem 1rem; border-radius:.75rem; white-space:nowrap; background:#e9e3ff; color:#64748b; font-weight:500; cursor:pointer; transition:all .2s; }
+  .tab.active { background:var(--primary); color:white; }
+  .header { background:white; box-shadow:0 2px 10px rgba(0,0,0,.1); position:sticky; top:0; z-index:999; padding:1rem; transition: transform .35s cubic-bezier(.4,0,.2,1); }
+  .header-content { display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto; }
+  .header-title { font-size:130%; color:var(--primary); margin:0; }
+  .header.hidden { transform: translateY(-100%); }
+  .header.visible { transform: translateY(0); }
+  .lang-modal { position:fixed; top:0;left:0;right:0;bottom:0; background:var(--bg-gradient); display:flex; align-items:center; justify-content:center; z-index:1000; padding:1rem; }
+  .lang-card { background:white; border-radius:1rem; padding:2rem; width:100%; max-width:400px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.2); }
+  .page-title { display:flex; align-items:center; gap:.5rem; font-size:1rem; margin:1rem 0; justify-content:space-between; }
+  .summary-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2rem; }
+  .summary-grid > *:first-child { grid-column: 1 / 1; }
+  .summary-card { text-align:center; white-space:nowrap; }
+  .summary-value { font-size:1.5rem; font-weight:700; margin-top:.5rem; white-space:nowrap; }
+  .action-buttons { display:flex; gap:1rem; justify-content:center; margin-bottom:2rem; flex-wrap:nowrap; }
+  .section-card { margin-bottom:1.5rem; }
+  .section-title { display:flex; align-items:center; gap:.5rem; margin-bottom:1rem; font-size:1.2rem; color:var(--dark); }
+  .form-grid { display:grid; gap:1rem; grid-template-columns:1fr 1fr auto; align-items:end; }
+  .form-group { display:flex; flex-direction:column; gap:.5rem; }
+  .modal-actions { display:flex; gap:1rem; margin-top:1rem; }
+  .modal-actions .btn { flex:1; display:flex; justify-content:center; align-items:center; }
+  .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255); border-top:1px solid var(--border); align-items:center; display:grid; grid-template-columns:repeat(3,1fr); z-index:1000; height:60px; padding:.0rem 0; }
+  .nav-item { text-align:center; color:#64748b; text-decoration:none; margin:0 0; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; }
+  .nav-item.active { color:var(--primary); font-weight:bold; }
+  .nav-icon { margin:0 0; padding:0 0; }
+  .nav-label { font-size:.75rem; margin-top:0; }
+  @media (max-width:768px) {
+    .container { padding:.5rem; }
+    .card { padding:1rem; }
+    .btn { font-size:.9rem; }
+    .form-grid { grid-template-columns:1fr; }
+    .summary-grid { grid-template-columns:repeat(2,1fr); gap:.5rem; margin-bottom:2rem; }
+    .summary-grid > *:first-child { grid-column:1 / -1; }
+  }
+  .ripple-btn { position:relative; overflow:hidden; outline:none; }
+  .ripple-effect { position:absolute; border-radius:50%; background-color:currentColor; transform:scale(0); filter:brightness(1.08); animation:ripple-animation .45s ease-out forwards; opacity:.6; }
+  @keyframes ripple-animation { to { transform:scale(2.5); opacity:0; } }
+  /* small utilities */
+  .flex { display:flex; gap:1rem; align-items:center; }
+  .muted { color:#64748b; font-size:.9rem; }
+  .text-center { text-align:center; }
+  .mb-1 { margin-bottom:1rem; }
+  .mt-1 { margin-top:1rem; }
+  .w-100 { width:100%; }
+  .hidden { display:none; }
+  /* ---------- END styles ---------- */
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div id="header" class="header visible">
+    <div class="header-content container">
+      <h1 id="app-title" class="header-title">HisabKhata</h1>
+      <button id="open-lang" class="btn btn-primary btn-sm ripple-btn" aria-label="Change language">
+        <!-- globe icon -->
+        <svg style="height:18px;width:18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main app mount -->
+  <main id="app" class="container" style="padding-bottom:5rem; padding-top:1rem;"></main>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <a id="nav-home" class="nav-item" href="#/">
+      <svg class="nav-icon" style="height:20px;width:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V9.5z"></path></svg>
+      <div class="nav-label">Dashboard</div>
+    </a>
+    <a id="nav-deposit" class="nav-item" href="#/deposit">
+      <svg class="nav-icon" style="height:20px;width:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20"></path><path d="M5 9l7-7 7 7"></path></svg>
+      <div class="nav-label">Deposits</div>
+    </a>
+    <a id="nav-expense" class="nav-item" href="#/expense">
+      <svg class="nav-icon" style="height:20px;width:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22V2"></path><path d="M19 9l-7 7-7-7"></path></svg>
+      <div class="nav-label">Expenses</div>
+    </a>
+  </nav>
+
+  <!-- Language Modal (hidden) -->
+  <div id="lang-modal" class="lang-modal hidden" aria-hidden="true">
+    <div class="lang-card card">
+      <h2 id="lang-modal-title">Select Language</h2>
+      <div style="display:flex;gap:1rem;margin-top:1rem;justify-content:center;">
+        <button id="btn-en" class="btn btn-primary">English</button>
+        <button id="btn-bn" class="btn">বাংলা</button>
+      </div>
+      <div style="margin-top:1rem;">
+        <button id="lang-modal-close" class="btn btn-sm" style="background:transparent;border:1px solid var(--border)">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic modal root -->
+  <div id="overlay-root" class="hidden"></div>
+
+  <!-- JS -->
+  <script>
+  /*************************************************************************
+   * Plain JS Single-File Conversion of your React app
+   * - Copy/paste as index.html and open
+   * - Uses hash-based routing: #/, #/deposit, #/expense
+   *************************************************************************/
+
+  /* ---------- translations (from your data/translations) ---------- */
+  const translations = {
+    en: {
+      hisabkhata: "HisabKhata",
+      selectLanguage: "Select Language",
+      english: "English",
+      bengali: "Bengali",
+      dashboard: "Dashboard",
+      deposits: "Deposits",
+      expenses: "Expenses",
+      totalSavings: "Total Savings",
+      totalDeposits: "Total Deposits",
+      totalExpenses: "Total Expenses",
+      last7DaysDeposits: "Last 7 Days Deposits",
+      last7DaysExpenses: "Last 7 Days Expenses",
+      addDeposit: "Add Deposit",
+      addExpense: "Add Expense",
+      name: "Name",
+      amount: "Amount",
+      date: "Date",
+      action: "Action",
+      delete: "Delete",
+      submit: "Submit",
+      noData: "No data available",
+      depositedBy: "Deposited by",
+      spentOn: "Spent on",
+      changeLanguage: "Change Language",
+      totalDeposit: "Total Deposit",
+      totalSpent: "Total Spent",
+      addNewDeposit: "Add New Deposit",
+      addNewExpense: "Add New Expense",
+      personName: "Person Name",
+      business: "Business",
+      otherBusiness: "Other (type name)",
+      customBusiness: "Custom Business Name",
+      depositDate: "Deposit Date",
+      depositAmount: "Deposit Amount",
+      whoSpent: "Who Spent",
+      spentDate: "Spent Date",
+      spentAmount: "Spent Amount",
+      close: "Close",
+      khejurLabat: "Khejur Labat",
+      talLabat: "Tal Labat",
+      morabba: "Morabba",
+      other: "Other",
+    },
+    bn: {
+      hisabkhata: "হিসাবখাতা",
+      selectLanguage: "ভাষা নির্বাচন করুন",
+      english: "ইংরেজি",
+      bengali: "বাংলা",
+      dashboard: "ড্যাশবোর্ড",
+      deposits: "জমা",
+      expenses: "খরচ",
+      totalSavings: "মোট সঞ্চয়",
+      totalDeposits: "মোট জমা",
+      totalExpenses: "মোট খরচ",
+      last7DaysDeposits: "গত ৭ দিনের জমা",
+      last7DaysExpenses: "গত ৭ দিনের খরচ",
+      addDeposit: "জমা যোগ করুন",
+      addExpense: "খরচ যোগ করুন",
+      name: "নাম",
+      amount: "পরিমাণ",
+      date: "তারিখ",
+      action: "কার্যক্রম",
+      delete: "মুছে ফেলুন",
+      submit: "জমা দিন",
+      noData: "কোনো তথ্য নেই",
+      depositedBy: "জমা করেছেন",
+      spentOn: "খরচ করা হয়েছে",
+      changeLanguage: "ভাষা পরিবর্তন",
+      totalDeposit: "মোট জমা",
+      totalSpent: "মোট খরচ",
+      addNewDeposit: "নতুন জমা যোগ করুন",
+      addNewExpense: "নতুন খরচ যোগ করুন",
+      personName: "ব্যক্তির নাম",
+      business: "ব্যবসা",
+      otherBusiness: "অন্যান্য (নাম লিখুন)",
+      customBusiness: "কাস্টম ব্যবসার নাম",
+      depositDate: "জমার তারিখ",
+      depositAmount: "জমার পরিমাণ",
+      whoSpent: "কার খরচ",
+      spentDate: "খরচের তারিখ",
+      spentAmount: "খরচের পরিমাণ",
+      close: "বন্ধ",
+      khejurLabat: "খেজুর লবাত",
+      talLabat: "তাল লবাত",
+      morabba: "মোরব্বা",
+      other: "অন্যান্য",
+    },
+  };
+
+  /* ---------- Utilities ---------- */
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  const fmtDateInput = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    // yyyy-mm-dd
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${d.getFullYear()}-${mm}-${dd}`;
+  };
+
+  const fmtDateDisplay = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    return d.toLocaleDateString(getLang() === 'bn' ? 'bn-BD' : 'en-US');
+  };
+
+  const getLang = () => localStorage.getItem('lang') || null;
+  const t = (key) => {
+    const lang = getLang() || 'en';
+    return (translations[lang] && translations[lang][key]) || translations['en'][key] || key;
+  };
+
+  const saveDeposits = (arr) => localStorage.setItem('deposits', JSON.stringify(arr || []));
+  const saveExpenses = (arr) => localStorage.setItem('expenses', JSON.stringify(arr || []));
+  const loadDeposits = () => JSON.parse(localStorage.getItem('deposits') || '[]');
+  const loadExpenses = () => JSON.parse(localStorage.getItem('expenses') || '[]');
+
+  /* ---------- App state ---------- */
+  let state = {
+    lang: getLang(),
+    deposits: loadDeposits(),
+    expenses: loadExpenses(),
+    showLangModal: false
+  };
+
+  /* ---------- Routing ---------- */
+  function route() {
+    const hash = location.hash.replace(/^#/, '') || '/';
+    setActiveNav(hash);
+    if (!state.lang) {
+      renderLanguageSelection();
+      return;
+    }
+    if (hash === '/' || hash === '') renderDashboard();
+    else if (hash.startsWith('/deposit')) renderDepositPage();
+    else if (hash.startsWith('/expense')) renderExpensePage();
+    else renderDashboard();
+    // update header title
+    $('#app-title').textContent = t('hisabkhata');
+  }
+
+  function setActiveNav(hash) {
+    $$('#bottom-nav .nav-item').forEach(a => a.classList.remove('active'));
+    if (hash === '/' || hash === '') $('#nav-home').classList.add('active');
+    else if (hash.startsWith('/deposit')) $('#nav-deposit').classList.add('active');
+    else if (hash.startsWith('/expense')) $('#nav-expense').classList.add('active');
+  }
+
+  /* ---------- Header scroll hide/show ---------- */
+  (function headerScrollHandler(){
+    let lastScrollY = window.scrollY;
+    const header = $('#header');
+    window.addEventListener('scroll', () => {
+      const currentY = window.scrollY;
+      if (currentY > lastScrollY && currentY > 100) {
+        header.classList.add('hidden');
+        header.classList.remove('visible');
+      } else if (currentY < lastScrollY) {
+        header.classList.remove('hidden');
+        header.classList.add('visible');
+      }
+      lastScrollY = currentY;
+    }, { passive: true });
+  })();
+
+  /* ---------- Ripple effect ---------- */
+  function attachRipple(el) {
+    if (!el) return;
+    el.classList.add('ripple-btn');
+    el.addEventListener('click', function (e) {
+      // create ripple
+      const rect = el.getBoundingClientRect();
+      const r = document.createElement('span');
+      r.className = 'ripple-effect';
+      const size = Math.max(rect.width, rect.height) * 1.2;
+      r.style.width = r.style.height = size + 'px';
+      const x = e.clientX - rect.left - size/2;
+      const y = e.clientY - rect.top - size/2;
+      r.style.left = `${x}px`;
+      r.style.top = `${y}px`;
+      el.appendChild(r);
+      setTimeout(()=> { r.remove(); }, 500);
+    });
+  }
+
+  /* attach ripple to initial buttons */
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('.ripple-btn');
+    if (el && !el.dataset.rippleAttached) {
+      attachRipple(el);
+      el.dataset.rippleAttached = '1';
+    }
+  });
+
+  /* ---------- Language handling ---------- */
+  function openLangModal() {
+    state.showLangModal = true;
+    $('#lang-modal').classList.remove('hidden');
+    $('#lang-modal').setAttribute('aria-hidden','false');
+    $('#btn-en').textContent = translations['en'].english;
+    $('#btn-bn').textContent = translations['bn'].bengali;
+    $('#lang-modal-title').textContent = t('selectLanguage');
+  }
+  function closeLangModal() {
+    state.showLangModal = false;
+    $('#lang-modal').classList.add('hidden');
+    $('#lang-modal').setAttribute('aria-hidden','true');
+  }
+
+  $('#open-lang').addEventListener('click', openLangModal);
+  $('#lang-modal-close').addEventListener('click', closeLangModal);
+  $('#btn-en').addEventListener('click', () => { setLang('en'); closeLangModal(); });
+  $('#btn-bn').addEventListener('click', () => { setLang('bn'); closeLangModal(); });
+
+  function setLang(lang) {
+    localStorage.setItem('lang', lang);
+    state.lang = lang;
+    // update static UI labels
+    renderAll();
+  }
+
+  /* ---------- Render helpers ---------- */
+  const app = $('#app');
+
+  function clearApp() { app.innerHTML = ''; }
+
+  function createEl(tag, attrs = {}, children = []) {
+    const el = document.createElement(tag);
+    for (const k in attrs) {
+      if (k === 'class') el.className = attrs[k];
+      else if (k === 'html') el.innerHTML = attrs[k];
+      else if (k.startsWith('on') && typeof attrs[k] === 'function') {
+        el.addEventListener(k.substring(2).toLowerCase(), attrs[k]);
+      } else el.setAttribute(k, attrs[k]);
+    }
+    if (!Array.isArray(children)) children = [children];
+    children.forEach(c => {
+      if (typeof c === 'string') el.appendChild(document.createTextNode(c));
+      else if (c instanceof Node) el.appendChild(c);
+    });
+    return el;
+  }
+
+  /* ---------- Dashboard ---------- */
+  function renderDashboard() {
+    clearApp();
+
+    // title row with actions
+    const titleRow = createEl('div', { class: 'page-title' }, [
+      createEl('h1', {}, [t('dashboard')]),
+      createEl('div', { class: 'action-buttons' }, [
+        createEl('button', { class: 'btn btn-primary ripple-btn', onclick: () => openAddDepositModal() }, [t('addDeposit')]),
+        createEl('button', { class: 'btn btn-danger ripple-btn', onclick: () => openAddExpenseModal() }, [t('addExpense')])
+      ])
+    ]);
+    app.appendChild(titleRow);
+
+    // compute totals
+    const deposits = state.deposits || [];
+    const expenses = state.expenses || [];
+
+    const totalDeposit = deposits.reduce((s, d) => s + Number(d.amount||0), 0);
+    const totalSpent = expenses.reduce((s, e) => s + Number(e.amount||0), 0);
+    const totalSavings = totalDeposit - totalSpent;
+
+    // last 7 days
+    const now = Date.now();
+    const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+    const deposits7 = deposits.filter(d => new Date(d.date).getTime() >= sevenDaysAgo);
+    const expenses7 = expenses.filter(e => new Date(e.date).getTime() >= sevenDaysAgo);
+    const totalDeposit7 = deposits7.reduce((s, d) => s + Number(d.amount||0), 0);
+    const totalSpent7 = expenses7.reduce((s, e) => s + Number(e.amount||0), 0);
+
+    // summary grid
+    const summaryGrid = createEl('div', { class: 'summary-grid' }, [
+      createEl('div', { class: 'card summary-card' }, [
+        createEl('div', { class: 'summary-value' }, [ t('totalSavings') + ': ' + formatCurrency(totalSavings) ]),
+        createEl('div', { class: 'muted mt-1' }, [ t('totalDeposit') + ': ' + formatCurrency(totalDeposit) ])
+      ]),
+      createEl('div', { class: 'card summary-card' }, [
+        createEl('div', { class: 'summary-value' }, [ t('totalDeposits') + ': ' + formatCurrency(totalDeposit) ]),
+        createEl('div', { class: 'muted mt-1' }, [ t('last7DaysDeposits') + ': ' + formatCurrency(totalDeposit7) ])
+      ]),
+      createEl('div', { class: 'card summary-card' }, [
+        createEl('div', { class: 'summary-value' }, [ t('totalExpenses') + ': ' + formatCurrency(totalSpent) ]),
+        createEl('div', { class: 'muted mt-1' }, [ t('last7DaysExpenses') + ': ' + formatCurrency(totalSpent7) ])
+      ])
+    ]);
+    app.appendChild(summaryGrid);
+
+    // deposits section
+    const depositsSection = createEl('div', { class: 'section-card card mt-1' }, [
+      createEl('div', { class: 'section-title' }, [ createEl('strong', {}, [ t('deposits') ]) ]),
+      createEl('div', {}, [ renderDepositsTable(deposits) ])
+    ]);
+    app.appendChild(depositsSection);
+
+    // expenses section
+    const expensesSection = createEl('div', { class: 'section-card card mt-1' }, [
+      createEl('div', { class: 'section-title' }, [ createEl('strong', {}, [ t('expenses') ]) ]),
+      createEl('div', {}, [ renderExpensesTable(expenses) ])
+    ]);
+    app.appendChild(expensesSection);
+  }
+
+  function renderDepositsTable(items) {
+    if (!items || items.length === 0) {
+      return createEl('div', { class: 'muted' }, [ t('noData') ]);
+    }
+    const table = createEl('table', { class: 'table' });
+    const thead = createEl('thead', {}, [
+      createEl('tr', {}, [
+        createEl('th', {}, [t('name')]),
+        createEl('th', {}, [t('amount')]),
+        createEl('th', {}, [t('date')]),
+        createEl('th', {}, [t('action')]),
+      ])
+    ]);
+    table.appendChild(thead);
+    const tbody = createEl('tbody');
+    items.slice().reverse().forEach((d, idx) => {
+      const tr = createEl('tr', {}, [
+        createEl('td', {}, [ d.name || '' ]),
+        createEl('td', {}, [ formatCurrency(Number(d.amount||0)) ]),
+        createEl('td', {}, [ fmtDateDisplay(d.date) ]),
+        createEl('td', {}, [ createEl('button', { class: 'btn btn-sm btn-danger ripple-btn', onclick: () => deleteDeposit(d.id) }, [t('delete')]) ])
+      ]);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    return table;
+  }
+
+  function renderExpensesTable(items) {
+    if (!items || items.length === 0) {
+      return createEl('div', { class: 'muted' }, [ t('noData') ]);
+    }
+    const table = createEl('table', { class: 'table' });
+    const thead = createEl('thead', {}, [
+      createEl('tr', {}, [
+        createEl('th', {}, [t('name')]),
+        createEl('th', {}, [t('amount')]),
+        createEl('th', {}, [t('date')]),
+        createEl('th', {}, [t('action')]),
+      ])
+    ]);
+    table.appendChild(thead);
+    const tbody = createEl('tbody');
+    items.slice().reverse().forEach((d) => {
+      const tr = createEl('tr', {}, [
+        createEl('td', {}, [ d.name || '' ]),
+        createEl('td', {}, [ formatCurrency(Number(d.amount||0)) ]),
+        createEl('td', {}, [ fmtDateDisplay(d.date) ]),
+        createEl('td', {}, [ createEl('button', { class: 'btn btn-sm btn-danger ripple-btn', onclick: () => deleteExpense(d.id) }, [t('delete')]) ])
+      ]);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    return table;
+  }
+
+  /* ---------- Deposit Page ---------- */
+  function renderDepositPage() {
+    clearApp();
+    const titleRow = createEl('div', { class: 'page-title' }, [
+      createEl('h1', {}, [ t('deposits') ]),
+      createEl('div', { class: 'action-buttons' }, [
+        createEl('button', { class: 'btn btn-primary ripple-btn', onclick: () => openAddDepositModal() }, [ t('addNewDeposit') ])
+      ])
+    ]);
+    app.appendChild(titleRow);
+
+    const depositsSection = createEl('div', { class: 'section-card card mt-1' }, [
+      createEl('div', { class: 'section-title' }, [ createEl('strong', {}, [ t('deposits') ]) ]),
+      renderDepositsTable(state.deposits)
+    ]);
+    app.appendChild(depositsSection);
+  }
+
+  /* ---------- Expense Page ---------- */
+  function renderExpensePage() {
+    clearApp();
+    const titleRow = createEl('div', { class: 'page-title' }, [
+      createEl('h1', {}, [ t('expenses') ]),
+      createEl('div', { class: 'action-buttons' }, [
+        createEl('button', { class: 'btn btn-danger ripple-btn', onclick: () => openAddExpenseModal() }, [ t('addNewExpense') ])
+      ])
+    ]);
+    app.appendChild(titleRow);
+
+    const expensesSection = createEl('div', { class: 'section-card card mt-1' }, [
+      createEl('div', { class: 'section-title' }, [ createEl('strong', {}, [ t('expenses') ]) ]),
+      renderExpensesTable(state.expenses)
+    ]);
+    app.appendChild(expensesSection);
+  }
+
+  /* ---------- Add Deposit / Expense Modals ---------- */
+  function openAddDepositModal(prefill = {}) {
+    const overlay = createModal();
+    overlay.classList.add('card');
+    overlay.innerHTML = `
+      <div class="modal-header">
+        <h3>${t('addNewDeposit')}</h3>
+        <button class="modal-close" data-close>&times;</button>
+      </div>
+      <div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>${t('personName')}</label>
+            <input id="deposit-name" class="input" value="${escapeHtml(prefill.name||'')}" />
+          </div>
+          <div class="form-group">
+            <label>${t('depositAmount')}</label>
+            <input id="deposit-amount" type="number" class="input" value="${escapeHtml(prefill.amount||'')}" />
+          </div>
+          <div class="form-group">
+            <label>${t('depositDate')}</label>
+            <input id="deposit-date" type="date" class="input" value="${fmtDateInput(prefill.date||new Date().toISOString())}" />
+          </div>
+        </div>
+        <div class="mt-1 modal-actions">
+          <button id="deposit-submit" class="btn btn-primary">${t('submit')}</button>
+          <button class="btn" data-close>${t('close')}</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.querySelector('[data-close]').addEventListener('click', () => overlay.remove());
+    overlay.querySelector('#deposit-submit').addEventListener('click', () => {
+      const name = $('#deposit-name', overlay).value.trim() || t('other');
+      const amount = parseFloat($('#deposit-amount', overlay).value) || 0;
+      const date = $('#deposit-date', overlay).value || new Date().toISOString();
+      const newItem = { id: generateId(), name, amount, date };
+      state.deposits.push(newItem);
+      saveDeposits(state.deposits);
+      overlay.remove();
+      renderAll();
+      // keep user on deposit page
+      location.hash = '#/deposit';
+    });
+  }
+
+  function openAddExpenseModal(prefill = {}) {
+    const overlay = createModal();
+    overlay.classList.add('card');
+    overlay.innerHTML = `
+      <div class="modal-header">
+        <h3>${t('addNewExpense')}</h3>
+        <button class="modal-close" data-close>&times;</button>
+      </div>
+      <div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>${t('whoSpent')}</label>
+            <input id="expense-name" class="input" value="${escapeHtml(prefill.name||'')}" />
+          </div>
+          <div class="form-group">
+            <label>${t('spentAmount')}</label>
+            <input id="expense-amount" type="number" class="input" value="${escapeHtml(prefill.amount||'')}" />
+          </div>
+          <div class="form-group">
+            <label>${t('spentDate')}</label>
+            <input id="expense-date" type="date" class="input" value="${fmtDateInput(prefill.date||new Date().toISOString())}" />
+          </div>
+        </div>
+        <div class="mt-1 modal-actions">
+          <button id="expense-submit" class="btn btn-primary">${t('submit')}</button>
+          <button class="btn" data-close>${t('close')}</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.querySelector('[data-close]').addEventListener('click', () => overlay.remove());
+    overlay.querySelector('#expense-submit').addEventListener('click', () => {
+      const name = $('#expense-name', overlay).value.trim() || t('other');
+      const amount = parseFloat($('#expense-amount', overlay).value) || 0;
+      const date = $('#expense-date', overlay).value || new Date().toISOString();
+      const newItem = { id: generateId(), name, amount, date };
+      state.expenses.push(newItem);
+      saveExpenses(state.expenses);
+      overlay.remove();
+      renderAll();
+      location.hash = '#/expense';
+    });
+  }
+
+  /* ---------- Modal API ---------- */
+  function createModal() {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    const inner = document.createElement('div');
+    inner.className = 'modal';
+    overlay.appendChild(inner);
+    // click outside to close
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+    document.body.appendChild(overlay);
+    return inner;
+  }
+
+  /* ---------- Delete functions ---------- */
+  function deleteDeposit(id) {
+    if (!confirm(t('delete') + '?')) return;
+    state.deposits = state.deposits.filter(d => d.id !== id);
+    saveDeposits(state.deposits);
+    renderAll();
+  }
+  function deleteExpense(id) {
+    if (!confirm(t('delete') + '?')) return;
+    state.expenses = state.expenses.filter(e => e.id !== id);
+    saveExpenses(state.expenses);
+    renderAll();
+  }
+
+  /* ---------- Helpers ---------- */
+  function formatCurrency(v) {
+    const num = Number(v || 0);
+    if (Number.isNaN(num)) return '0';
+    // show in local style, but short:
+    try {
+      const lang = getLang() === 'bn' ? 'bn-BD' : 'en-US';
+      return new Intl.NumberFormat(lang, { style:'currency', currency:'USD', maximumFractionDigits:2 }).format(num);
+    } catch(e) {
+      return num.toFixed(2);
+    }
+  }
+  function generateId() { return 'id-' + Math.random().toString(36).slice(2,9); }
+  function escapeHtml(s='') { return (''+s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+  /* ---------- Language selection full-page (when no lang chosen) ---------- */
+  function renderLanguageSelection() {
+    clearApp();
+    const langCard = createEl('div', { class: 'lang-card card text-center' }, [
+      createEl('h2', {}, [ t('selectLanguage') || translations['en'].selectLanguage ]),
+      createEl('div', { style: 'margin-top:1rem; display:flex; gap:1rem; justify-content:center;' }, [
+        createEl('button', { class: 'btn btn-primary ripple-btn', onclick: () => { setLang('en'); location.hash = '#/'; } }, [ translations['en'].english ]),
+        createEl('button', { class: 'btn ripple-btn', onclick: () => { setLang('bn'); location.hash = '#/'; } }, [ translations['bn'].bengali ])
+      ]),
+      createEl('p', { class: 'muted mt-1' }, ['(You can change later with the globe button)'])
+    ]);
+    app.appendChild(createEl('div', { style:'display:flex;align-items:center;justify-content:center;height:60vh' }, [langCard]));
+  }
+
+  /* ---------- Render wrapper ---------- */
+  function renderAll() {
+    // update nav labels and bottom-nav
+    $('#nav-home .nav-label').textContent = t('dashboard');
+    $('#nav-deposit .nav-label').textContent = t('deposits');
+    $('#nav-expense .nav-label').textContent = t('expenses');
+
+    // header title
+    $('#app-title').textContent = t('hisabkhata');
+
+    // if no lang selection, show lang page
+    if (!state.lang) {
+      renderLanguageSelection();
+      return;
+    }
+
+    // reroute current view
+    route();
+  }
+
+  /* ---------- Initial setup ---------- */
+  // On initial load, if no lang stored -> show language page
+  window.addEventListener('hashchange', route);
+  window.addEventListener('popstate', route);
+
+  // wire up language open button ripple (already handled by delegated click)
+  // wire up nav label translations done in renderAll
+
+  // initialize state.lang from localStorage
+  state.lang = getLang();
+
+  // initialize deposits & expenses arrays (ensure numeric amounts)
+  state.deposits = (loadDeposits() || []).map(d => ({ ...d, amount: Number(d.amount || 0) }));
+  state.expenses = (loadExpenses() || []).map(e => ({ ...e, amount: Number(e.amount || 0) }));
+
+  // initial render
+  renderAll();
+
+  // make sure clicking bottom nav anchors updates hash and closes modals if any
+  $$('#bottom-nav a').forEach(a => {
+    a.addEventListener('click', (ev) => {
+      // allow default hash change; avoid full page reload
+      // (anchors already have href="#/...")
+      // close modals if open
+      $$('.modal-overlay').forEach(m => m.remove());
+      $$('#lang-modal').forEach && $$('#lang-modal').forEach(m => m.classList.add('hidden'));
+    });
+  });
+
+  /* End of file */
+  </script>
+</body>
+</html>
