@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HisabKhata</title>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; line-height: 1.5; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --primary: #4361ee;
+  --success: #10b981;
+  --danger: #ef4444;
+  --dark: #1e293b;
+  --lightdark: #424547;
+  --light: #f8fafc;
+  --gray: #e2e8f0;
+  --border: #cbd5e1;
+  --bg-gradient: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+body { font-family: 'Inter', 'Noto Sans Bengali', sans-serif; background: var(--bg-gradient); color: var(--dark); min-height: 100vh; font-size: 16px; }
+body.no-scroll { overflow: hidden; }
+.hidden { display: none !important; }
+
+/* Layout & Cards */
+.container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+.card { background: #fff; border-radius: 1rem; padding: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--gray); margin-bottom: 1rem; transition: transform 0.2s, box-shadow 0.2s; }
+.summary-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+/* Buttons Generic */
+.btn { padding: 0.75rem 1.5rem; border: none; border-radius: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 1rem; text-decoration: none; box-shadow: var(--shadow-sm); }
+.btn-primary { background: var(--primary); color: white; }
+.btn-success { background: var(--success); color: white; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-warning { background: #f59e0b; color: white; }
+.btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+.btn-empty { background: transparent; color: var(--primary); box-shadow: none; }
+
+/* New Hover State */
+.btn:hover:not(.btn-empty) { filter: brightness(1.1); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); }
+
+.btn-round { width: 40px; height: 40px; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; box-shadow: none; }
+.btn-context { width: 100%; border: none; background: transparent; padding: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; text-align: left; font-size: 1rem; color: var(--lightdark); border-radius: 8px; transition: background 0.1s; }
+.btn-context:hover { background: var(--gray); }
+
+/* FEEDBACK 1: Standard Button Click Effect (Scale) */
+.btn-effect:active {
+    transform: scale(0.98);
+    filter: brightness(0.95);
+    transition: transform 0.05s ease-out;
+}
+
+/* FEEDBACK 2: Icon/Context Button Click Effect (Background + Subtle Scale) */
+.icon-effect:active {
+    background-color: rgba(0,0,0,0.05);
+    transform: scale(0.95);
+    transition: all 0.05s ease-out;
+}
+/* Ensure rounded buttons keep their shape on active */
+.btn-round.icon-effect:active { border-radius: 50%; }
+
+/* Inputs */
+.input, .select { padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 0.75rem; font-size: 1rem; width: 100%; margin-top: 5px; margin-bottom: 10px; display: block; background: var(--light); transition: border-color 0.2s, box-shadow 0.2s; }
+.input:focus, .select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1); }
+.label { font-size: 0.9rem; font-weight: 600; margin-top: 10px; display: block; color: #64748b; }
+
+/* Tables */
+.table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 1rem; font-size: 0.9rem; }
+.table th { background: var(--gray); padding: 0.75rem; text-align: left; font-weight: 600; border-bottom: 2px solid var(--border); white-space: nowrap; color: var(--dark); }
+.table td { padding: 0.75rem; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.table tr:nth-child(even) { background: #fdfdfe; } /* Light striping for better readability */
+.table tr:hover { background: rgba(67, 97, 238, 0.05); }
+
+/* Modals */
+.modal-overlay, .lang-modal, .more-menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; backdrop-filter: blur(3px); animation: fadeIn 0.3s; }
+.lang-modal { background: var(--bg-gradient); backdrop-filter: none; }
+.more-menu-overlay { justify-content: flex-end; background: transparent; align-items: flex-start; backdrop-filter: none; }
+.modal { background: white; border-radius: 1rem; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 1.5rem; box-shadow: var(--shadow-lg); animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.lang-card { background: white; border-radius: 1rem; padding: 2rem; width: 100%; max-width: 400px; text-align: center; box-shadow: var(--shadow-lg); animation: fadeIn 0.3s; }
+.more-menu { margin: 45px 15px 0 0; width: 220px; background: white; border-radius: 12px; box-shadow: var(--shadow-lg); padding: 5px; animation: scaleIn 0.2s ease-out; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+.modal-header h2 { font-size: 1.5rem; }
+.modal-close { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 5px; border-radius: 50%; }
+.modal-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+.modal-actions .btn { flex: 1; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0.5; } to { transform: translateY(0); opacity: 1; } }
+@keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* Tabs */
+.tabs { display: flex; overflow-x: auto; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 0.5rem; }
+.tab { padding: 0.6rem 1.25rem; border-radius: 0.75rem; white-space: nowrap; background: var(--gray); color: var(--lightdark); cursor: pointer; font-weight: 500; transition: background 0.2s, color 0.2s; }
+.tab.active { background: var(--primary); color: white; box-shadow: var(--shadow-sm); }
+
+/* Header & Nav */
+.header { background: white; box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 999; padding: 0.75rem 1rem; height: 60px; display: flex; align-items: center; width: 100%; transition: height 0.2s; }
+.header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
+.header-title { font-size: 1.3rem; color: var(--primary); font-weight: 700; margin: 0; }
+
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(3, 1fr); z-index: 1000; height: 70px; align-items: center; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
+.nav-item { text-align: center; color: #64748b; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; font-size: 0.8rem; padding: 5px 0; transition: color 0.2s; }
+.nav-item.active { color: var(--primary); font-weight: 700; }
+.nav-icon { display: flex; align-items: center; justify-content: center; margin-bottom: 2px; transition: background 0.2s; }
+.nav-item.active .nav-icon { background: rgba(67,97,238,0.1); border-radius: 25px; padding: 4px 18px; }
+
+/* Dashboard Specific */
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+.summary-grid > *:first-child { grid-column: 1 / 1; }
+.summary-card { text-align: center; cursor: pointer; }
+.summary-icon { margin: 0 auto 0.75rem; display: block; }
+.summary-value { font-size: 1.5rem; font-weight: 700; margin-top: 0.5rem; }
+.action-buttons { display: flex; gap: 1rem; justify-content: center; margin-bottom: 1.5rem; }
+.page-title { display: flex; align-items: center; justify-content: space-between; margin: 1.5rem 0 1rem 0; }
+.page-title h1 { display: flex; gap: 0.75rem; font-size: 1.5rem; font-weight: 700; }
+.section-title { display: flex; align-items: center; gap: 0.5rem; font-size: 1.2rem; margin-bottom: 1rem; font-weight: 600; }
+
+/* Settings Buttons */
+.settings-btn { width: 100%; justify-content: flex-start; margin-bottom: 10px; }
+
+/* Progress Spinner */
+.progress-spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* Mobile */
+@media (max-width: 768px) {
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    .summary-grid > *:first-child { grid-column: 1 / -1; }
+    .page-title h1 { font-size: 1.4rem; }
+    .action-buttons { flex-direction: column; }
+    .btn { width: 100%; }
+}
+
+/* Toast */
+.notification { position: fixed; top: 20px; right: 10px; padding: 14px 24px; border-radius: 10px; color: #fff; font-weight: 600; z-index: 99999; animation: slideIn 0.3s; box-shadow: var(--shadow-lg); }
+.notification.success { background: var(--success); }
+.notification.error { background: var(--danger); }
+.notification.info { background: var(--primary); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <header id="main-header" class="header">
+        <div class="header-content">
+            <h1 class="header-title" data-i18n="hisabkhata">HisabKhata</h1>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-round btn-empty icon-effect" onclick="toggleLangModal()">
+                    <i data-lucide="globe" width="20"></i>
+                </button>
+                <button class="btn-round btn-empty icon-effect" onclick="toggleMoreMenu()">
+                    <i data-lucide="more-vertical" width="20"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding-bottom: 6rem; padding-top: 1rem;">
+        
+        <div id="view-dashboard" class="view-section active">
+            <div class="page-title">
+                <h1><i data-lucide="wallet" style="color: var(--primary)"></i> <span data-i18n="dashboard">Dashboard</span></h1>
+            </div>
+
+            <div class="summary-grid">
+                <div class="card summary-card btn-effect">
+                    <i data-lucide="wallet" class="summary-icon" style="color: var(--primary)"></i>
+                    <h3 data-i18n="totalSavings">Total Savings</h3>
+                    <p id="dash-savings" class="summary-value">₹0.00</p>
+                </div>
+                <div class="card summary-card btn-effect">
+                    <i data-lucide="trending-up" class="summary-icon" style="color: var(--success)"></i>
+                    <h3 data-i18n="totalDeposits">Total Deposits</h3>
+                    <p id="dash-deposits" class="summary-value" style="color: var(--success)">₹0.00</p>
+                </div>
+                <div class="card summary-card btn-effect">
+                    <i data-lucide="trending-down" class="summary-icon" style="color: var(--danger)"></i>
+                    <h3 data-i18n="totalExpenses">Total Expenses</h3>
+                    <p id="dash-expenses" class="summary-value" style="color: var(--danger)">₹0.00</p>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button onclick="router('deposit')" class="btn btn-success btn-effect">
+                    <i data-lucide="plus" width="20"></i> <span data-i18n="addDeposit">Deposit</span>
+                </button>
+                <button onclick="router('expense')" class="btn btn-danger btn-effect">
+                    <i data-lucide="plus" width="20"></i> <span data-i18n="addExpense">Expense</span>
+                </button>
+            </div>
+
+            <div class="section-card card">
+                <h2 class="section-title"><i data-lucide="arrow-up-right" style="color: var(--success)"></i> <span data-i18n="last7DaysDeposits">Recent Deposits</span></h2>
+                <div id="dash-recent-deposits" style="overflow-x: auto;"></div>
+            </div>
+
+            <div class="section-card card">
+                <h2 class="section-title"><i data-lucide="arrow-down-right" style="color: var(--danger)"></i> <span data-i18n="last7DaysExpenses">Recent Expenses</span></h2>
+                <div id="dash-recent-expenses" style="overflow-x: auto;"></div>
+            </div>
+        </div>
+
+        <div id="view-deposit" class="view-section hidden">
+            <div class="page-title">
+                <h1><i data-lucide="arrow-up-right" style="color: var(--success)"></i> <span data-i18n="deposits">Deposits</span></h1>
+                <button onclick="openDepositModal()" class="btn btn-success btn-effect">
+                    <i data-lucide="plus" width="20"></i> <span data-i18n="addNewDeposit">Add New</span>
+                </button>
+            </div>
+            
+            <div class="card" style="margin-bottom: 1rem; text-align: center;">
+                <h3 data-i18n="totalDeposit">Total Deposit</h3>
+                <p id="dep-total" class="summary-value" style="color: var(--success)">₹0.00</p>
+            </div>
+
+            <div id="deposit-tabs" class="tabs"></div>
+
+            <div class="card">
+                <div id="deposit-list" style="overflow-x: auto;"></div>
+            </div>
+        </div>
+
+        <div id="view-expense" class="view-section hidden">
+            <div class="page-title">
+                <h1><i data-lucide="arrow-down-right" style="color: var(--danger)"></i> <span data-i18n="expenses">Expenses</span></h1>
+                <button onclick="openModal('modal-add-expense')" class="btn btn-danger btn-effect">
+                    <i data-lucide="plus" width="20"></i> <span data-i18n="addNewExpense">Add New</span>
+                </button>
+            </div>
+
+            <div class="card" style="margin-bottom: 1rem; text-align: center;">
+                <h3 data-i18n="totalSpent">Total Spent</h3>
+                <p id="exp-total" class="summary-value" style="color: var(--danger)">₹0.00</p>
+            </div>
+
+            <div class="card">
+                <div id="expense-list" style="overflow-x: auto;"></div>
+            </div>
+        </div>
+
+        <div id="view-settings" class="view-section hidden">
+            <div class="page-title">
+                <h1><i data-lucide="settings"></i> <span data-i18n="settings">Settings</span></h1>
+            </div>
+
+            <div class="card settings-card">
+                <h3 style="margin-bottom: 1rem;">GitHub Sync</h3>
+                <input type="text" id="git-user" class="input" placeholder="GitHub Username">
+                <input type="text" id="git-repo" class="input" placeholder="Repository Name">
+                <input type="text" id="git-file" class="input" placeholder="File Path (e.g., data.json)">
+                <input type="text" id="git-branch" class="input" placeholder="Branch (e.g., main)">
+                <input type="password" id="git-token" class="input" placeholder="GitHub Token (ghp_...)">
+                
+                <button onclick="saveGitSettings()" class="btn btn-success btn-effect settings-btn" style="margin-top: 10px;">
+                    <i data-lucide="save" width="18"></i> <span data-i18n="saveSettings">Save Settings</span>
+                </button>
+
+                <div class="sync-buttons" style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button onclick="syncToGithub()" class="btn btn-warning btn-effect settings-btn" style="flex: 1;">
+                        <i data-lucide="upload" width="18"></i> <span data-i18n="syncNow">Sync To GitHub</span>
+                    </button>
+                    <button onclick="syncFromGithub()" class="btn btn-danger btn-effect settings-btn" style="flex: 1;">
+                        <i data-lucide="download" width="18"></i> <span data-i18n="syncNow">Sync From GitHub</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card settings-card" style="margin-top: 15px;">
+                <h3 style="margin-bottom: 1rem;">Export PDF</h3> <div style="display: flex; gap: 10px; flex-direction: column;">
+                    <button onclick="generatePDF('deposit')" class="btn btn-primary btn-effect settings-btn">
+                        <i data-lucide="file-down" width="18"></i> <span data-i18n="exportDepositPdf">Export Deposit PDF</span>
+                    </button>
+                    <button onclick="generatePDF('expense')" class="btn btn-primary btn-effect settings-btn">
+                        <i data-lucide="file-down" width="18"></i> <span data-i18n="exportExpensePdf">Export Expense PDF</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card settings-card" style="margin-top: 15px;">
+                <h3 style="margin-bottom: 1rem;">PDF Options</h3>
+                
+                <label class="label">Table Striping</label>
+                <select class="select" id="pdfStrip"><option value="yes">Enabled</option><option value="no">Disabled</option></select>
+
+                <label class="label">Header Color</label>
+                <input type="color" class="input" id="pdfHeaderColor" value="#1d84ff" style="height: 50px; padding: 5px;">
+
+                <label class="label">Page Orientation</label>
+                <select class="select" id="pdfOrient"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select>
+
+                <label class="label">Watermark</label>
+                <input type="text" class="input" id="pdfWatermark" placeholder="Confidential">
+                
+                <label class="label">Show Total Row</label>
+                <select class="select" id="pdfTotal"><option value="yes">Show</option><option value="no">Hide</option></select>
+            </div>
+
+            <div class="card settings-card" style="margin-top: 15px;">
+                <h3 style="margin-bottom: 1rem;">Backup & Restore</h3> <div style="display: flex; gap: 10px; flex-direction: column;">
+                    <button onclick="exportBackup()" class="btn btn-success btn-effect settings-btn">
+                        <i data-lucide="file-down" width="18"></i> <span data-i18n="exportBackup">Export Backup JSON</span>
+                    </button>
+                    <button onclick="importBackup()" class="btn btn-danger btn-effect settings-btn">
+                        <i data-lucide="upload" width="18"></i> <span data-i18n="importBackup">Import Backup JSON</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card settings-card" style="margin-top: 15px;">
+                 <h3 style="margin-bottom: 1rem;">Danger Zone</h3>
+                 <button onclick="confirmClearData()" class="btn btn-danger btn-effect" style="width: 100%;" data-i18n="resetAllData">Reset All Data</button>
+            </div>
+        </div>
+
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="#" onclick="router('dashboard')" class="nav-item active icon-effect" id="nav-dashboard">
+            <div class="nav-icon"><i data-lucide="home"></i></div>
+            <div class="nav-label" data-i18n="dashboard">Dashboard</div>
+        </a>
+        <a href="#" onclick="router('deposit')" class="nav-item icon-effect" id="nav-deposit">
+            <div class="nav-icon"><i data-lucide="arrow-up-right"></i></div>
+            <div class="nav-label" data-i18n="deposits">Deposits</div>
+        </a>
+        <a href="#" onclick="router('expense')" class="nav-item icon-effect" id="nav-expense">
+            <div class="nav-icon"><i data-lucide="arrow-down-right"></i></div>
+            <div class="nav-label" data-i18n="expenses">Expenses</div>
+        </a>
+    </nav>
+
+    <div id="modal-alert" class="modal-overlay hidden" style="z-index: 2000;">
+        <div class="modal" style="max-width: 320px; text-align: center;">
+            <div style="margin-bottom: 1rem;">
+                <i data-lucide="alert-circle" id="alert-icon" style="color: var(--primary); width: 40px; height: 40px;"></i>
+            </div>
+            <h3 id="alert-message" style="margin-bottom: 1.5rem; color: #333;">Message</h3>
+            
+            <div id="alert-actions-ok" class="hidden">
+                <button onclick="closeAlert()" class="btn btn-primary btn-effect" style="width: 100%;">OK</button>
+            </div>
+
+            <div id="alert-actions-confirm" class="hidden" style="display: flex; gap: 10px;">
+                <button id="btn-confirm-yes" class="btn btn-danger btn-effect" style="flex: 1;">Yes</button>
+                <button onclick="closeAlert()" class="btn btn-success btn-effect" style="flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-progress" class="modal-overlay hidden">
+        <div class="modal" style="text-align: center; max-width: 300px;">
+            <div class="progress-spinner"></div>
+            <h3 id="progress-msg" style="margin: 1rem 0;">Processing...</h3>
+            <p>Please wait...</p>
+        </div>
+    </div>
+
+    <div id="modal-lang" class="lang-modal hidden">
+        <div class="lang-card">
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+                <button class="modal-close btn-round btn-empty icon-effect" onclick="toggleLangModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <i data-lucide="globe" style="margin: 0 auto 1.5rem; color: var(--primary); width: 48px; height: 48px;"></i>
+            <h2 style="margin-bottom: 1.5rem" data-i18n="selectLanguage">Select Language</h2>
+            <div style="display: flex; flexDirection: column; gap: 1rem;">
+                <button onclick="changeLang('en')" class="btn btn-primary btn-effect" data-i18n="english">English</button>
+                <button onclick="changeLang('bn')" class="btn btn-success btn-effect" data-i18n="bengali">Bengali</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="menu-more" class="more-menu-overlay hidden" onclick="toggleMoreMenu()">
+        <div class="more-menu" onclick="event.stopPropagation()">
+            <button class="more-item btn-context icon-effect" onclick="router('settings'); toggleMoreMenu();">
+                <i data-lucide="settings" width="20"></i> <span data-i18n="settings">Settings</span>
+            </button>
+            <button class="more-close btn-context icon-effect" onclick="toggleMoreMenu()" data-i18n="close">Close</button>
+        </div>
+    </div>
+
+    <div id="modal-add-deposit" class="modal-overlay hidden">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 data-i18n="addNewDeposit">Add Deposit</h2>
+                <button class="modal-close icon-effect" onclick="closeModal('modal-add-deposit')"><i data-lucide="x"></i></button>
+            </div>
+            <form id="form-deposit">
+                <div class="form-group">
+                    <label data-i18n="personName">Person Name</label>
+                    <select id="dep-person-select" class="select" required onchange="handlePersonSelect(this)">
+                        </select>
+                </div>
+                <div id="div-new-person" class="form-group hidden">
+                    <label data-i18n="enterNewPerson">Enter New Person</label>
+                    <input type="text" id="dep-person-input" class="input">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="business">Business</label>
+                    <select id="dep-business-select" class="select" required onchange="handleBusinessSelect(this)">
+                        <option value="" data-i18n="select">Select</option>
+                        <option value="khejurLabat" data-i18n="khejurLabat">Khejur Labat</option>
+                        <option value="talLabat" data-i18n="talLabat">Tal Labat</option>
+                        <option value="morabba" data-i18n="morabba">Morabba</option>
+                        <option value="other" data-i18n="other">Other</option>
+                    </select>
+                </div>
+                <div id="div-custom-business" class="form-group hidden">
+                    <label data-i18n="customBusiness">Custom Business</label>
+                    <input type="text" id="dep-business-custom" class="input">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="date">Date</label>
+                    <input type="date" id="dep-date" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="amount">Amount</label>
+                    <input type="number" step="0.01" id="dep-amount" class="input" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-success btn-effect" data-i18n="submit">Submit</button>
+                    <button type="button" onclick="closeModal('modal-add-deposit')" class="btn btn-danger btn-effect" data-i18n="close">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-add-expense" class="modal-overlay hidden">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 data-i18n="addNewExpense">Add Expense</h2>
+                <button class="modal-close icon-effect" onclick="closeModal('modal-add-expense')"><i data-lucide="x"></i></button>
+            </div>
+            <form id="form-expense">
+                <div class="form-group">
+                    <label data-i18n="whoSpent">Who Spent?</label>
+                    <input type="text" id="exp-who" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="date">Date</label>
+                    <input type="date" id="exp-date" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="amount">Amount</label>
+                    <input type="number" step="0.01" id="exp-amount" class="input" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-danger btn-effect" data-i18n="submit">Submit</button>
+                    <button type="button" onclick="closeModal('modal-add-expense')" class="btn btn-success btn-effect" data-i18n="close">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="notification hidden"></div>
+
+    <script>
+        // --- DATA & TRANSLATIONS ---
+const translations = {
+    en: {
+        hisabkhata: "HisabKhata", dashboard: "Dashboard", deposits: "Deposits", expenses: "Expenses",
+        totalSavings: "Total Savings", totalDeposits: "Total Deposits", totalExpenses: "Total Expenses",
+        addDeposit: "Deposit", addExpense: "Expense", last7DaysDeposits: "Recent Deposits",
+        last7DaysExpenses: "Recent Expenses", noData: "No Data Available",
+        personName: "Person Name", date: "Date", amount: "Amount", business: "Business",
+        whoSpent: "Who Spent", action: "Action", addNewDeposit: "Add New Deposit",
+        addNewExpense: "Add New Expense", select: "Select", enterNewPerson: "Enter New Person Name",
+        customBusiness: "Custom Business", depositDate: "Deposit Date", depositAmount: "Deposit Amount",
+        spentDate: "Spent Date", spent Amount: "Spent Amount", submit: "Submit", close: "Close",
+        settings: "Settings", selectLanguage: "Select Language", english: "English", bengali: "বাংলা",
+        delete: "Delete", confirmDelete: "Are you sure you want to delete this transaction?", totalDeposit: "Total Deposit", totalSpent: "Total Spent",
+        khejurLabat: "Khejur Labat", talLabat: "Tal Labat", morabba: "Morabba", other: "Other",
+        saveSettings: "Save Settings", syncNow: "Sync Now", syncFailed: "Sync Failed",
+        resetConfirm: "Delete EVERYTHING? This cannot be undone.",
+        // New UI texts
+        exportDepositPdf: "Export Deposit PDF", exportExpensePdf: "Export Expense PDF", backupRestore: "Backup & Restore",
+        exportBackup: "Export Backup JSON", importBackup: "Import Backup JSON", resetAllData: "Reset All Data"
+    },
+    bn: {
+        hisabkhata: "হিসাবখাতা", dashboard: "ড্যাশবোর্ড", deposits: "জমা", expenses: "খরচ",
+        totalSavings: "মোট সঞ্চয়", totalDeposits: "মোট জমা", totalExpenses: "মোট খরচ",
+        addDeposit: "জমা করুন", addExpense: "খরচ করুন", last7DaysDeposits: "সাম্প্রতিক জমা",
+        last7DaysExpenses: "সাম্প্রতিক খরচ", noData: "কোন তথ্য নেই",
+        personName: "নাম", date: "তারিখ", amount: "টাকা", business: "ব্যবসা",
+        whoSpent: "কে খরচ করেছে", action: "একশন", addNewDeposit: "নতুন জমা যোগ করুন",
+        addNewExpense: "নতুন খরচ যোগ করুন", select: "নির্বাচন করুন", enterNewPerson: "নতুন নাম লিখুন",
+        customBusiness: "অন্য ব্যবসা", depositDate: "জমার তারিখ", depositAmount: "জমার পরিমাণ",
+        spentDate: "খরচের তারিখ", spentAmount: "খরচের পরিমাণ", submit: "জমা দিন", close: "বন্ধ করুন",
+        settings: "সেটিংস", selectLanguage: "ভাষা নির্বাচন করুন", english: "English", bengali: "বাংলা",
+        delete: "মুছুন", confirmDelete: "আপনি কি নিশ্চিত যে আপনি এটি মুছতে চান?", totalDeposit: "সর্বমোট জমা", totalSpent: "সর্বমোট খরচ",
+        khejurLabat: "খেজুর লবাট", talLabat: "তাল লবাট", morabba: "মোরব্বা", other: "অন্যান্য",
+        saveSettings: "সেটিংস সংরক্ষণ", syncNow: "সিঙ্ক করুন", syncFailed: "সিঙ্ক ব্যর্থ হয়েছে",
+        resetConfirm: "সবকিছু মুছে ফেলবেন? এটি ফিরিয়ে আনা যাবে না।",
+        // New UI texts
+        exportDepositPdf: "জমা PDF এক্সপোর্ট", exportExpensePdf: "খরচ PDF এক্সপোর্ট", backupRestore: "ব্যাকআপ এবং রিস্টোর",
+        exportBackup: "ব্যাকআপ JSON এক্সপোর্ট", importBackup: "ব্যাকআপ JSON ইম্পোর্ট", resetAllData: "সমস্ত ডেটা রিসেট করুন"
+    }
+};
+
+// --- STATE MANAGEMENT ---
+let state = {
+    lang: localStorage.getItem('lang') || 'en',
+    deposits: JSON.parse(localStorage.getItem('deposits') || '[]'),
+    expenses: JSON.parse(localStorage.getItem('expenses') || '[]'),
+    activeDepositTab: ''
+};
+
+// --- INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    applyLanguage();
+    router('dashboard'); // Default route
+    
+    // Load Settings
+    document.getElementById('git-user').value = localStorage.getItem("gitUser") || "";
+    document.getElementById('git-repo').value = localStorage.getItem("gitRepo") || "";
+    document.getElementById('git-file').value = localStorage.getItem("gitFile") || "";
+    document.getElementById('git-branch').value = localStorage.getItem("gitBranch") || "main";
+    document.getElementById('git-token').value = localStorage.getItem("gitToken") || "";
+
+    // Set today's date on form inputs
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dep-date').value = today;
+    document.getElementById('exp-date').value = today;
+});
+
+// --- ROUTER ---
+function router(viewName) {
+    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active', 'hidden'));
+    document.querySelectorAll('.view-section:not(#view-dashboard):not(#view-deposit):not(#view-expense):not(#view-settings)').forEach(el => el.classList.add('hidden'));
+
+    const target = document.getElementById(`view-${viewName}`);
+    if (target) {
+        target.classList.remove('hidden');
+        target.classList.add('active');
+    }
+
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const navItem = document.getElementById(`nav-${viewName}`);
+    if (navItem) navItem.classList.add('active');
+
+    if (viewName === 'dashboard') renderDashboard();
+    if (viewName === 'deposit') renderDeposits();
+    if (viewName === 'expense') renderExpenses();
+    
+    window.scrollTo(0, 0);
+}
+
+// --- RENDERING LOGIC ---
+function renderDashboard() {
+    const totalDep = state.deposits.reduce((sum, d) => sum + d.amount, 0);
+    const totalExp = state.expenses.reduce((sum, e) => sum + e.amount, 0);
+    const savings = totalDep - totalExp;
+
+    document.getElementById('dash-savings').innerText = `₹${Math.abs(savings).toFixed(2)}`;
+    document.getElementById('dash-savings').style.color = savings >= 0 ? 'var(--success)' : 'var(--danger)';
+    document.getElementById('dash-deposits').innerText = `₹${totalDep.toFixed(2)}`;
+    document.getElementById('dash-expenses').innerText = `₹${totalExp.toFixed(2)}`;
+
+    // Sort by date and get last 7
+    const recentDeps = [...state.deposits].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 7);
+    renderTable('dash-recent-deposits', recentDeps, ['person', 'date', 'amount', 'business'], false, 'deposit');
+    
+    const recentExps = [...state.expenses].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 7);
+    renderTable('dash-recent-expenses', recentExps, ['who', 'date', 'amount'], false, 'expense');
+}
+
+function renderDeposits() {
+    const people = [...new Set(state.deposits.map(d => d.person))].sort(); // Sort people alphabetically
+    const tabsContainer = document.getElementById('deposit-tabs');
+    const t = translations[state.lang];
+
+    // Ensure 'All' tab is always present
+    let tabsHtml = `<div class="tab ${state.activeDepositTab === '' ? 'active' : ''} btn-effect" onclick="filterDeposits('')">${t.select}</div>`;
+
+    people.forEach(p => {
+        tabsHtml += `<div class="tab ${state.activeDepositTab === p ? 'active' : ''} btn-effect" onclick="filterDeposits('${p}')">${p}</div>`;
+    });
+    tabsContainer.innerHTML = tabsHtml;
+
+    const filtered = state.activeDepositTab ? state.deposits.filter(d => d.person === state.activeDepositTab) : state.deposits;
+    document.getElementById('dep-total').innerText = `₹${state.deposits.reduce((a,b)=>a+b.amount,0).toFixed(2)}`;
+    
+    // Sort transactions by date descending
+    const sortedFiltered = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    renderTable('deposit-list', sortedFiltered, ['person', 'date', 'amount', 'business'], true, 'deposit');
+}
+
+function filterDeposits(person) {
+    state.activeDepositTab = person;
+    renderDeposits();
+}
+
+function renderExpenses() {
+    document.getElementById('exp-total').innerText = `₹${state.expenses.reduce((a,b)=>a+b.amount,0).toFixed(2)}`;
+    
+    // Sort transactions by date descending
+    const sortedExpenses = [...state.expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    renderTable('expense-list', sortedExpenses, ['who', 'date', 'amount'], true, 'expense');
+}
+
+function renderTable(containerId, data, columns, showDelete, type) {
+    const container = document.getElementById(containerId);
+    const t = translations[state.lang];
+
+    if (data.length === 0) {
+        container.innerHTML = `<p style="text-align: center; color: #999; padding: 1rem;">${t.noData}</p>`;
+        return;
+    }
+
+    let html = `<table class="table"><thead><tr>`;
+    columns.forEach(col => {
+        let labelKey = col === 'person' ? 'personName' : (col === 'who' ? 'whoSpent' : col);
+        html += `<th>${t[labelKey] || labelKey}</th>`;
+    });
+    if (showDelete) html += `<th style="text-align: center;">${t.action}</th>`;
+    html += `</tr></thead><tbody>`;
+
+    data.forEach((item, index) => {
+        // Find the index in the *original* state array for deletion reference
+        const originalArray = type === 'deposit' ? state.deposits : state.expenses;
+        const originalIndex = originalArray.findIndex(originalItem => originalItem === item); // Assumes unique object references or can be matched by value if needed
+
+        html += `<tr>`;
+        columns.forEach(col => {
+            let val = item[col];
+            let style = '';
+
+            if (col === 'date') {
+                // Full Date Format: DD MMMM, YYYY
+                val = new Date(val).toLocaleDateString(state.lang === 'bn' ? 'bn-BD' : 'en-US', { year: 'numeric', month: 'long', day: '2-digit' });
+            }
+            if (col === 'amount') {
+                val = `₹${parseFloat(val).toFixed(2)}`;
+                style = `font-weight:700; color: var(--${type === 'expense' ? 'danger' : 'success'})`;
+            }
+            if (col === 'business') {
+                 // Translate business value
+                val = t[item.business] || item.business; 
+            }
+            
+            html += `<td style="${style}">${val}</td>`;
+        });
+        if (showDelete) {
+            html += `<td style="text-align: center;"><button onclick="deleteItem('${type}', ${originalIndex})" class="btn-round btn-empty icon-effect" style="color:var(--danger)"><i data-lucide="trash-2" width="16"></i></button></td>`;
+        }
+        html += `</tr>`;
+    });
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+    lucide.createIcons();
+}
+
+// --- CUSTOM MODAL LOGIC ---
+
+function openModal(id) {
+    const el = document.getElementById(id);
+    if(el) {
+        el.classList.remove('hidden');
+        document.body.classList.add('no-scroll');
+    }
+}
+
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if(el) {
+        el.classList.add('hidden');
+        document.body.classList.remove('no-scroll');
+    }
+}
+
+// Specific Toggles
+function toggleLangModal() { 
+    const el = document.getElementById('modal-lang');
+    if(el.classList.contains('hidden')) openModal('modal-lang');
+    else closeModal('modal-lang');
+}
+function toggleMoreMenu() { 
+    const el = document.getElementById('menu-more');
+    if(el.classList.contains('hidden')) openModal('menu-more');
+    else closeModal('menu-more');
+}
+
+// Custom Alert & Confirm
+let confirmCallback = null;
+
+function showAlert(message) {
+    document.getElementById('alert-message').innerText = message;
+    document.getElementById('alert-actions-ok').classList.remove('hidden');
+    document.getElementById('alert-actions-confirm').classList.add('hidden');
+    document.getElementById('alert-icon').style.color = 'var(--primary)';
+    openModal('modal-alert');
+}
+
+function showConfirm(message, callback) {
+    document.getElementById('alert-message').innerText = message;
+    document.getElementById('alert-actions-ok').classList.add('hidden');
+    document.getElementById('alert-actions-confirm').classList.remove('hidden');
+    document.getElementById('alert-icon').style.color = 'var(--danger)';
+    confirmCallback = callback;
+    openModal('modal-alert');
+}
+
+function closeAlert() {
+    closeModal('modal-alert');
+    confirmCallback = null;
+}
+
+// Confirm Yes Button Listener
+document.getElementById('btn-confirm-yes').onclick = function() {
+    if (confirmCallback) confirmCallback();
+    closeAlert();
+};
+
+// --- FORM LOGIC ---
+
+// Populate Dropdown
+function updatePersonSelect() {
+    const select = document.getElementById('dep-person-select');
+    const t = translations[state.lang];
+    const people = [...new Set(state.deposits.map(d => d.person))].sort(); // Sort people alphabetically
+
+    let html = `<option value="">${t.select}</option>`;
+    people.forEach(p => {
+        html += `<option value="${p}">${p}</option>`;
+    });
+    html += `<option value="__new__">${t.enterNewPerson} ➕</option>`;
+    
+    select.innerHTML = html;
+}
+
+function openDepositModal() {
+    updatePersonSelect(); 
+    document.getElementById('div-new-person').classList.add('hidden');
+    document.getElementById('div-custom-business').classList.add('hidden');
+    document.getElementById('form-deposit').reset();
+    document.getElementById('dep-date').value = new Date().toISOString().split('T')[0]; // Reset date to today
+    openModal('modal-add-deposit');
+}
+
+function handlePersonSelect(select) {
+    document.getElementById('div-new-person').classList.toggle('hidden', select.value !== '__new__');
+    document.getElementById('dep-person-input').value = ''; // Clear input on change
+}
+function handleBusinessSelect(select) {
+    document.getElementById('div-custom-business').classList.toggle('hidden', select.value !== 'other');
+    document.getElementById('dep-business-custom').value = ''; // Clear input on change
+}
+
+document.getElementById('form-deposit').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const personSelect = document.getElementById('dep-person-select').value;
+    const personInput = document.getElementById('dep-person-input').value.trim();
+    const person = personSelect === '__new__' ? personInput : personSelect;
+    const bizSelect = document.getElementById('dep-business-select').value;
+    const bizCustom = document.getElementById('dep-business-custom').value.trim();
+    const business = bizSelect === 'other' ? bizCustom : bizSelect;
+    const date = document.getElementById('dep-date').value;
+    const amount = parseFloat(document.getElementById('dep-amount').value);
+
+    if (!person || !business || !date || !amount) return showAlert(translations[state.lang].submit);
+
+    state.deposits.push({ person, business, date, amount });
+    saveData();
+    closeModal('modal-add-deposit');
+    router('deposit');
+    showToast('Deposit Added', 'success');
+    e.target.reset();
+});
+
+document.getElementById('form-expense').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const who = document.getElementById('exp-who').value.trim();
+    const date = document.getElementById('exp-date').value;
+    const amount = parseFloat(document.getElementById('exp-amount').value);
+
+    if (!who || !date || !amount) return showAlert(translations[state.lang].submit);
+
+    state.expenses.push({ who, date, amount });
+    saveData();
+    closeModal('modal-add-expense');
+    router('expense');
+    showToast('Expense Added', 'success');
+    e.target.reset();
+});
+
+function deleteItem(type, index) {
+    const t = translations[state.lang];
+    showConfirm(t.confirmDelete, () => {
+        if (type === 'deposit') state.deposits.splice(index, 1);
+        else state.expenses.splice(index, 1);
+        saveData();
+        router(type);
+        showToast('Deleted Successfully', 'success');
+        applyLanguage(); // Re-apply language to refresh data-i18n attributes on the page
+    });
+}
+
+function confirmClearData() {
+    const t = translations[state.lang];
+    showConfirm(t.resetConfirm, () => {
+        localStorage.clear();
+        location.reload();
+    });
+}
+
+function saveData() {
+    localStorage.setItem('deposits', JSON.stringify(state.deposits));
+    localStorage.setItem('expenses', JSON.stringify(state.expenses));
+}
+
+// --- SETTINGS FEATURES ---
+
+function saveGitSettings() {
+    localStorage.setItem("gitUser", document.getElementById('git-user').value);
+    localStorage.setItem("gitRepo", document.getElementById('git-repo').value);
+    localStorage.setItem("gitFile", document.getElementById('git-file').value);
+    localStorage.setItem("gitBranch", document.getElementById('git-branch').value);
+    localStorage.setItem("gitToken", document.getElementById('git-token').value);
+    showToast("GitHub Settings Saved", "success");
+}
+
+async function syncToGithub() {
+    const user = document.getElementById('git-user').value;
+    const repo = document.getElementById('git-repo').value;
+    const path = document.getElementById('git-file').value;
+    const token = document.getElementById('git-token').value;
+    const branch = document.getElementById('git-branch').value;
+
+    if(!user || !repo || !path || !token) return showAlert("Missing GitHub Settings");
+
+    showProgress("Syncing to GitHub...");
+    
+    try {
+        const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
+        
+        const getRes = await fetch(url, { headers: { Authorization: `token ${token}` } });
+        let sha = null;
+        if(getRes.ok) {
+            const json = await getRes.json();
+            sha = json.sha;
+        }
+
+        const contentStr = JSON.stringify({ deposits: state.deposits, expenses: state.expenses }, null, 2);
+        const b64Content = btoa(unescape(encodeURIComponent(contentStr)));
+
+        const putRes = await fetch(url, {
+            method: "PUT",
+            headers: { Authorization: `token ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+                message: "Auto Sync: Hisab Data",
+                content: b64Content,
+                branch: branch,
+                sha: sha
+            })
+        });
+
+        hideProgress();
+        if(!putRes.ok) throw new Error("Sync Failed: " + putRes.status);
+        showToast("Synced Successfully!", "success");
+
+    } catch(e) {
+        hideProgress();
+        showAlert(e.message);
+    }
+}
+
+async function syncFromGithub() {
+    const user = document.getElementById('git-user').value;
+    const repo = document.getElementById('git-repo').value;
+    const path = document.getElementById('git-file').value;
+    const token = document.getElementById('git-token').value;
+    const branch = document.getElementById('git-branch').value;
+
+    if(!user || !repo || !path || !token) return showAlert("Missing GitHub Settings");
+
+    showProgress("Downloading from GitHub...");
+
+    try {
+        const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
+        const res = await fetch(url, { headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json" } });
+
+        if(!res.ok) throw new Error("Fetch Failed");
+
+        const json = await res.json();
+        if(json.content) {
+            const decoded = decodeURIComponent(escape(atob(json.content)));
+            const data = JSON.parse(decoded);
+            
+            if(data.deposits) state.deposits = data.deposits;
+            if(data.expenses) state.expenses = data.expenses;
+            
+            saveData();
+            hideProgress();
+            showToast("Data Restored!", "success");
+            location.reload();
+        }
+    } catch(e) {
+        hideProgress();
+        showAlert(e.message);
+    }
+}
+
+function generatePDF(type) {
+    const { jsPDF } = window.jspdf;
+    const data = type === 'deposit' ? state.deposits : state.expenses;
+    const t = translations[state.lang];
+    
+    if(!data.length) return showAlert("No data to export");
+
+    const striped = document.getElementById("pdfStrip").value === "yes";
+    const headerColorHex = document.getElementById("pdfHeaderColor").value;
+    const orientation = document.getElementById("pdfOrient").value;
+    const watermark = document.getElementById("pdfWatermark").value;
+    const showTotal = document.getElementById("pdfTotal").value === "yes";
+
+    const r = parseInt(headerColorHex.slice(1, 3), 16);
+    const g = parseInt(headerColorHex.slice(3, 5), 16);
+    const b = parseInt(headerColorHex.slice(5, 7), 16);
+
+    const doc = new jsPDF(orientation, "pt", "A4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    doc.setFillColor(r, g, b);
+    doc.rect(0, 0, pageWidth, 80, "F");
+    doc.setFontSize(26);
+    doc.setTextColor(255, 255, 255);
+    doc.text(t.hisabkhata, 40, 50);
+    doc.setFontSize(14);
+    doc.text(type === 'deposit' ? t.deposits : t.expenses, 40, 75);
+
+    if(watermark) {
+        doc.setTextColor(200, 200, 200);
+        doc.setFontSize(60);
+        doc.text(watermark, pageWidth/2, 400, { align: 'center', angle: 45, opacity: 0.2 });
+    }
+
+    const rows = data.map((item, i) => [
+        i + 1,
+        item.person || item.who || "-",
+        new Date(item.date).toLocaleDateString(), // Use simpler date format for table cell to save space
+        "₹" + parseFloat(item.amount).toFixed(2),
+        t[item.business] || item.business || "-"
+    ]);
+
+    doc.autoTable({
+        startY: 100,
+        head: [["#", t.personName, t.date, t.amount, type === 'deposit' ? t.business : t.whoSpent]],
+        body: rows,
+        theme: striped ? 'grid' : 'plain',
+        headStyles: { fillColor: [r, g, b], textColor: 255 },
+        styles: { fontSize: 10, cellPadding: 6 },
+    });
+
+    if(showTotal) {
+        const total = data.reduce((s, x) => s + Number(x.amount), 0);
+        const finalY = doc.lastAutoTable.finalY + 20;
+        doc.setFontSize(14);
+        doc.setTextColor(0,0,0);
+        doc.text(`${type === 'deposit' ? t.totalDeposit : t.totalSpent}: ₹${total.toFixed(2)}`, 40, finalY);
+    }
+
+    doc.save(`${type}_report.pdf`);
+}
+
+function exportBackup() {
+    const dataStr = JSON.stringify({ deposits: state.deposits, expenses: state.expenses }, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "hisab_backup.json";
+    a.click();
+}
+
+function importBackup() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json";
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const json = JSON.parse(reader.result);
+                if(json.deposits) localStorage.setItem("deposits", JSON.stringify(json.deposits));
+                if(json.expenses) localStorage.setItem("expenses", JSON.stringify(json.expenses));
+                location.reload();
+            } catch(e) {
+                showAlert("Invalid Backup File");
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+function changeLang(lang) {
+    state.lang = lang;
+    localStorage.setItem('lang', lang);
+    applyLanguage();
+    toggleLangModal();
+    const currentView = document.querySelector('.view-section.active').id.replace('view-', '');
+    router(currentView);
+}
+
+function applyLanguage() {
+    const t = translations[state.lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.innerText = t[key];
+    });
+    // Update specific hardcoded texts in the Settings view
+    document.querySelector('.settings-card:nth-of-type(2) h3').innerText = t.exportDepositPdf.replace(' Deposit PDF', ''); // Export PDF
+    document.querySelector('.settings-card:nth-of-type(2) button:nth-of-type(1) span').innerText = t.exportDepositPdf;
+    document.querySelector('.settings-card:nth-of-type(2) button:nth-of-type(2) span').innerText = t.exportExpensePdf;
+    
+    document.querySelector('.settings-card:nth-of-type(4) h3').innerText = t.backupRestore;
+    document.querySelector('.settings-card:nth-of-type(4) button:nth-of-type(1) span').innerText = t.exportBackup;
+    document.querySelector('.settings-card:nth-of-type(4) button:nth-of-type(2) span').innerText = t.importBackup;
+    
+    document.querySelector('.settings-card:nth-of-type(5) button').innerText = t.resetAllData;
+}
+
+function showToast(msg, type) {
+    const toast = document.getElementById('toast');
+    toast.innerText = msg;
+    toast.className = `notification ${type}`;
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+function showProgress(msg) {
+    document.getElementById('progress-msg').innerText = msg;
+    openModal('modal-progress');
+}
+
+function hideProgress() {
+    closeModal('modal-progress');
+}
+
+    </script>
+</body>
+</html>
