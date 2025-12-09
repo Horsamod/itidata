@@ -1069,7 +1069,7 @@
     "unit": "Unit 1",
     "remarks": "Another test remark",
     "marksheetAllUrl": null,
-    "certificateUrl": "https://raw.githubusercontent.com/Horsamod/itidata/main/assets/files/89999999999999/89999999999999_NCVTCertificate.jpeg",
+    "certificateUrl": null,
     "markSheetYear1Url": "https://raw.githubusercontent.com/Horsamod/itidata/main/assets/files/89999999999999/89999999999999_MarkSheet_Year_1.jpeg",
     "markSheetYear2Url": "https://raw.githubusercontent.com/Horsamod/itidata/main/assets/files/89999999999999/89999999999999_MarkSheet_Year_2.jpeg",
     "itiName": "KOLKATA PRIVATE ITI",
