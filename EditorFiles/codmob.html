@@ -1,10 +1,11 @@
+trst
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-    <title>Mobile Code Editor Ultra</title> <!-- Prism.js -->
+    <title>Mobile Code Editor Pro</title> <!-- Prism.js for syntax highlighting -->
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup.min.js"></script>
@@ -51,33 +52,27 @@
             flex: 1;
             padding: 10px;
             text-align: center;
-            cursor: pointer;
             border-right: 1px solid var(--border);
+            cursor: pointer;
         }
 
         .tab.active {
             color: var(--accent);
         }
 
-        .editor-wrapper {
+        .editor-container {
             flex: 1;
             overflow: auto;
-            position: relative;
         }
 
         pre {
             margin: 0;
             min-height: 100%;
-            padding: 12px;
-            white-space: pre-wrap;
-            /* 🔥 FIX: preserve formatting */
-            word-break: break-word;
         }
 
         code {
             outline: none;
             caret-color: var(--accent);
-            display: block;
         }
 
         footer {
@@ -107,19 +102,19 @@
 </head>
 
 <body>
-    <header>📱 Mobile Code Editor Ultra</header>
+    <header>📱 Mobile Code Editor Pro</header>
     <div class="tabs">
         <div class="tab active" data-lang="html">HTML</div>
         <div class="tab" data-lang="css">CSS</div>
         <div class="tab" data-lang="js">JS</div>
     </div>
-    <div class="editor-wrapper">
-        <pre><code id="editor" contenteditable="true" class="language-html"></code></pre>
+    <div class="editor-container">
+        <pre><code id="editor" class="language-html" contenteditable="true"></code></pre>
     </div>
     <footer>
         <button onclick="runCode()">▶ Run</button>
-        <button onclick="formatCode()">✨ Format</button>
         <button onclick="saveCode()">💾 Save</button>
+        <button onclick="clearEditor()">🗑 Clear</button>
     </footer><iframe id="preview"></iframe>
     <script>
         const editor = document.getElementById('editor');
@@ -127,35 +122,33 @@
         const tabs = document.querySelectorAll('.tab');
 
         const state = {
-            html: `<!DOCTYPE html>\n<html>\n  <body>\n    <h1>Hello World</h1>\n  </body>\n</html>`,
-            css: `body {\n  font-family: sans-serif;\n}`,
-            js: `console.log('Hello JS');`,
+            html: '<!DOCTYPE html>\n<html>\n<body>\n<h1>Hello</h1>\n</body>\n</html>',
+            css: 'body { font-family: sans-serif; }',
+            js: 'console.log("Hello JS");',
             active: 'html'
         };
 
-        function restore() {
-            ['html', 'css', 'js'].forEach(k => {
+        function load() {
+            Object.keys(state).forEach(k => {
                 if (localStorage[k]) state[k] = localStorage[k];
             });
             switchTab('html');
         }
 
         function switchTab(lang) {
-            // Save current text EXACTLY (preserves newlines)
-            state[state.active] = editor.textContent;
+            state[state.active] = editor.innerText;
             state.active = lang;
 
             tabs.forEach(t => t.classList.toggle('active', t.dataset.lang === lang));
-
             editor.className = `language-${lang === 'js' ? 'javascript' : lang}`;
-            editor.textContent = state[lang]; // 🔥 FIX: textContent not innerText
+            editor.innerText = state[lang];
             Prism.highlightElement(editor);
         }
 
-        tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.lang)));
+        tabs.forEach(tab => tab.onclick = () => switchTab(tab.dataset.lang));
 
         function runCode() {
-            state[state.active] = editor.textContent;
+            state[state.active] = editor.innerText;
             const src = `<!DOCTYPE html><html><head><style>${state.css}</style></head><body>${state.html}<script>${state.js}<\/script></body></html>`;
             preview.srcdoc = src;
 
@@ -163,21 +156,25 @@
 
         function saveCode() {
             Object.keys(state).forEach(k => localStorage[k] = state[k]);
-            alert('Saved');
+            alert('Saved locally');
         }
 
-        function formatCode() { // Simple formatter (safe for mobile) editor.textContent = editor.textContent .replace(/></g, '>\n<') .replace(/\n\s*\n/g, '\n'); Prism.highlightElement(editor); }
+        function clearEditor() {
+            if (confirm('Clear current tab?')) {
+                editor.innerText = '';
+            }
+        }
 
-            editor.addEventListener('keydown', e => {
-                if (e.key === 'Tab') {
-                    e.preventDefault();
-                    document.execCommand('insertText', false, '  ');
-                }
-            });
+        editor.addEventListener('input', () => Prism.highlightElement(editor));
 
-            editor.addEventListener('input', () => Prism.highlightElement(editor));
+        editor.addEventListener('keydown', e => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                document.execCommand('insertText', false, '  ');
+            }
+        });
 
-            restore();
+        load();
     </script>
 
 </body>
