@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ace Mobile IDE Pro</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Ace Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ext-language_tools.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #1e1e1e;
+            --bg-sidebar: #252526;
+            --bg-active: #37373d;
+            --bg-hover: #2a2d2e;
+            --border: #333;
+            --accent: #007acc;
+            --danger: #ff6b6b;
+            --text: #cccccc;
+            --text-bright: #ffffff;
+            --header-height: 50px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0;
+            height: 100vh;
+            background-color: var(--bg-dark);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- Header --- */
+        header {
+            height: var(--header-height);
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            z-index: 10;
+        }
+
+        .brand { font-weight: 600; font-size: 1.1rem; color: var(--text-bright); display: flex; align-items: center; gap: 10px; }
+        
+        .actions { display: flex; gap: 8px; }
+        .btn {
+            background: var(--bg-active);
+            border: 1px solid var(--border);
+            color: var(--text-bright);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: var(--bg-hover); }
+        .btn-primary { background: var(--accent); border-color: var(--accent); }
+        .btn-primary:hover { background: #0062a3; }
+
+        /* --- Layout --- */
+        .workspace {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 240px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 20;
+            user-select: none;
+        }
+
+        .explorer-header {
+            padding: 10px 15px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: #888;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .explorer-actions i {
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .explorer-actions i:hover { color: var(--text-bright); }
+
+        .file-tree {
+            flex: 1;
+            overflow-y: auto;
+            padding: 5px 0;
+        }
+
+        .tree-node {
+            padding: 6px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            color: var(--text);
+            border-left: 2px solid transparent;
+        }
+        .tree-node:hover { background: var(--bg-hover); }
+        .tree-node.active { background: var(--bg-active); border-left-color: var(--accent); color: var(--text-bright); }
+        
+        .arrow { font-size: 0.7rem; color: #888; width: 14px; text-align: center; transition: transform 0.15s; }
+        .arrow.expanded { transform: rotate(90deg); }
+        .arrow.hidden { visibility: hidden; }
+        
+        .icon { width: 16px; text-align: center; }
+        .icon.folder { color: #dcb67a; }
+        .icon.file-html { color: #e34c26; }
+        .icon.file-css { color: #563d7c; }
+        .icon.file-js { color: #f1e05a; }
+        .icon.file-default { color: #888; }
+
+        /* --- Editor --- */
+        #editor-container {
+            flex: 1;
+            position: relative;
+            background: var(--bg-dark);
+        }
+        #editor {
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            font-size: 14px;
+        }
+
+        /* --- Context Menu --- */
+        #context-menu {
+            position: fixed; /* Fixed to viewport to prevent scrolling issues */
+            background: #252526;
+            border: 1px solid #454545;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            padding: 4px 0;
+            display: none;
+            z-index: 9999;
+            min-width: 160px;
+            animation: fadeIn 0.1s ease-out;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        .ctx-item {
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.1s;
+        }
+        .ctx-item:hover { background: var(--accent); color: white; }
+        .ctx-sep { height: 1px; background: #454545; margin: 4px 0; }
+        .ctx-danger { color: var(--danger); }
+        .ctx-danger:hover { background: var(--danger); color: white; }
+
+        /* --- Preview Overlay --- */
+        #preview-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            z-index: 50;
+            display: none;
+            flex-direction: column;
+        }
+        .preview-bar {
+            background: #f0f0f0;
+            padding: 8px 15px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #333;
+        }
+        #preview-frame { flex: 1; border: none; }
+
+        /* --- Mobile Responsive --- */
+        .toggle-btn { display: none; }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                height: 100%;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+                width: 80%;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .toggle-btn { display: block; }
+            .brand span { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <button class="btn toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <span><i class="fas fa-code" style="color:var(--accent)"></i> AceIDE</span>
+        </div>
+        <div class="actions">
+            <button class="btn" onclick="saveProject()"><i class="fas fa-save"></i> Save</button>
+            <button class="btn btn-primary" onclick="runProject()"><i class="fas fa-play"></i> Run</button>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <!-- File Tree Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="explorer-header">
+                <span>Explorer</span>
+                <div class="explorer-actions">
+                    <i class="fas fa-folder-plus" onclick="createNodeInRoot('folder')" title="New Root Folder"></i>
+                    <i class="fas fa-file-circle-plus" onclick="createNodeInRoot('file')" title="New Root File"></i>
+                </div>
+            </div>
+            <div id="tree-root" class="file-tree"></div>
+        </div>
+
+        <!-- Editor Area -->
+        <div id="editor-container">
+            <div id="editor"></div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="context-menu"></div>
+
+    <!-- Preview Modal -->
+    <div id="preview-overlay">
+        <div class="preview-bar">
+            <strong>App Preview</strong>
+            <button class="btn" style="background:var(--danger); border-color:var(--danger); padding:4px 10px;" onclick="closePreview()">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+        <iframe id="preview-frame"></iframe>
+    </div>
+
+    <script>
+        // --- 1. Ace Editor Configuration ---
+        ace.config.set('basePath', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/');
+        
+        const editor = ace.edit("editor");
+        editor.setTheme("ace/theme/tomorrow_night");
+        editor.setFontSize(14);
+        editor.setShowPrintMargin(false);
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: true,
+            wrap: true,
+        });
+
+        // --- 2. State Management ---
+        const DEFAULT_FS = {
+            id: 'root',
+            name: 'root',
+            type: 'folder',
+            children: [
+                { id: 'f1', name: 'index.html', type: 'file', content: '<!DOCTYPE html>\n<html>\n<head>\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <div class="container">\n    <h1>Hello World</h1>\n    <p>Context Menu Fixed!</p>\n    <button onclick="msg()">Test JS</button>\n  </div>\n  <script src="script.js"><\/script>\n</body>\n</html>' },
+                { id: 'f2', name: 'style.css', type: 'file', content: 'body {\n  background: #1e1e1e;\n  color: #fff;\n  font-family: sans-serif;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n  margin: 0;\n}\n.container { text-align: center; }' },
+                { id: 'f3', name: 'script.js', type: 'file', content: 'function msg() {\n  alert("It works!");\n}' },
+                { id: 'd1', name: 'components', type: 'folder', children: [] }
+            ]
+        };
+
+        let fsData = JSON.parse(localStorage.getItem('ace_fs_v2')) || DEFAULT_FS;
+        let sessions = {}; 
+        let currentFileId = null;
+        let expandedFolders = new Set(['root']); 
+        let contextMenuData = null; // Stores { node, parentId }
+
+        // --- 3. Tree Rendering ---
+        const treeRoot = document.getElementById('tree-root');
+
+        function renderTree() {
+            treeRoot.innerHTML = '';
+            fsData.children.forEach(node => {
+                treeRoot.appendChild(createTreeNode(node, 0, 'root'));
+            });
+        }
+
+        function createTreeNode(node, depth, parentId) {
+            const wrapper = document.createElement('div');
+            
+            // Row
+            const row = document.createElement('div');
+            row.className = `tree-node ${currentFileId === node.id ? 'active' : ''}`;
+            row.style.paddingLeft = `${depth * 15 + 10}px`;
+            
+            // Event Listeners (Logic Fix)
+            row.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (node.type === 'folder') toggleFolder(node.id);
+                else openFile(node.id);
+            });
+
+            row.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showContextMenu(e, node, parentId);
+            });
+
+            // Icons
+            const arrowClass = node.type === 'folder' 
+                ? (expandedFolders.has(node.id) ? 'fas fa-chevron-right arrow expanded' : 'fas fa-chevron-right arrow') 
+                : 'fas fa-chevron-right arrow hidden';
+            
+            const iconClass = getIconClass(node);
+
+            row.innerHTML = `
+                <i class="${arrowClass}"></i>
+                <i class="icon ${iconClass}"></i>
+                <span>${node.name}</span>
+            `;
+            
+            wrapper.appendChild(row);
+
+            // Recursion
+            if (node.type === 'folder' && expandedFolders.has(node.id)) {
+                if (node.children && node.children.length > 0) {
+                    node.children.forEach(child => {
+                        wrapper.appendChild(createTreeNode(child, depth + 1, node.id));
+                    });
+                } else {
+                    const empty = document.createElement('div');
+                    empty.style.paddingLeft = `${(depth + 1) * 15 + 10}px`;
+                    empty.style.color = '#555';
+                    empty.style.fontSize = '0.8rem';
+                    empty.textContent = 'Empty folder';
+                    wrapper.appendChild(empty);
+                }
+            }
+            return wrapper;
+        }
+
+        function getIconClass(node) {
+            if (node.type === 'folder') return 'fas fa-folder folder';
+            if (node.name.endsWith('.html')) return 'fab fa-html5 file-html';
+            if (node.name.endsWith('.css')) return 'fab fa-css3-alt file-css';
+            if (node.name.endsWith('.js')) return 'fab fa-js file-js';
+            return 'fas fa-file file-default';
+        }
+
+        function toggleFolder(id) {
+            if (expandedFolders.has(id)) expandedFolders.delete(id);
+            else expandedFolders.add(id);
+            renderTree();
+        }
+
+        // --- 4. File Logic ---
+        function openFile(id) {
+            const node = findNode(fsData.children, id);
+            if (!node || node.type !== 'file') return;
+
+            // Session Management
+            if (!sessions[id]) {
+                const mode = getAceMode(node.name);
+                sessions[id] = ace.createEditSession(node.content || '', mode);
+                sessions[id].on('change', () => {
+                    node.content = sessions[id].getValue();
+                });
+            }
+
+            editor.setSession(sessions[id]);
+            currentFileId = id;
+            
+            // Mobile handling
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+            renderTree();
+            editor.focus();
+        }
+
+        function getAceMode(filename) {
+            if (filename.endsWith('.js')) return 'ace/mode/javascript';
+            if (filename.endsWith('.css')) return 'ace/mode/css';
+            if (filename.endsWith('.html')) return 'ace/mode/html';
+            return 'ace/mode/text';
+        }
+
+        // --- 5. Context Menu System (FIXED) ---
+        const contextMenu = document.getElementById('context-menu');
+
+        // Global click to close menu
+        document.addEventListener('click', (e) => {
+            if (!contextMenu.contains(e.target)) hideContextMenu();
+        });
+
+        function hideContextMenu() {
+            contextMenu.style.display = 'none';
+        }
+
+        function showContextMenu(e, node, parentId) {
+            contextMenuData = { node, parentId };
+            
+            // Build Menu DOM programmatically (Fixes "not working" issue)
+            contextMenu.innerHTML = ''; // Clear previous
+
+            // Helper to create items
+            const createItem = (text, icon, onClick, isDanger = false) => {
+                const item = document.createElement('div');
+                item.className = `ctx-item ${isDanger ? 'ctx-danger' : ''}`;
+                item.innerHTML = `<i class="${icon}"></i> ${text}`;
+                item.onclick = (evt) => {
+                    evt.stopPropagation();
+                    hideContextMenu();
+                    onClick();
+                };
+                contextMenu.appendChild(item);
+            };
+
+            const createSep = () => {
+                const sep = document.createElement('div');
+                sep.className = 'ctx-sep';
+                contextMenu.appendChild(sep);
+            };
+
+            // Add Items based on type
+            if (node.type === 'folder') {
+                createItem('New File', 'fas fa-file-plus', () => createItemAction(node, 'file'));
+                createItem('New Folder', 'fas fa-folder-plus', () => createItemAction(node, 'folder'));
+                createSep();
+            }
+
+            createItem('Rename', 'fas fa-edit', () => renameAction(node));
+            createItem('Delete', 'fas fa-trash', () => deleteAction(node, parentId), true);
+
+            // Positioning
+            contextMenu.style.display = 'block';
+            
+            // Calculate position to keep inside viewport
+            let x = e.clientX;
+            let y = e.clientY;
+            
+            const rect = contextMenu.getBoundingClientRect();
+            if (x + rect.width > window.innerWidth) x -= rect.width;
+            if (y + rect.height > window.innerHeight) y -= rect.height;
+            
+            contextMenu.style.left = `${x}px`;
+            contextMenu.style.top = `${y}px`;
+        }
+
+        // --- 6. CRUD Actions ---
+        
+        function createNodeInRoot(type) {
+            const name = prompt(`Enter new root ${type} name:`);
+            if (!name) return;
+            
+            const newNode = {
+                id: Date.now().toString(),
+                name: name,
+                type: type,
+                content: type === 'file' ? '' : null,
+                children: type === 'folder' ? [] : null
+            };
+            
+            fsData.children.push(newNode);
+            saveProject();
+            renderTree();
+        }
+
+        function createItemAction(parentNode, type) {
+            const name = prompt(`Enter ${type} name:`);
+            if (!name) return;
+
+            const newNode = {
+                id: Date.now().toString(),
+                name: name,
+                type: type,
+                content: type === 'file' ? '' : null,
+                children: type === 'folder' ? [] : null
+            };
+
+            parentNode.children.push(newNode);
+            expandedFolders.add(parentNode.id);
+            saveProject();
+            renderTree();
+            
+            if (type === 'file') openFile(newNode.id);
+        }
+
+        function renameAction(node) {
+            const newName = prompt("Rename to:", node.name);
+            if (newName && newName.trim() !== "") {
+                node.name = newName;
+                saveProject();
+                renderTree();
+            }
+        }
+
+        function deleteAction(node, parentId) {
+            if (!confirm(`Are you sure you want to delete ${node.name}?`)) return;
+
+            // Find parent array
+            let parentList;
+            if (parentId === 'root') {
+                parentList = fsData.children;
+            } else {
+                const parentNode = findNode(fsData.children, parentId);
+                parentList = parentNode ? parentNode.children : null;
+            }
+
+            if (parentList) {
+                const idx = parentList.findIndex(n => n.id === node.id);
+                if (idx > -1) {
+                    parentList.splice(idx, 1);
+                    // If active file was deleted
+                    if (currentFileId === node.id) {
+                        currentFileId = null;
+                        editor.setValue("");
+                    }
+                    saveProject();
+                    renderTree();
+                }
+            }
+        }
+
+        // --- 7. Utilities & Helpers ---
+
+        function findNode(nodes, id) {
+            for (let node of nodes) {
+                if (node.id === id) return node;
+                if (node.children) {
+                    const found = findNode(node.children, id);
+                    if (found) return found;
+                }
+            }
+            return null;
+        }
+
+        function saveProject() {
+            localStorage.setItem('ace_fs_v2', JSON.stringify(fsData));
+            const btn = document.querySelector('.btn i.fa-save').parentNode;
+            btn.innerHTML = '<i class="fas fa-check"></i> Saved';
+            setTimeout(() => btn.innerHTML = '<i class="fas fa-save"></i> Save', 1500);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // --- 8. Runner Logic ---
+        function runProject() {
+            let files = {};
+            // Flatten logic
+            function traverse(nodes) {
+                nodes.forEach(n => {
+                    if (n.type === 'file') files[n.name] = n.content;
+                    if (n.children) traverse(n.children);
+                });
+            }
+            traverse(fsData.children);
+
+            let html = files['index.html'] || '<h3>No index.html</h3>';
+            const css = files['style.css'] || '';
+            const js = files['script.js'] || '';
+
+            // Inject styles/scripts
+            if (css) html = html.replace('</head>', `<style>${css}</style></head>`);
+            
+            if (js) {
+                 if (html.includes('<script src="script.js">')) {
+                     html = html.replace('<script src="script.js"><\/script>', `<script>${js}<\/script>`);
+                 } else {
+                     html = html.replace('</body>', `<script>${js}<\/script></body>`);
+                 }
+            }
+
+            const frame = document.getElementById('preview-frame');
+            frame.srcdoc = html;
+            document.getElementById('preview-overlay').style.display = 'flex';
+        }
+
+        function closePreview() {
+            document.getElementById('preview-overlay').style.display = 'none';
+        }
+
+        // Init
+        renderTree();
+        const firstFile = fsData.children.find(n => n.type === 'file');
+        if (firstFile) openFile(firstFile.id);
+
+    </script>
+</body>
+</html>
+
