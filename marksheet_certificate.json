@@ -1176,7 +1176,7 @@
     "certificateType": "1",
     "certificateIssueDate": "16-Aug-2025",
     "certified": true,
-    "disable": null,
+    "disable": "https://ncvtmis.gov.in",
     "submissionDate": "2025-12-31T12:14:18.446Z",
     "marks": [
       {
