@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marksheet Generator</title>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+body { margin: 0 auto; padding: 0; font-family: 'Cambria', sans-serif; background-color: #ccd2db; background: rgba(205, 203, 219, 0.904) radial-gradient(rgba(50, 28, 68, 0.412) 10%, transparent 1%); background-attachment: fixed; background-size: 7px 7px; }
+@font-face { font-family: 'Cambria'; src: url('fonts/Cambria.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'CambriaBold'; src: url('fonts/Cambria-Bold.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'CambriaItalic'; src: url('fonts/Cambria-Italic.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'CambriaBoldItalic'; src: url('fonts/Cambria-BoldItalic.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'Arial'; src: url('fonts/ARIAL.ttf') format('truetype'); }
+.f0, .f2 { font-size: 13.33px; font-family: 'CambriaBold'; fill: #000000; }
+.f1 { font-size: 12px; font-family: 'CambriaBold'; fill: #000000; }
+.f3, .f6, .f10 { font-size: 13.33px; font-family: 'Cambria'; fill: #000000; }
+.f9 { font-size: 12px; font-family: 'CambriaItalic'; fill: #000000; }
+.f12, .f13 { font-size: 13.33px; font-family: 'CambriaBoldItalic'; fill: #000000; }
+.f11 { stroke: #000000; stroke-width: 1; }
+.f7 { stroke: #d2d2d2; stroke-width: 1; }
+.f5 { stroke: #000000; stroke-width: .5; stroke-dasharray: 2, 3; }
+.f4 { stroke: #000000; stroke-width: 1; stroke-dasharray: 2, 3; }
+.f8 { stroke: #d2d2d2; stroke-width: .5; }
+.pdfpage { position: relative; background: white; overflow: hidden; transform-origin: 0 0; }
+.pdfpage p { position: absolute; white-space: pre; transform-origin: 0 0; margin: 0; }
+.pdfpage .ce { shape-rendering: crispEdges; }
+.pdfpage .ann p { margin: 0; }
+.pdfpage a { color: inherit; text-decoration: inherit; }
+.pdfpage .pdfformfield { white-space: pre-wrap; }
+.pdfpage image { position: absolute; left: 0px; top: 0px; width: 1px; height: 1px; transform-origin: 0 0; }
+.pdfpage svg { position: absolute; stroke: none; fill: none; white-space: pre; margin: 0; padding: 0; width: 100%; height: 100%; }
+clipPath path { clip-rule: evenodd; }
+@media print {
+    @page { size: letter landscape; margin: 0; page-break-after: avoid; width: 1104px !important; height: 816px !important; }
+    body { margin: 0; padding: 0; background: white; height: auto !important; }
+    .input-container, .print-hide, #notification { display: none !important; }
+    .pdfpage { width: 1104px !important; height: 816px !important; transform: none !important; margin: 0 !important; box-shadow: none !important; page-break-after: avoid; }
+    .pdfpage svg { width: 1104px !important; height: 816px !important; }
+}
+@media screen {
+    .pdfpage { box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15); overflow: hidden; background: white; width: 98vw; height: auto; display: none; }
+    .pdfpage.show { display: block; }
+}
+.input-container { margin: 20px auto; max-width: 816px; padding: 25px; background: white; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); border-radius: 16px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: center; }
+.form-group { display: flex; flex-direction: column; gap: 8px; min-width: 200px; flex: 1; }
+.checkbox-group { flex-direction: row; align-items: center; gap: 10px; min-width: auto; flex: 0 1 auto; }
+.checkbox-group input { width: auto; margin: 0; cursor: pointer; }
+.checkbox-group label { margin: 0; cursor: pointer; }
+.form-group label { font-weight: 600; color: #2d3748; font-size: 14px; margin-bottom: 4px; }
+.form-group input { padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; transition: all 0.3s ease; background: #f8fafc; }
+.form-group input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15); background: white; }
+.btn-generate, .btn-print, .btn-download { color: white; border: none; padding: 12px 24px; font-size: 14px; font-weight: 600; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; min-height: 48px; }
+.btn-generate:hover, .btn-print:hover, .btn-download:hover { transform: translateY(-2px); }
+.btn-generate:disabled, .btn-print:disabled, .btn-download:disabled { background: #a0aec0; cursor: not-allowed; transform: none; }
+.btn-generate { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.btn-generate:hover { box-shadow: 0 8px 25px rgba(102, 126, 234, 0.35); }
+.btn-print { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
+.btn-print:hover { box-shadow: 0 8px 25px rgba(72, 187, 120, 0.35); }
+.btn-download { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); }
+.btn-download:hover { box-shadow: 0 8px 25px rgba(237, 137, 54, 0.35); }
+#notification { position: fixed; top: 20px; right: 20px; max-width: 400px; padding: 16px 20px; border-radius: 12px; font-weight: 600; text-align: center; display: none; z-index: 1000; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); }
+.error { background: linear-gradient(135deg, #fc8181, #f56565); color: white; }
+.success { background: linear-gradient(135deg, #68d391, #48bb78); color: white; }
+.loading { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.actions { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+.ds { font-family: 'Arial'; }
+@media screen and (max-width: 768px) {
+    .input-container { width: 95%; padding: 20px 15px; flex-direction: column; gap: 15px; }
+    .form-group { min-width: 100%; }
+    .form-group input { width: 100%; box-sizing: border-box; }
+    .btn-generate, .btn-print, .btn-download { width: 100%; justify-content: center; }
+    .actions { width: 100%; }
+    .actions>* { flex: 1; }
+    #notification { right: 10px; left: 10px; max-width: none; }
+    .pdfpage { width: 100vw; }
+}
+</style>
+</head>
+<body>
+<div class="input-container">
+    <div class="form-group">
+        <label for="rollNumber">Roll Number</label>
+        <input type="text" id="rollNumber" placeholder="Enter roll number" required>
+    </div>
+    <div class="form-group">
+        <label for="certificateNumber">Certificate Number</label>
+        <input type="text" id="certificateNumber" placeholder="Enter certificate number" required>
+    </div>
+    <div class="form-group">
+        <label for="profileImage">Profile Image (368 X 476)</label>
+        <input type="file" id="profileImage" accept="image/*">
+    </div>
+    <div class="form-group checkbox-group">
+        <input type="checkbox" id="showSignature" checked>
+        <label for="showSignature">Show Digital Signature</label>
+    </div>
+    <div class="actions">
+        <button class="btn-generate" id="generateButton">
+            <i class="fas fa-file-download"></i> Generate
+        </button>
+        <button class="btn-print print-hide" id="printButton" disabled>
+            <i class="fas fa-print"></i> Print
+        </button>
+        <button class="btn-download print-hide" id="downloadButton" disabled>
+            <i class="fas fa-download"></i> Download PDF
+        </button>
+    </div>
+</div>
+<div id="notification"></div>
+<div class="part pdfpage" orientation="landscape" _toc_id="pdfpage0" index="0" id="pdfpage0" style="width:1104px;height:816px;">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%">
+        <style>
+            image { position: absolute; left: 0px; top: 0px; width: 1px; height: 1px; transform-origin: 0 0 }
+            text { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; shape-rendering: geometricPrecision; }
+        </style>
+        <defs>
+            <clipPath id="cl2"><path d="M24 792h1070.3998 v-743.9998 h-1070.3998 z" /></clipPath>
+            <clipPath id="cl0"><path d="M79.20 183.96v-105.6000 h91.2000 v105.6000 z" /></clipPath>
+        </defs>
+        <g clip-path="url(#cl0)">
+            <image id="traineeImage" x="79.2" y="77.51" style="width:91.2px;height:117.97px" xlink:href="image/profile.jpg" />
+        </g>
+        <image x="483.68" y="51.75" style="width:63.67px;height:86.4px" xlink:href="image/asok.jpg" />
+        <image id="qrcode" x="873.6" y="68.98" style="width:115.2px;height:115.2px" xlink:href="image/qr.png" />
+        <g clip-path="url(#cl2)">
+            <path class="f4" d="M193.23 252.21h328.5213  M521.76 252.21h83.3000  M605.06 252.21h92.8226  M828.65 252.21h191.8347  M193.23 273.19h328.5213  M521.76 273.19h83.3000  M605.06 273.19h92.8226  M828.65 273.19h191.8347  M193.23 294.17h328.5213  M521.76 294.17h83.3000  M605.06 294.17h92.8226  M697.88 294.17h130.7679  M828.65 294.17h191.8347 " />
+            <path class="f5" d="M193.23 314.82h827.2479 " />
+        </g>
+        <g clip-path="url(#cl2)">
+            <path class="f7 ce" d="M143.46 430.36h61.2693 v-23.3000 h-61.2693 z M269.15 430.36h61.2707 v-23.3000 h-61.2707 z M394.84 430.36h61.2693 v-23.3000 h-61.2693 z M520.53 430.36h61.2706 v-23.3000 h-61.2706 z M646.22 430.36h61.2693 v-23.3000 h-61.2693 z M771.91 430.36h61.2707 v-23.3000 h-61.2707 z M143.46 453.66h61.2693 v-23.3000 h-61.2693 z M269.15 453.66h61.2707 v-23.3000 h-61.2707 z M394.84 453.66h61.2693 v-23.3000 h-61.2693 z M520.53 453.66h61.2706 v-23.3000 h-61.2706 z M646.22 453.66h61.2693 v-23.3000 h-61.2693 z M771.91 453.66h61.2707 v-23.3000 h-61.2707 z M897.60 430.36h59.8106 v-23.3000 h-59.8106 z M897.60 453.66h59.8106 v-23.3000 h-59.8106 z M204.73 430.36h64.4200 v-23.3000 h-64.4200 z M330.42 430.36h64.4200 v-23.3000 h-64.4200 z M456.11 430.36h64.4200 v-23.3000 h-64.4200 z M581.80 430.36h64.4200 v-23.3000 h-64.4200 z M707.49 430.36h64.4200 v-23.3000 h-64.4200 z M833.18 430.36h64.4200 v-23.3000 h-64.4200 z M957.24 407.06h65.1827  M957.41 406.89v23.6333  M957.24 430.36h65.1827 " />
+            <path class="f8 ce" d="M1022.42 406.89v23.6333 " />
+            <path class="f7 ce" d="M204.73 453.66h64.4200 v-23.3000 h-64.4200 z M330.42 453.66h64.4200 v-23.3000 h-64.4200 z M456.11 453.66h64.4200 v-23.3000 h-64.4200 z M581.80 453.66h64.4200 v-23.3000 h-64.4200 z M707.49 453.66h64.4200 v-23.3000 h-64.4200 z M833.18 453.66h64.4200 v-23.3000 h-64.4200 z M957.24 430.36h65.1827  M957.41 430.19v23.6333  M957.24 453.66h65.1827 " />
+            <path class="f8 ce" d="M1022.42 430.19v23.6333 " />
+            <path class="f7 ce" d="M143.46 407.06h61.2693 v-36.6293 h-61.2693 z M269.15 407.06h61.2707 v-36.6293 h-61.2707 z M394.84 407.06h61.2693 v-36.6293 h-61.2693 z M520.53 407.06h61.2706 v-36.6293 h-61.2706 z M646.22 407.06h61.2693 v-36.6293 h-61.2693 z M771.91 407.06h61.2707 v-36.6293 h-61.2707 z M143.29 453.66h61.6026  M143.46 453.49v20.8160 " />
+            <path class="f8 ce" d="M143.29 474.31h61.6026 " />
+            <path class="f7 ce" d="M204.73 453.49v20.8160  M268.98 453.66h61.6040  M269.15 453.49v20.8160 " />
+            <path class="f8 ce" d="M268.98 474.31h61.6040 " />
+            <path class="f7 ce" d="M330.42 453.49v20.8160  M394.67 453.66h61.6027  M394.84 453.49v20.8160 " />
+            <path class="f8 ce" d="M394.67 474.31h61.6027 " />
+            <path class="f7 ce" d="M456.11 453.49v20.8160  M520.36 453.66h61.6039  M520.53 453.49v20.8160 " />
+            <path class="f8 ce" d="M520.36 474.31h61.6039 " />
+            <path class="f7 ce" d="M581.80 453.49v20.8160  M646.05 453.66h61.6027  M646.22 453.49v20.8160 " />
+            <path class="f8 ce" d="M646.05 474.31h61.6027 " />
+            <path class="f7 ce" d="M707.49 453.49v20.8160  M771.74 453.66h61.6039  M771.91 453.49v20.8160 " />
+            <path class="f8 ce" d="M771.74 474.31h61.6039 " />
+            <path class="f7 ce" d="M833.18 453.49v20.8160  M897.60 407.06h59.8106 v-36.6293 h-59.8106 z M897.43 453.66h60.1440  M897.60 453.49v20.8160 " />
+            <path class="f8 ce" d="M897.43 474.31h60.1440 " />
+            <path class="f7 ce" d="M957.41 453.49v20.8160  M204.73 407.06h64.4200 v-36.6293 h-64.4200 z M330.42 407.06h64.4200 v-36.6293 h-64.4200 z M456.11 407.06h64.4200 v-36.6293 h-64.4200 z M581.80 407.06h64.4200 v-36.6293 h-64.4200 z M707.49 407.06h64.4200 v-36.6293 h-64.4200 z M833.18 407.06h64.4200 v-36.6293 h-64.4200 z M957.24 370.43h65.1827  M957.41 370.26v36.9626  M957.24 407.06h65.1827 " />
+            <path class="f8 ce" d="M1022.42 370.26v36.9626 " />
+            <path class="f7 ce" d="M204.56 453.66h64.7533  M204.73 453.49v20.8160 " />
+            <path class="f8 ce" d="M204.56 474.31h64.7533 " />
+            <path class="f7 ce" d="M269.15 453.49v20.8160  M330.25 453.66h64.7534  M330.42 453.49v20.8160 " />
+            <path class="f8 ce" d="M330.25 474.31h64.7534 " />
+            <path class="f7 ce" d="M394.84 453.49v20.8160  M455.94 453.66h64.7533  M456.11 453.49v20.8160 " />
+            <path class="f8 ce" d="M455.94 474.31h64.7533 " />
+            <path class="f7 ce" d="M520.53 453.49v20.8160  M581.63 453.66h64.7534  M581.80 453.49v20.8160 " />
+            <path class="f8 ce" d="M581.63 474.31h64.7534 " />
+            <path class="f7 ce" d="M646.22 453.49v20.8160  M707.32 453.66h64.7533  M707.49 453.49v20.8160 " />
+            <path class="f8 ce" d="M707.32 474.31h64.7533 " />
+            <path class="f7 ce" d="M771.91 453.49v20.8160  M833.01 453.66h64.7533  M833.18 453.49v20.8160 " />
+            <path class="f8 ce" d="M833.01 474.31h64.7533 " />
+            <path class="f7 ce" d="M897.60 453.49v20.8160  M957.24 453.66h65.1827  M957.41 453.49v20.8160 " />
+            <path class="f8 ce" d="M957.24 474.31h65.1827  M1022.42 453.49v20.8160  M143.29 318.48h126.0226 " />
+            <path class="f7 ce" d="M143.46 318.48v52.1107  M143.29 370.43h126.0226  M269.15 318.48v52.1107 " />
+            <path class="f8 ce" d="M268.98 318.48h126.0240 " />
+            <path class="f7 ce" d="M269.15 318.48v52.1107  M268.98 370.43h126.0240  M394.84 318.48v52.1107 " />
+            <path class="f8 ce" d="M394.67 318.48h126.0226 " />
+            <path class="f7 ce" d="M394.84 318.48v52.1107  M394.67 370.43h126.0226  M520.53 318.48v52.1107 " />
+            <path class="f8 ce" d="M520.36 318.48h126.0239 " />
+            <path class="f7 ce" d="M520.53 318.48v52.1107  M520.36 370.43h126.0239  M646.22 318.48v52.1107 " />
+            <path class="f8 ce" d="M646.05 318.48h126.0227 " />
+            <path class="f7 ce" d="M646.22 318.48v52.1107  M646.05 370.43h126.0227  M771.91 318.48v52.1107 " />
+            <path class="f8 ce" d="M771.74 318.48h126.0239 " />
+            <path class="f7 ce" d="M771.91 318.48v52.1107  M771.74 370.43h126.0239  M897.60 318.48v52.1107 " />
+            <path class="f8 ce" d="M897.43 318.48h124.9933 " />
+            <path class="f7 ce" d="M897.60 318.48v52.1107  M897.43 370.43h124.9933 " />
+            <path class="f8 ce" d="M1022.42 318.48v52.1107 " />
+            <path class="f7 ce" d="M87.50 430.36h55.9586 v-23.3000 h-55.9586 z M87.50 453.66h55.9586 v-23.3000 h-55.9586 z M46.14 430.36h41.3613 v-23.3000 h-41.3613 z M46.14 453.66h41.3613 v-23.3000 h-41.3613 z M87.50 407.06h55.9586 v-36.6293 h-55.9586 z M87.33 453.66h56.2920  M87.50 453.49v20.8160 " />
+            <path class="f8 ce" d="M87.33 474.31h56.2920 " />
+            <path class="f7 ce" d="M143.46 453.49v20.8160  M46.14 407.06h41.3613 v-36.6293 h-41.3613 z M45.97 453.66h41.6947  M46.14 453.49v20.8160 " />
+            <path class="f8 ce" d="M45.97 474.31h41.6947 " />
+            <path class="f7 ce" d="M87.50 453.49v20.8160 " />
+            <path class="f8 ce" d="M45.97 318.48h41.6947 " />
+            <path class="f7 ce" d="M46.14 318.48v52.1107  M45.97 370.43h41.6947  M87.50 318.48v52.1107 " />
+            <path class="f8 ce" d="M87.33 318.48h56.2920 " />
+            <path class="f7 ce" d="M87.50 318.48v52.1107  M87.33 370.43h56.2920  M143.46 318.48v52.1107 " />
+        </g>
+        <path class="f5" d="M339.37 495.29h681.1105 " clip-path="url(#cl2)" />
+        <image x="871.6" y="513.63" style="width:112.88px;height:52.77px" xlink:href="image/sign2.jpg" />
+        <g id="digitalSignatureBlock" transform="translate(871, 515)">
+            <g id="tick" transform="translate(62, 8)">
+                <path fill="#000000" stroke="#000000" fill-opacity="1.000" stroke-opacity="1.000" fill-rule="nonzero" stroke-width="0.0" stroke-linejoin="miter" stroke-linecap="square" d="M10.20,17.77L19.11,4.44L21.58,6.76L10.20,21.60L2.72,14.86L5.25,12.51z" />
+                <path fill="#00B542" stroke="#000000" fill-opacity="1.000" stroke-opacity="1.000" fill-rule="nonzero" stroke-width="0.35999998" stroke-linejoin="miter" stroke-linecap="square" d="M9.68,16.63L19.11,2.93L21.58,5.21L9.68,20.60L1.86,13.61L4.50,11.18z" />
+            </g>
+            <text class="ds" x="0" y="12" font-family="Arial" font-size="6.5" font-weight="500" fill="#000">Signature valid</text>
+            <text class="ds" x="0" y="18" font-family="Arial" font-size="6.5" font-weight="500" fill="#000">DS Directorate General</text>
+            <text class="ds" x="0" y="24" font-family="Arial" font-size="6.5" font-weight="500" fill="#000">of Training 01</text>
+            <text class="ds" x="80" y="15" font-family="Arial" font-size="5.2" fill="#000">Digitally signed by DS Directorate</text>
+            <text class="ds" x="80" y="20.3" font-family="Arial" font-size="5.2" fill="#000">General of Training 01</text>
+            <text class="ds" x="80" y="25.5" font-family="Arial" font-size="5.2" fill="#000">Date: <tspan id="dsDate">2025.03.09 12:14:14 +05:30</tspan></text>
+            <text class="ds" x="80" y="30.5" font-family="Arial" font-size="5.2" fill="#000">Reason: Approved</text>
+        </g>
+        <path class="f11 ce" d="M138.56 624.26h78.8680" />
+        <text class="f0" y="65.6" x="31.5">Reg No.: </text>
+        <text class="f1" y="152.3" x="328.5">CONSOLIDATED STATEMENT OF MARKS FOR AITT CONDUCTED BY D.G.T.</text>
+        <text class="f1" y="166.4" x="421.2">Directorate General of Training (DGT)*</text>
+        <text class="f1" y="180.5" x="436.1">Craftsmen Training Scheme (CTS)</text>
+        <text id="academicSession" class="f0" y="212.6" x="440.5">Academic Session - Aug 2019</text>
+        <text class="f0" y="228.3" x="374.9">All Years (CTS Annual System) Engineering Trades</text>
+        <text class="f0" y="63.4" x="853.2">Roll No.: </text>
+        <text class="f0" y="246.5" x="151.5">Name</text>
+        <text class="f0" y="246.5" x="743.8">Date of Birth</text>
+        <text class="f0" y="267.6" x="44.1">Father/Guardian Name</text>
+        <text class="f0" y="267.6" x="712.6">Exam Month-Year</text>
+        <text class="f0" y="288.5" x="111.7">Trade Name</text>
+        <text class="f0" y="288.5" x="530.2">NSQF Level</text>
+        <text class="f0" y="288.5" x="740.2">Trainee Type</text>
+        <text class="f3" y="288.5" x="831.4">REGULAR</text>
+        <text class="f0" y="309.5" x="64.9">ITI Name &amp; Address</text>
+        <text class="f0" y="349.2" x="164.3">Trade Theory</text>
+        <text class="f0" y="341.4" x="287.6">Employability </text>
+        <text class="f0" y="357" x="315.4">Skills</text>
+        <text class="f0" y="333.5" x="424.2">Workshop </text>
+        <text class="f0" y="349.2" x="408.8">Calculation and </text>
+        <text class="f0" y="364.8" x="434.9">Science</text>
+        <text class="f0" y="341.4" x="544.7">Engineering </text>
+        <text class="f0" y="357" x="557.2">Drawing</text>
+        <text class="f0" y="349.2" x="662">Trade Practical</text>
+        <text class="f0" y="341.4" x="801.6">Formative </text>
+        <text class="f0" y="357" x="798.7">Assessment</text>
+        <text class="f0" y="349.2" x="944.1">Total</text>
+        <text class="f0" y="393.6" x="50.4">S. No.Year</text>
+        <text class="f0" y="385.7" x="159.9">Max </text>
+        <text class="f0" y="401.4" x="154.8">Marks</text>
+        <text class="f0" y="385.7" x="217.5">Marks</text>
+        <text class="f0" y="401.4" x="212.2">Secured</text>
+        <text class="f0" y="385.7" x="285.6">Max </text>
+        <text class="f0" y="401.4" x="280.4">Marks</text>
+        <text class="f0" y="385.7" x="343.3">Marks</text>
+        <text class="f0" y="401.4" x="337.9">Secured</text>
+        <text class="f0" y="385.7" x="411.4">Max </text>
+        <text class="f0" y="401.4" x="406.2">Marks</text>
+        <text class="f0" y="385.7" x="469">Marks</text>
+        <text class="f0" y="401.4" x="463.6">Secured</text>
+        <text class="f0" y="385.7" x="537">Max </text>
+        <text class="f0" y="401.4" x="531.8">Marks</text>
+        <text class="f0" y="385.7" x="594.6">Marks</text>
+        <text class="f0" y="401.4" x="589.2">Secured</text>
+        <text class="f0" y="385.7" x="662.7">Max </text>
+        <text class="f0" y="401.4" x="657.5">Marks</text>
+        <text class="f0" y="385.7" x="720.3">Marks</text>
+        <text class="f0" y="401.4" x="714.9">Secured</text>
+        <text class="f0" y="385.7" x="788.4">Max </text>
+        <text class="f0" y="401.4" x="783.2">Marks</text>
+        <text class="f0" y="385.7" x="846">Marks</text>
+        <text class="f0" y="401.4" x="840.7">Secured</text>
+        <text class="f0" y="385.7" x="913.3">Max </text>
+        <text class="f0" y="401.4" x="908.2">Marks</text>
+        <text class="f0" y="385.7" x="970.8">Marks</text>
+        <text class="f0" y="401.4" x="965.4">Secured</text>
+        <text class="f3" y="423.6" x="63.1">1</text>
+        <text class="f3" y="423.6" x="96.1">Year-1</text>
+        <text class="f3" y="423.6" x="162.1">100</text>
+        <text id="tradeTheorySecured1" class="f6" y="423.6" x="229.4">71</text>
+        <text class="f3" y="423.6" x="292.3">50</text>
+        <text id="employabilitySkillsSecured1" class="f6" y="423.6" x="355.2">37</text>
+        <text class="f3" y="423.6" x="418.1">50</text>
+        <text id="workshopCalculationSecured1" class="f6" y="423.6" x="480.9">38</text>
+        <text class="f3" y="423.6" x="543.7">50</text>
+        <text id="engineeringDrawingSecured1" class="f6" y="423.6" x="606.5">35</text>
+        <text class="f3" y="423.6" x="665.8">250</text>
+        <text id="tradePracticalSecured1" class="f6" y="423.6" x="728.5">161</text>
+        <text class="f3" y="423.6" x="791.4">200</text>
+        <text id="formativeAssessmentSecured1" class="f6" y="423.6" x="854.2">173</text>
+        <text class="f0" y="423.6" x="915.6">700</text>
+        <text id="totalSecured1" class="f2" y="423.6" x="978.1">515</text>
+        <text class="f3" y="446.9" x="63.1">2</text>
+        <text class="f3" y="446.9" x="96.1">Year-2</text>
+        <text class="f3" y="446.9" x="162.6">100</text>
+        <text id="tradeTheorySecured2" class="f6" y="446.9" x="229.4">82</text>
+        <text id="employabilitySkillsMaxMarks2" class="f3" y="446.9" x="297.5">-</text>
+        <text id="employabilitySkillsSecured2" class="f3" y="446.9" x="360.5">-</text>
+        <text class="f3" y="446.9" x="418.6">50</text>
+        <text id="workshopCalculationSecured2" class="f6" y="446.9" x="480.9">45</text>
+        <text class="f3" y="446.9" x="543.7">50</text>
+        <text id="engineeringDrawingSecured2" class="f6" y="446.9" x="606.5">39</text>
+        <text class="f3" y="446.9" x="665.8">250</text>
+        <text id="tradePracticalSecured1" class="f6" y="446.9" x="728.5">213</text>
+        <text class="f3" y="446.9" x="791.4">250</text>
+        <text id="formativeAssessmentSecured2" class="f6" y="446.9" x="854.2">220</text>
+        <text class="f0" y="446.9" x="915.6">700</text>
+        <text id="totalSecured2" class="f2" y="446.9" x="978.1">599</text>
+        <text class="f0" y="469" x="99.3">Total</text>
+        <text class="f0" y="469" x="162.3">200</text>
+        <text id="tradeTheorySecured3" class="f2" y="469" x="229">153</text>
+        <text id="employabilitySkillsMaxMarks3" class="f0" y="469" x="291.8">50</text>
+        <text id="employabilitySkillsSecured3" class="f2" y="469" x="354.7">37</text>
+        <text class="f0" y="469" x="413.7">100</text>
+        <text id="workshopCalculationSecured3" class="f2" y="469" x="480.4">83</text>
+        <text class="f0" y="469" x="539.3">100</text>
+        <text id="engineeringDrawingSecured3" class="f2" y="469" x="606">74</text>
+        <text class="f0" y="469" x="665">500</text>
+        <text id="tradePracticalSecured3" class="f2" y="469" x="727.8">374</text>
+        <text class="f0" y="469" x="790.7">450</text>
+        <text id="formativeAssessmentSecured3" class="f2" y="469" x="853.5">393</text>
+        <text class="f0" y="469" x="911.7">1400</text>
+        <text id="totalSecured3" class="f2" y="469" x="975">1114</text>
+        <text class="f0" y="490" x="43.8">RESULT DATE: </text>
+        <text class="f0" y="490" x="281.8">RESULT: Pass</text>
+        <text class="f3" y="511" x="35.4">Note: 1. Minimum pass marks for theoretical paper-33%,for Practical and Formative assessment - 60% </text>
+        <text class="f1" y="525.4" x="35.4">* Directorate General of Training (DGT) is recognised as awarding body by NCVET. </text>
+        <text class="f3" y="554.9" x="35.4"> </text>
+        <text class="f0" y="598" x="31.5">New Delhi</text>
+        <text class="f0" y="598" x="840.8"> Controller of Examination</text>
+        <text class="f0" y="618.9" x="31.5">Date Of Printing</text>
+        <text class="f9" y="638.7" x="30.1">This is a computer generated Mark Sheet and it does not require any physical signature or attestation. All contents of this Mark Sheet can be verified for authenticity by the process of online </text>
+        <text class="f9" y="652.8" x="30.1">verification through scanning the QR code printed above. The verification can also be done by visiting NCVTMIS portal (https://ncvtmis.gov.in/Pages/MarkSheet/Validate.aspx) and entering the roll </text>
+        <text class="f9" y="666.9" x="30.1">number.</text>
+        <text class="f9" y="681" x="30.1">The DGT shall not be responsible for any direct or indirect financial losses, any loss of goodwill or reputation, or any other loss or damage caused by any incorrect / fraudulent information in this </text>
+        <text class="f9" y="695.1" x="30.1">computer generated certificate that cannot be validated by the NCVTMIS portal. DGT also reserves the right to take appropriate legal action in such cases.</text>
+        <text id="dateOfBirth" class="f6" y="246.5" x="831.4">19-Mar-2003</text>
+        <text id="traineeName" class="f10" y="246.5" x="195.9">ANISUDDIN MOLLICK</text>
+        <text id="fatherName" class="f10" y="267.6" x="195.9">NAJRUL ISLAM MOLLICK</text>
+        <text id="rollNumber" class="f0" y="65.6" x="83.6">R190822034778</text>
+        <text id="tradeName" class="f3" y="288.5" x="195.9">Fitter</text>
+        <text id="level" class="f3" y="288.5" x="607.7">5</text>
+        <text id="itiNameAddress" class="f3" y="309.5" x="195.9">PR19000171-BANKURA PRIVATE ITI DHALDANGA, BANKURA BANKURA, WEST BENGAL 722101</text>
+        <text id="examSession" class="f3" y="267.6" x="831.4">Jul 2021</text>
+        <text id="rollNumber2" class="f0" y="63.4" x="907.2">00190822034778</text>
+        <text id="resultDate" class="f0" y="490" x="153.2">30-Aug-2021</text>
+        <text id="printDate" class="f12" y="618.9" x="141.2">27 Mar 2024</text>
+    </svg>
+    <div id="qrcode1" style="display:none;"></div>
+</div>
+<script>
+$(document).ready(function() {
+    function showMessage(message, type) { $('#notification').text(message).removeClass('error success').addClass(type).fadeIn(); setTimeout(() => $('#notification').fadeOut(), 5000); }
+    function resetButton(button, originalText) { button.html(originalText); button.prop('disabled', false); }
+    function formatRollNumber(rollNumber, isFirst = false) { if (isFirst) { if (rollNumber.startsWith('R')) return rollNumber; else if (rollNumber.startsWith('00')) return 'R' + rollNumber.slice(2); else return 'R' + rollNumber; } else { if (rollNumber.startsWith('00')) return rollNumber; else if (rollNumber.startsWith('R')) return '00' + rollNumber.slice(1); else return '00' + rollNumber; } }
+    function formatQRCodeRollNumber(rollNumber) { if (rollNumber.startsWith('R')) return rollNumber; else return 'R' + rollNumber; }
+    function formatMarks(mark) { return mark ? `${Math.floor(mark)}` : '0'; }
+    function formatTotalMarks(mark) { return mark ? `${Math.floor(mark)}` : '0'; }
+    function imageToBase64(url, callback) { const img = new Image(); img.crossOrigin = 'Anonymous'; img.onload = function() { const canvas = document.createElement('canvas'); canvas.width = this.width; canvas.height = this.height; const ctx = canvas.getContext('2d'); ctx.drawImage(this, 0, 0); callback(canvas.toDataURL('image/jpeg')); }; img.onerror = function() { showMessage('Error loading image: ' + url, 'error'); callback(null); }; img.src = url; }
+    const imageUrls = { asok: 'image/asok.jpg', sign: 'image/sign2.jpg' };
+    function preloadImages() { imageToBase64(imageUrls.asok, function(dataUrl) { if (dataUrl) $('image[x="483.68"]').attr('xlink:href', dataUrl); }); imageToBase64(imageUrls.sign, function(dataUrl) { if (dataUrl) $('image[x="871.6"]').attr('xlink:href', dataUrl); }); }
+    function generateQRCode(rollNumber) { $('#qrcode1').empty(); const qrUrl = `https://www.ncvtmisgovin.in/pages/marksheet/validate?Key=${rollNumber}|A|All`; new QRCode(document.getElementById('qrcode1'), { text: qrUrl, width: 1000, height: 1000 }); }
+    function updateProfileImage(file) { if (file) { const reader = new FileReader(); reader.onload = function(e) { $('#traineeImage').attr('xlink:href', e.target.result); }; reader.readAsDataURL(file); } }
+    function adjustPageScale() { const $pdfPage = $('.pdfpage'); const pageWidth = 1104; const viewportWidth = $(window).width(); const margin = viewportWidth <= 768 ? 30 : 40; const availableWidth = viewportWidth - margin; let scale = availableWidth / pageWidth; if (viewportWidth <= 480) scale = Math.min(scale, 0.4); else if (viewportWidth <= 768) scale = Math.min(scale, 0.7); else if (viewportWidth <= 1024) scale = Math.min(scale, 1); else if (viewportWidth <= 1400) scale = Math.min(scale, 0.95); else scale = Math.min(scale, 1); $pdfPage.css({ 'transform': `scale(${scale})` }); setBodyHeight(); }
+    function getDigitalSignatureDate() { const now = new Date(); const year = now.getFullYear(); const month = String(now.getMonth() + 1).padStart(2, '0'); const day = String(now.getDate()).padStart(2, '0'); const hours = String(now.getHours()).padStart(2, '0'); const minutes = String(now.getMinutes()).padStart(2, '0'); const seconds = String(now.getSeconds()).padStart(2, '0'); return `${year}.${month}.${day} ${hours}:${minutes}:${seconds} +05:30`; }
+    $('#generateButton').click(function() {
+        const button = $(this); const originalText = button.html(); button.html('<div class="loading"></div> Generating...'); button.prop('disabled', true);
+        const rollNumber = $('#rollNumber').val().trim(); const certificateNumber = $('#certificateNumber').val().trim(); const profileImage = $('#profileImage')[0].files[0];
+        if (!rollNumber || !certificateNumber) { showMessage('Please enter both roll number and certificate number.', 'error'); resetButton(button, originalText); return; }
+        const repoOwner = 'Horsamod'; const repoName = 'itidata'; const filePath = 'marksheet_certificate.json'; const rawUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/main/${filePath}`;
+        $.ajax({
+            url: rawUrl, method: 'GET',
+            success: function(data) {
+                let records = []; try { records = JSON.parse(data); if (!Array.isArray(records)) records = []; } catch (e) { records = []; }
+                const record = records.find(r => r.rollNumber === rollNumber || '00' + r.rollNumber === rollNumber || '00' + r.rollNumber.slice(1) === rollNumber);
+                if (!record) { showMessage('No record found for the provided roll number and certificate number.', 'error'); resetButton(button, originalText); return; }
+                const year1Marks = record.marks.find(m => m.year === 'Year-1'); const year2Marks = record.marks.find(m => m.year === 'Year-2');
+                if (!year1Marks || !year2Marks) { showMessage('Year-1 or Year-2 marks not found for this record.', 'error'); resetButton(button, originalText); return; }
+                const date = new Date(); const day = date.getDate().toString().padStart(2, '0'); const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; const month = monthNames[date.getMonth()]; const year = date.getFullYear(); const currentDate = `${day} ${month} ${year}`;
+                $('#rollNumber').text(formatRollNumber(record.rollNumber, true)); $('#rollNumber2').text(formatRollNumber(record.rollNumber)); $('#traineeName').text(record.traineeName || ''); $('#fatherName').text(record.fatherName || ''); $('#dateOfBirth').text(record.dateOfBirth || ''); $('#tradeName').text(record.tradeName || ''); $('#level').text(record.level || ''); $('#itiNameAddress').text(`${record.itiCode}-${record.itiName}, ${record.itiAddress}, ${record.district}, ${record.state}, ${record.pinCode}`); $('#academicSession').text(`Academic Session - ${record.academicSession || ''}`); $('#examSession').text(year2Marks.examSession || 'Jul 2021'); $('#resultDate').text(year2Marks.resultDate || '30-Aug-2021'); $('#dsDate').text(getDigitalSignatureDate()); $('#printDate').text(currentDate);
+                $('#tradeTheorySecured1').text(formatMarks(year1Marks.tradeTheorySecured)); $('#employabilitySkillsSecured1').text(formatMarks(year1Marks.employabilitySkillsSecured)); $('#workshopCalculationSecured1').text(formatMarks(year1Marks.workshopCalculationSecured)); $('#engineeringDrawingSecured1').text(formatMarks(year1Marks.engineeringDrawingSecured)); $('#tradePracticalSecured1').text(formatMarks(year1Marks.tradePracticalSecured)); $('#formativeAssessmentSecured1').text(formatMarks(year1Marks.formativeAssessmentSecured)); $('#totalSecured1').text(formatTotalMarks(year1Marks.totalSecured));
+                $('#tradeTheorySecured2').text(formatMarks(year2Marks.tradeTheorySecured)); const employabilitySkills2 = year2Marks.employabilitySkillsSecured >= 1 ? year2Marks.employabilitySkillsSecured : null; $('#employabilitySkillsMaxMarks2').text(employabilitySkills2 !== null ? '50' : '-'); $('#employabilitySkillsSecured2').text(employabilitySkills2 !== null ? formatMarks(employabilitySkills2) : '-'); $('#workshopCalculationSecured2').text(formatMarks(year2Marks.workshopCalculationSecured)); $('#engineeringDrawingSecured2').text(formatMarks(year2Marks.engineeringDrawingSecured)); $('#tradePracticalSecured2').text(formatMarks(year2Marks.tradePracticalSecured)); $('#formativeAssessmentSecured2').text(formatMarks(year2Marks.formativeAssessmentSecured)); $('#totalSecured2').text(formatTotalMarks(year2Marks.totalSecured));
+                const tradeTheorySecured3 = (year1Marks.tradeTheorySecured || 0) + (year2Marks.tradeTheorySecured || 0); const employabilitySkillsSecured3 = (year1Marks.employabilitySkillsSecured || 0) + (employabilitySkills2 || 0); const workshopCalculationSecured3 = (year1Marks.workshopCalculationSecured || 0) + (year2Marks.workshopCalculationSecured || 0); const engineeringDrawingSecured3 = (year1Marks.engineeringDrawingSecured || 0) + (year2Marks.engineeringDrawingSecured || 0); const tradePracticalSecured3 = (year1Marks.tradePracticalSecured || 0) + (year2Marks.tradePracticalSecured || 0); const formativeAssessmentSecured3 = (year1Marks.formativeAssessmentSecured || 0) + (year2Marks.formativeAssessmentSecured || 0); const totalSecured3 = tradeTheorySecured3 + employabilitySkillsSecured3 + workshopCalculationSecured3 + engineeringDrawingSecured3 + tradePracticalSecured3 + formativeAssessmentSecured3;
+                $('#tradeTheorySecured3').text(formatTotalMarks(tradeTheorySecured3)); $('#employabilitySkillsMaxMarks3').text(employabilitySkills2 !== null ? '100' : '50'); $('#employabilitySkillsSecured3').text(formatTotalMarks(employabilitySkillsSecured3)); $('#workshopCalculationSecured3').text(formatTotalMarks(workshopCalculationSecured3)); $('#engineeringDrawingSecured3').text(formatTotalMarks(engineeringDrawingSecured3)); $('#tradePracticalSecured3').text(formatTotalMarks(tradePracticalSecured3)); $('#formativeAssessmentSecured3').text(formatTotalMarks(formativeAssessmentSecured3)); $('#totalSecured3').text(formatTotalMarks(totalSecured3)); $('#result').text(totalSecured3 >= 840 ? 'Pass' : 'Fail');
+                const formattedQRCodeRollNumber = formatQRCodeRollNumber(record.rollNumber); document.title = `Marksheet_All_${formattedQRCodeRollNumber}`;
+                if ($('#showSignature').is(':checked')) { $('#digitalSignatureBlock').show(); } else { $('#digitalSignatureBlock').hide(); }
+                updateProfileImage(profileImage); generateQRCode(record.rollNumber);
+                setTimeout(() => { const qr1Canvas = $('#qrcode1 canvas')[0]; if (qr1Canvas) { $('#qrcode').attr('xlink:href', qr1Canvas.toDataURL('image/png')); } $('#pdfpage0').addClass('show'); $('#printButton, #downloadButton').prop('disabled', false); $(window).resize(adjustPageScale); adjustPageScale(); setBodyHeight(); showMessage('Marksheet generated successfully!', 'success'); resetButton(button, originalText); }, 100);
+            },
+            error: function(jqXHR) { showMessage(jqXHR.status === 404 ? 'JSON file not found in repository.' : 'Error fetching records from GitHub.', 'error'); resetButton(button, originalText); }
+        });
+    });
+    $('#printButton').click(function() { window.print(); });
+    async function embedFontsInSVG() {
+        const fontsToEmbed = [ { name: 'Cambria', url: 'fonts/Cambria.ttf' }, { name: 'CambriaBold', url: 'fonts/Cambria-Bold.ttf' }, { name: 'CambriaItalic', url: 'fonts/Cambria-Italic.ttf' }, { name: 'CambriaBoldItalic', url: 'fonts/Cambria-BoldItalic.ttf' }, { name: 'Arial', url: 'fonts/ARIAL.ttf' } ];
+        let fontStyles = '';
+        for (const font of fontsToEmbed) {
+            try { const response = await fetch(font.url); const blob = await response.blob(); const base64 = await new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); }); fontStyles += `@font-face { font-family: '${font.name}'; src: url('${base64}') format('truetype'); }`; } catch (error) { console.error(`Failed to load font: ${font.name}`, error); showMessage(`Failed to load font: ${font.name}`, error); }
+        }
+        const svgStyle = $('#pdfpage0 svg style'); svgStyle.append(fontStyles);
+    }
+    $('#downloadButton').click(async function() {
+        const button = $(this); const originalText = button.html(); const $element = $('#pdfpage0'); const rollNo = $('#rollNumber2').text() || 'Document'; button.html('<div class="loading"></div> Processing Fonts...'); button.prop('disabled', true);
+        await embedFontsInSVG(); button.html('<div class="loading"></div> Generating PDF...'); const originalTransform = $element.css('transform'); const originalMargin = $element.css('margin');
+        $element.css({ 'transform': 'none', 'overflow': 'hidden', 'height': '816px', 'width': '1104px', 'margin': '0', 'position': 'relative', 'display': 'block' });
+        const opt = { margin: 0, filename: `Marksheet_All_${rollNo}.pdf`, image: { type: 'jpeg', quality: 0.94 }, html2canvas: { scale: 4, useCORS: true, width: 1104, height: 816, scrollY: 0, scrollX: 0, letterRendering: true, allowTaint: false, logging: false, putOnlyUsedFonts: true }, jsPDF: { unit: 'px', format: [1104, 816], orientation: 'landscape', compress: true, precision: 99, putOnlyUsedFonts: true } };
+        html2pdf().set(opt).from($element[0]).save().then(() => { $element.css({ 'transform': originalTransform, 'margin': originalMargin }); setBodyHeight(); resetButton(button, originalText); showMessage('PDF downloaded successfully with embedded fonts!', 'success'); }).catch(err => { console.error(err); $element.css({ 'transform': originalTransform, 'margin': originalMargin }); resetButton(button, originalText); showMessage('Error generating PDF.', 'error'); });
+    });
+    preloadImages();
+});
+function setBodyHeight() { const $inputContainer = $('.input-container'); const $actionElement = $('.actions'); const $pdfPage = $('.pdfpage'); const vh = $(window).height(); const containerHeight = $inputContainer.outerHeight(); const actionHeight = $actionElement.outerHeight(); const pdfHeight = $pdfPage.is(':visible') ? $pdfPage.outerHeight() : 0; const scale = parseFloat($pdfPage.css('transform').split(',')[3]) || 1; const scaledPdfHeight = pdfHeight * scale; if ($pdfPage.is(':visible') && pdfHeight > 0) { const bodyWidth = $('body').width(); const pdfWidth = $pdfPage.outerWidth(); const scaledPdfWidth = pdfWidth * scale; const horizontalMargin = Math.max(0, (bodyWidth - scaledPdfWidth) / 2); $pdfPage.css({ 'margin-top': '20px', 'margin-bottom': '20px', 'margin-left': horizontalMargin + 'px', 'margin-right': horizontalMargin + 'px' }); const totalMarginHeight = 40; const totalHeight = Math.max(vh, containerHeight + scaledPdfHeight + totalMarginHeight + 30); $('body').css('height', totalHeight + 'px'); } else { const totalHeight = Math.max(vh, containerHeight + scaledPdfHeight + 30); $('body').css('height', totalHeight + 'px'); } }
+</script>
+</body>
+</html>
