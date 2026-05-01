@@ -546,7 +546,7 @@
     "shift": "Shift 2",
     "unit": "Unit 4",
     "remarks": "Additional remark",
-    "marksheetAllUrl": "https://raw.githubusercontent.com/Horsamod/itidata/main/assets/files/R200323024379/R200323024379_Marksheet_All.css",
+    "marksheetAllUrl": null,
     "certificateUrl": "https://raw.githubusercontent.com/Horsamod/itidata/main/assets/files/R200323024379/R200323024379_NCVTCertificate.pdf",
     "markSheetYear1Url": "https://raw.githubusercontent.com/Horsamod/itidata/main/assets/files/R200323024379/R200323024379_MarkSheet_Year_1.pdf",
     "markSheetYear2Url": "https://raw.githubusercontent.com/Horsamod/itidata/main/assets/files/R200323024379/R200323024379_MarkSheet_Year_2.pdf",
