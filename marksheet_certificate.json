@@ -1592,7 +1592,7 @@
     "certificateType": "1",
     "certificateIssueDate": "27-Sep-2024",
     "certified": true,
-    "disable": "https://ncvtmis.gov.in",
+    "disable": null,
     "submissionDate": "2026-05-10T04:07:57.368Z",
     "marks": [
       {
